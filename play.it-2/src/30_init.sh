@@ -93,8 +93,6 @@ if [ ! "$OPTION_PACKAGE" ]; then
 	unset GUESSED_HOST_OS
 	if [ -e '/etc/os-release' ]; then
 		GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-	elif [ -e '/etc/issue' ]; then
-		GUESSED_HOST_OS="$(head --lines=1 '/etc/issue' | cut --delimiter=' ' --fields=1 | tr [:upper:] [:lower:])"
 	elif which lsb_release >/dev/null 2>&1; then
 		GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
 	fi
