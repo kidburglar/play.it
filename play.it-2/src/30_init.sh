@@ -53,13 +53,13 @@ while [ $# -gt 0 ]; do
 			exit 0
 		;;
 		('--checksum='*|\
-		'--checksum'|\
-		'--compression='*|\
-		'--compression'|\
-		'--prefix='*|\
-		'--prefix'|\
-		'--package='*|\
-		'--package')
+		 '--checksum'|\
+		 '--compression='*|\
+		 '--compression'|\
+		 '--prefix='*|\
+		 '--prefix'|\
+		 '--package='*|\
+		 '--package')
 			if [ "${1%=*}" != "${1#*=}" ]; then
 				option="$(printf '%s' "${1%=*}" | sed 's/^--//')"
 				value="${1#*=}"
@@ -97,7 +97,10 @@ if [ ! "$OPTION_PACKAGE" ]; then
 		GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
 	fi
 	case "$GUESSED_HOST_OS" in
-		('debian'|'ubuntu'|'linuxmint')
+		('debian'|\
+		 'ubuntu'|\
+		 'linuxmint'\
+		 'handylinux')
 			DEFAULT_OPTION_PACKAGE='deb'
 		;;
 		('arch')
