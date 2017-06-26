@@ -99,7 +99,7 @@ if [ ! "$OPTION_PACKAGE" ]; then
 		GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
 	fi
 	case "$GUESSED_HOST_OS" in
-		('debian'|'ubuntu')
+		('debian'|'ubuntu'|'linuxmint')
 			DEFAULT_OPTION_PACKAGE='deb'
 		;;
 		('arch')
