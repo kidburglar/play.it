@@ -2,7 +2,15 @@
 # USAGE: print_instructions_deb $pkg[…]
 # CALLS: print_instructions_deb_apt print_instructions_deb_dpkg
 print_instructions_deb() {
-	if [ -e /etc/debian_version ] && cat /etc/debian_version | grep --invert-match '[^0-9.]' 1>/dev/null && [ $(cut -d'.' -f1 /etc/debian_version) -ge 9 ]; then
+	if which dpkg >/dev/null 2>&1 &&\
+	   which apt >/dev/null 2>&1; then
+		debian_version="$(dpkg --list apt|awk 'END {print $3}')"
+		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
+		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"
+	fi
+	if [ $debian_version_major -ge 2 ] ||\
+	   [ $debian_version_major = 1 ] &&\
+	   [ $debian_version_minor -ge 1 ]; then
 		print_instructions_deb_apt "$@"
 	else
 		print_instructions_deb_dpkg "$@"
