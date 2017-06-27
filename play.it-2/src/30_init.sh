@@ -99,11 +99,11 @@ if [ ! "$OPTION_PACKAGE" ]; then
 	case "$GUESSED_HOST_OS" in
 		('debian'|\
 		 'ubuntu'|\
-		 'linuxmint'\
+		 'linuxmint'|\
 		 'handylinux')
 			DEFAULT_OPTION_PACKAGE='deb'
 		;;
-		('arch'\
+		('arch'|\
 		 'manjaro'|'manjarolinux')
 			DEFAULT_OPTION_PACKAGE='arch'
 		;;
