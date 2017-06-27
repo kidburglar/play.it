@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170601.1
+script_version=20170627.1
 
 # Set game-specific variables
 
@@ -63,8 +63,8 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./KentuckyRouteZero.x86'
-APP_MAIN_EXE_BIN64='./KentuckyRouteZero.x86_64'
+APP_MAIN_EXE_BIN32='KentuckyRouteZero.x86'
+APP_MAIN_EXE_BIN64='KentuckyRouteZero.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
@@ -75,12 +75,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa-glx | libgl1, libx11-6, libxcursor1, libxrandr2, libxau6, libglu1-mesa | libglu1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libgl lib32-libx11 lib32-libxcursor lib32-libxrandr lib32-gcc-libs lib32-libxext lib32-libxcb lib32-libxrender lib32-libxfixes lib32-libxau lib32-libxdmcp lib32-glu"
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libxrandr2, libglu1-mesa | libglu1"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libxcursor lib32-libxrandr lib32-glu"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libgl libx11 libxcursor libxrandr gcc-libs libxext libxcb libxrender libxfixes libxau libxdmcp glu"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libxcursor libxrandr glu"
 
 # Load common functions
 
@@ -111,7 +111,7 @@ PKG='PKG_BIN64'
 organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC' "$PATH_DOC"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -129,11 +129,11 @@ PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
 mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+ln --force --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
+rm --force "$PATH_ICON/$GAME_ID.png"
 rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
 EOF
 
@@ -144,7 +144,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
