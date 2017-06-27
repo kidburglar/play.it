@@ -103,7 +103,8 @@ if [ ! "$OPTION_PACKAGE" ]; then
 		 'handylinux')
 			DEFAULT_OPTION_PACKAGE='deb'
 		;;
-		('arch')
+		('arch'\
+		 'manjaro'|'manjarolinux')
 			DEFAULT_OPTION_PACKAGE='arch'
 		;;
 		(*)
