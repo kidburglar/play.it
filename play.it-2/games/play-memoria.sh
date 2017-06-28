@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.2
+script_version=20170628.1
 
 # Set game-specific variables
 
@@ -67,24 +67,48 @@ ARCHIVE_GOG_PART6_MD5='c8712354bbd093b706f551e75b549061'
 ARCHIVE_GOG_PART6_TYPE='innosetup'
 
 ARCHIVE_DOC1_PATH='app/documents/licenses'
-ARCHIVE_DOC1_FILES='./*.txt'
+ARCHIVE_DOC1_FILES='./*'
 
 ARCHIVE_DOC2_PATH='tmp'
 ARCHIVE_DOC2_FILES='./*eula.txt'
 
-ARCHIVE_GAME_PATH='app'
-ARCHIVE_GAME_FILES='./avcodec-54.dll ./avformat-54.dll ./avutil-52.dll ./banner.jpg ./characters ./config.ini ./data.vis ./documents ./folder.jpg ./gfw_high.ico ./goggame.dll ./languages.xml ./libsndfile-1.dll ./lua ./memoria.exe ./openal32.dll ./scenes ./sdl2.dll ./swresample-0.dll ./swscale-2.dll ./videos ./visionaireconfigurationtool.exe ./zlib1.dll'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./avcodec-54.dll ./avformat-54.dll ./avutil-52.dll ./config.ini ./libsndfile-1.dll ./memoria.exe ./openal32.dll ./sdl2.dll ./swresample-0.dll ./swscale-2.dll ./visionaireconfigurationtool.exe ./zlib1.dll'
+
+ARCHIVE_GAME_SCENES_PATH='app'
+ARCHIVE_GAME_SCENES_FILES='./scenes'
+
+ARCHIVE_GAME_CHARACTERS_PATH='app'
+ARCHIVE_GAME_CHARACTERS_FILES='./characters'
+
+ARCHIVE_GAME_VIDEOS_PATH='app'
+ARCHIVE_GAME_VIDEOS_FILES='./videos'
+
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./banner.jpg ./data.vis ./folder.jpg ./languages.xml ./lua'
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='memoria.exe'
-APP_MAIN_ICON='gfw_high.ico'
+APP_MAIN_ICON='memoria.exe'
 APP_MAIN_ICON_RES='16 32 48 256'
 
-PACKAGES_LIST='PKG_MAIN'
+PACKAGES_LIST='PKG_BIN PKG_SCENES PKG_CHARACTERS PKG_VIDEOS PKG_DATA'
 
-PKG_MAIN_ARCH='32'
-PKG_MAIN_DEPS_DEB='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
-PKG_MAIN_DEPS_ARCH='wine'
+PKG_SCENES_ID="${GAME_ID}-scenes"
+PKG_SCENES_DESCRIPTION='scenes'
+
+PKG_CHARACTERS_ID="${GAME_ID}-characters"
+PKG_CHARACTERS_DESCRIPTION='characters'
+
+PKG_VIDEOS_ID="${GAME_ID}-videos"
+PKG_VIDEOS_DESCRIPTION='videos'
+
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_SCENES_ID, $PKG_CHARACTERS_ID, $PKG_VIDEOS_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_SCENES_ID $PKG_CHARACTERS_ID $PKG_VIDEOS_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -124,17 +148,32 @@ ARCHIVE='ARCHIVE_GOG'
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-organize_data 'DOC1' "$PATH_DOC"
-organize_data 'DOC2' "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
+PKG='PKG_BIN'
+organize_data 'GAME_BIN' "$PATH_GAME"
 
+PKG='PKG_SCENES'
+organize_data 'GAME_SCENES' "$PATH_GAME"
+
+PKG='PKG_CHARACTERS'
+organize_data 'GAME_CHARACTERS' "$PATH_GAME"
+
+PKG='PKG_VIDEOS'
+organize_data 'GAME_VIDEOS' "$PATH_GAME"
+
+PKG='PKG_DATA'
+organize_data 'DOC1'      "$PATH_DOC"
+organize_data 'DOC2'      "$PATH_DOC"
+organize_data 'GAME_DATA' "$PATH_GAME"
+
+PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
-rm "${PKG_MAIN_PATH}${PATH_GAME}/$APP_MAIN_ICON"
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
