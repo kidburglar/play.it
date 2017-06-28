@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170628.1
 
 # Set game-specific variables
 
@@ -66,12 +66,12 @@ APP_MAIN_ICON_RES='128'
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB='libc6, libglu1-mesa | libglu1, libx11-6, libxcursor1, libxrandr2, libxau6'
-PKG_BIN32_DEPS_ARCH='lib32-glu lib32-libxcursor lib32-libxrandr lib32-libxext lib32-libxcb lib32-libxrender lib32-libxfixes'
+PKG_BIN32_DEPS_DEB='libc6, libglu1-mesa | libglu1, libxcursor1, libxrandr2'
+PKG_BIN32_DEPS_ARCH='lib32-glu lib32-libxcursor lib32-libxrandr'
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH='glu libxcursor libxrandr libxext libxcb libxrender libxfixes'
+PKG_BIN64_DEPS_ARCH='glu libxcursor libxrandr'
 
 # Load common functions
 
@@ -131,7 +131,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
