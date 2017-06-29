@@ -1,12 +1,7 @@
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: (PLAYIT_WORKDIR) (PKG) (PKG_PATH)
+# NEEDED VARS: PLAYIT_WORKDIR PKG PKG_PATH
 organize_data() {
-	[ $# = 2 ] || ( echo 'FIXME: failure in organize_data()' && return 1 )
-	[ "$PLAYIT_WORKDIR" ] || ( echo 'FIXME: failure in organize_data()' && return 1 )
-	[ $PKG ] || ( echo 'FIXME: failure in organize_data()' && return 1 )
-	[ -n "$(eval printf -- '%b' \"\$${PKG}_PATH\")" ] || ( echo 'FIXME: failure in organize_data()' && return 1 )
-
 	local archive_path
 	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
 		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
