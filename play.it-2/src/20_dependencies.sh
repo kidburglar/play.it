@@ -41,6 +41,9 @@ check_deps() {
 	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
 	fi
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
+		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
+	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in
 			('7z')
