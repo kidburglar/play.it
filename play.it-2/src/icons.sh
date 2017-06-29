@@ -90,7 +90,7 @@ extract_and_sort_icons_from() {
 # USAGE: move_icons_to $pkg
 # NEEDED VARS: PATH_ICON_BASE PKG
 move_icons_to() {
-	local source_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	(
 		cd "$source_path"
