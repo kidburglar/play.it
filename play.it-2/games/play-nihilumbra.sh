@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170630.2
+script_version=20170630.3
 
 # Set game-specific variables
 
@@ -113,7 +113,7 @@ done
 PATH_ICON="${PATH_ICON_BASE}/48x48/apps"
 if [ ! -e "\${PATH_ICON}/${GAME_ID}.svg" ]; then
 	mkdir --parents "\${PATH_ICON}"
-	ln --symbolic "${PATH_GAME}/icon48x48.xpm" "\${PATH_ICON}/${GAME_ID}.svg"
+	ln --symbolic "${PATH_GAME}/icon48x48.xpm" "\${PATH_ICON}/${GAME_ID}.xpm"
 fi
 EOF
 
