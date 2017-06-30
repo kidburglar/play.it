@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170630.1
+script_version=20170630.2
 
 # Set game-specific variables
 
@@ -105,23 +105,31 @@ write_launcher 'APP_MAIN'
 cat > "$postinst" << EOF
 for res in ${APP_MAIN_ICON_RES}; do
 	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	mkdir --parents "\${PATH_ICON}"
-	ln --symbolic "${PATH_GAME}/icon\${res}x\${res}.png" "\${PATH_ICON}/${GAME_ID}.png"
+	if [ ! -e "\${PATH_ICON}/${GAME_ID}.png" ]; then
+		mkdir --parents "\${PATH_ICON}"
+		ln --symbolic "${PATH_GAME}/icon\${res}x\${res}.png" "\${PATH_ICON}/${GAME_ID}.png"
+	fi
 done
 PATH_ICON="${PATH_ICON_BASE}/48x48/apps"
-mkdir --parents "\${PATH_ICON}"
-ln --symbolic "${PATH_GAME}/icon48x48.xpm" "\${PATH_ICON}/${GAME_ID}.svg"
+if [ ! -e "\${PATH_ICON}/${GAME_ID}.svg" ]; then
+	mkdir --parents "\${PATH_ICON}"
+	ln --symbolic "${PATH_GAME}/icon48x48.xpm" "\${PATH_ICON}/${GAME_ID}.svg"
+fi
 EOF
 
 cat > "$prerm" << EOF
 for res in ${APP_MAIN_ICON_RES}; do
 	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	rm "\${PATH_ICON}/${GAME_ID}.png"
-	rmdir --parents --ignore-fail-on-non-empty "\${PATH_ICON}"
+	if [ -e "\${PATH_ICON}/${GAME_ID}.png" ]; then
+		rm "\${PATH_ICON}/${GAME_ID}.png"
+		rmdir --ignore-fail-on-non-empty "\${PATH_ICON}"
+	fi
 done
 PATH_ICON="${PATH_ICON_BASE}/48x48/apps"
-rm "\${PATH_ICON}/${GAME_ID}.xpm"
-rmdir --parents --ignore-fail-on-non-empty "\${PATH_ICON}"
+if [ -e "\${PATH_ICON}/${GAME_ID}.xpm" ]; then
+	rm --force "\${PATH_ICON}/${GAME_ID}.xpm"
+	rmdir --ignore-fail-on-non-empty "\${PATH_ICON}"
+fi
 EOF
 
 write_metadata
