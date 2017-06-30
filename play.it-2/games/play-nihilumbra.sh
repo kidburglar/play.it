@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170630.1
 
 # Set game-specific variables
 
@@ -46,17 +46,16 @@ ARCHIVES_LIST='ARCHIVE_HUMBLE_32 ARCHIVE_HUMBLE_64'
 ARCHIVE_HUMBLE_32='Nihilumbra-1.35-linux32.tar.gz'
 ARCHIVE_HUMBLE_32_MD5='24ba59112bdb95b05651ebe48ec5882d'
 ARCHIVE_HUMBLE_32_SIZE='2400000'
-ARCHIVE_HUMBLE_32_VERSION='1.0-humble150122'
+ARCHIVE_HUMBLE_32_VERSION='1.35-humble150122'
 
 ARCHIVE_HUMBLE_64='Nihilumbra-1.35-linux64.tar.gz'
 ARCHIVE_HUMBLE_64_MD5='18aa096020cedea4f208ca55f7e5c85f'
 ARCHIVE_HUMBLE_64_SIZE='2400000'
-ARCHIVE_HUMBLE_64_VERSION='1.0-humble150122'
+ARCHIVE_HUMBLE_64_VERSION='1.35-humble150122'
 
 ARCHIVE_GAME_PATH_HUMBLE_32='Nihilumbra-1.35-linux32'
 ARCHIVE_GAME_PATH_HUMBLE_64='Nihilumbra-1.35-linux64'
 ARCHIVE_GAME_FILES='./icon128x128.png ./icon32x32.png ./icon48x48.png ./icon48x48.xpm ./icon64x64.png ./Nihilumbra_Data ./Nihilumbra'
-
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='Nihilumbra'
