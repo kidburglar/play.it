@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.1
+script_version=20170701.2
 
 # Set game-specific variables
 
 GAME_ID='crypt-of-the-necrodancer'
-GAME_NAME='Crypt Of The Necrodancer'
+GAME_NAME='Crypt Of The NecroDancer'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
@@ -75,6 +75,7 @@ DATA_DIRS='./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
 DATA_FILES='./data/save_data.xml ./data/played.dat'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_LIBS='.'
 APP_MAIN_EXE='NecroDancer'
 APP_MAIN_ICON='data/noarch/support/icon.png'
 APP_MAIN_ICON_RES='256'
@@ -91,8 +92,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libglu1-mesa | libglu1, libopenal1, libfftw3-single3, libglfw2, libgsm1, libsamplerate0, libschroedinger-1.0-0, libtag1v5-vanilla | libtag1-vanilla, libyaml-0-2, libvorbis0a"
-PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-libogg lib32-libvorbis lib32-libx11 lib32-libxau lib32-libxcb lib32-libxdmcp lib32-libxext lib32-libgl lib32-openal lib32-libxrandr"
+PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
+PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
 
 # Load common functions
 
