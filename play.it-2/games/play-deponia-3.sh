@@ -29,17 +29,17 @@ set -o errexit
 ###
 
 ###
-# Deponia 3 - Goodbye Deponia
+# Deponia 3: Goodbye Deponia
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170618.1
+script_version=20170701.1
 
 # Set game-specific variables
 
 GAME_ID='deponia-3'
-GAME_NAME='Deponia 3 - Goodbye Deponia'
+GAME_NAME='Deponia 3: Goodbye Deponia'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
@@ -52,6 +52,9 @@ ARCHIVE_HUMBLE='Deponia3_DEB_Full_3.2.3.3320_Multi_Daedalic_ESD.tar.gz'
 ARCHIVE_HUMBLE_MD5='1fe92f0faf379541440895de68a1a14e'
 ARCHIVE_HUMBLE_SIZE='3700000'
 ARCHIVE_HUMBLE_VERSION='3.2.0.3320-humble'
+
+ARCHIVE_ICONS='deponia-3_icons.tar.gz'
+ARCHIVE_ICONS_MD5='d57dfcd4b23ff2c7f4163b9db20329f2'
 
 ARCHIVE_DOC_PATH_GOG='data/noarch/game'
 ARCHIVE_DOC_PATH_HUMBLE='Goodbye Deponia'
@@ -71,6 +74,9 @@ ARCHIVE_GAME_VIDEOS_FILES='./videos'
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Goodbye Deponia'
 ARCHIVE_GAME_DATA_FILES='./characters ./data.vis ./lua ./scenes'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./256x256'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='Deponia3'
@@ -108,10 +114,22 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
@@ -123,16 +141,13 @@ PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-
-if [ "$ARCHIVE" = 'ARCHIVE_GOG' ]; then
-	APP_MAIN_ICON="$APP_MAIN_ICON_GOG"
-	APP_MAIN_ICON_RES="$APP_MAIN_ICON_GOG_RES"
-fi
-if [ "$APP_MAIN_ICON" ]; then
-	res="$APP_MAIN_ICON_RES"
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+elif [ "$ARCHIVE" = 'ARCHIVE_GOG' ]; then
+	res="$APP_MAIN_ICON_RES_GOG"
 	PATH_ICON="${PKG_DATA_PATH}${PATH_ICON_BASE}/${res}x${res}/apps"
 	mkdir --parents "$PATH_ICON"
-	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PATH_ICON/$GAME_ID.png"
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
