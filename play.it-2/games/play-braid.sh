@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170604.1
+script_version=20170701.1
 
 # Set game-specific variables
 
 GAME_ID='braid'
 GAME_NAME='Braid'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_braid_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='22bac5c37b44916fea3e23092706d55d'
+ARCHIVE_GOG='gog_braid_2.0.0.3.sh'
+ARCHIVE_GOG_MD5='0d60f92ed8d1c72afb11c217cc907264'
 ARCHIVE_GOG_SIZE='170000'
-ARCHIVE_GOG_VERSION='2015.06.11-gog2.0.0.2'
+ARCHIVE_GOG_VERSION='2015.06.11-gog2.0.0.3'
+
+ARCHIVE_GOG_OLD='gog_braid_2.0.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='22bac5c37b44916fea3e23092706d55d'
+ARCHIVE_GOG_OLD_SIZE='170000'
+ARCHIVE_GOG_OLD_VERSION='2015.06.11-gog2.0.0.2'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
