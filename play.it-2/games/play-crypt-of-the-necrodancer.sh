@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.2
+script_version=20170701.3
 
 # Set game-specific variables
 
@@ -52,6 +52,9 @@ ARCHIVE_GOG_OLD='gog_crypt_of_the_necrodancer_2.3.0.5.sh'
 ARCHIVE_GOG_OLD_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
 ARCHIVE_GOG_OLD_SIZE='1500000'
 ARCHIVE_GOG_OLD_VERSION='1.27-gog2.3.0.5'
+
+ARCHIVE_ICONS='crypt-of-the-necrodancer_icons.tar.gz'
+ARCHIVE_ICONS_MD5='04d2bb19adc13dbadce6161bd92bf59a'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -71,14 +74,17 @@ ARCHIVE_GAME_VIDEO_FILES='./data/video'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./data'
 
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./128x128 ./256x256'
+
 DATA_DIRS='./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
 DATA_FILES='./data/save_data.xml ./data/played.dat'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_LIBS='.'
 APP_MAIN_EXE='NecroDancer'
-APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
+APP_MAIN_ICON_GOG_RES='256'
 
 PACKAGES_LIST='PKG_MUSIC PKG_VIDEO PKG_DATA PKG_BIN'
 
@@ -113,9 +119,21 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
@@ -131,10 +149,14 @@ organize_data 'DOC1'      "$PATH_DOC"
 organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	res="$APP_MAIN_ICON_GOG_RES"
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
