@@ -34,32 +34,43 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170525.1
+script_version=20170701.1
 
 # Set game-specific variables
 
 GAME_ID='war-for-the-overworld'
 GAME_NAME='War for the Overworld'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
+
+ARCHIVE_GOG='gog_war_for_the_overworld_2.2.0.3.sh'
+ARCHIVE_GOG_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG_SIZE='2500000'
+ARCHIVE_GOG_VERSION='1.6.2f3-gog2.2.0.3'
 
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
 ARCHIVE_HUMBLE_SIZE='2500000'
 ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
 
-ARCHIVE_GAME_BIN_PATH='Linux'
-ARCHIVE_GAME_BIN_FILES='./WFTO.x86_64 ./WFTO_Data/Plugins ./WFTO_Data/Mono ./WFTO_Data/CoherentUI_Host/linux/CoherentUI_Host* ./WFTO_Data/CoherentUI_Host/linux/lib*'
+ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_DATA_PATH='Linux'
-ARCHIVE_GAME_DATA_FILES='./WFTO_Data'
+ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
+ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host* ./WFTO*_Data/CoherentUI_Host/linux/lib*'
 
-DATA_DIRS='./logs ./WFTO_Data/GameData'
+ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
+ARCHIVE_GAME_DATA_FILES='./WFTO*_Data'
+
+DATA_DIRS='./logs ./WFTO*_Data/GameData'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='WFTO.x86_64'
+APP_MAIN_EXE_GOG='WFTOGame.x86_64'
+APP_MAIN_EXE_HUMBLE='WFTO.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='WFTO_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='WFTO*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
@@ -96,20 +107,30 @@ extract_data_from "$SOURCE_ARCHIVE"
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}/WFTO_Data/CoherentUI_Host/linux/CoherentUI_Host"
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}/WFTO_Data/CoherentUI_Host/linux/CoherentUI_Host.bin"
+chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host
+chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
 
 PKG='PKG_DATA'
+organize_data 'DOC'       "$PATH_GAME"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 (
-	cd "${PKG_DATA_PATH}${PATH_GAME}/WFTO_Data/uiresources/maps"
+	cd "${PKG_DATA_PATH}${PATH_GAME}"/WFTO*_Data/uiresources/maps
 	mv 'Stonegate.unity.png' 'stonegate.unity.png'
 )
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
+
+case "$ARCHIVE" in
+	('ARCHIVE_GOG')
+		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
+	;;
+	('ARCHIVE_HUMBLE')
+		APP_MAIN_EXE="$APP_MAIN_EXE_HUMBLE"
+	;;
+esac
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
