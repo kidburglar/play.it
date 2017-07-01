@@ -34,14 +34,14 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.1
+script_version=20170701.2
 
 # Set game-specific variables
 
 GAME_ID='windward'
 GAME_NAME='Windward'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
 ARCHIVE_GOG='gog_windward_2.36.0.40.sh'
 ARCHIVE_GOG_MD5='6afbdcfda32a6315139080822c30396a'
@@ -58,13 +58,20 @@ ARCHIVE_GOG_OLDER_MD5='f5ce09719bf355e48d2eac59b84592d1'
 ARCHIVE_GOG_OLDER_SIZE='120000'
 ARCHIVE_GOG_OLDER_VERSION='20160707-gog2.35.0.38'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_HUMBLE='WindwardLinux_HB.zip'
+ARCHIVE_HUMBLE_MD5='f2d1a9a91055ecb6c5ce1bd7e3ddd803'
+ARCHIVE_HUMBLE_SIZE='130000'
+ARCHIVE_HUMBLE_VERSION='20160707-humble1'
+
+ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./Windward.x86 ./WWServer.exe ./Windward_Data/Plugins ./Windward_Data/Mono'
+ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_HUMBLE='.'
+ARCHIVE_GAME_BIN_FILES='./Windward.x86 ./Windward_Data/Plugins ./Windward_Data/Mono'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='.'
 ARCHIVE_GAME_DATA_FILES='./Windward_Data'
 
 DATA_DIRS='./logs'
