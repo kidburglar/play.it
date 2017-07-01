@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170607.1
+script_version=20170701.1
 
 # Set game-specific variables
 
@@ -48,14 +48,11 @@ ARCHIVE_HUMBLE_MD5='b7b269b8e33d682a2fca5c548928dabf'
 ARCHIVE_HUMBLE_SIZE='1400000'
 ARCHIVE_HUMBLE_VERSION='1.0.0.2-humble141119'
 
-ARCHIVE_DOC1_PATH='particulars_1.0.0.2_lin/licenses'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_DOC_PATH='particulars_1.0.0.2_lin'
+ARCHIVE_DOC_FILES='./readme.txt ./release_notes.txt ./licenses'
 
-ARCHIVE_DOC2_PATH='particulars_1.0.0.2_lin'
-ARCHIVE_DOC2_FILES='./readme.txt ./release_notes.txt'
-
-ARCHIVE_GAME_BIN32_PATH='particulars_1.0.0.2_lin'
-ARCHIVE_GAME_BIN32_FILES='./p_1-0-0-2 ./*_Data/*/x86'
+ARCHIVE_GAME_BIN_PATH='particulars_1.0.0.2_lin'
+ARCHIVE_GAME_BIN_FILES='./p_1-0-0-2 ./*_Data/*/x86'
 
 ARCHIVE_GAME_DATA_PATH='particulars_1.0.0.2_lin'
 ARCHIVE_GAME_DATA_FILES='./*_Data ./libsteam_api.so ./libSteamworksNative.so'
@@ -63,19 +60,19 @@ ARCHIVE_GAME_DATA_FILES='./*_Data ./libsteam_api.so ./libSteamworksNative.so'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='p_1-0-0-2'
+APP_MAIN_EXE_BIN='p_1-0-0-2'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32'
+PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libx11-6, libxcursor1, libxrandr2, libxau6, libglu1-mesa | libglu1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libx11 lib32-libxcursor lib32-libxrandr lib32-gcc-libs lib32-libxext lib32-libxcb lib32-libxrender lib32-libxfixes lib32-libxau lib32-libxdmcp lib32-glu"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libxrandr2, libglu1-mesa | libglu1"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libxcursor lib32-libxrandr lib32-glu"
 
 # Load common functions
 
@@ -99,19 +96,18 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
+PKG='PKG_BIN'
+organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC1' "$PATH_DOC"
-organize_data 'DOC2' "$PATH_DOC"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN32'
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
@@ -120,18 +116,22 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+if [ ! -e "${PATH_ICON}/${GAME_ID}.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "${PATH_ICON}/${GAME_ID}.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN32'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
