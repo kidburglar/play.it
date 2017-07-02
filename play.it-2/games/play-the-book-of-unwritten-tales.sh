@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170607.1
+script_version=20170702.1
 
 # Set game-specific variables
 
@@ -63,6 +63,9 @@ ARCHIVE_DOC_FILES='./*eula.txt'
 ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./bout.exe ./alut.dll ./cg.dll ./libogg.dll ./libtheora.dll ./libtheoraplayer.dll ./libvorbis.dll ./libvorbisfile.dll ./lua5.1.dll ./lua51.dll ./ogremain.dll ./ois.dll ./particleuniverse.dll ./plugin_cgprogrammanager.dll ./rendersystem_direct3d9.dll ./plugins.cfg ./resources.cfg'
 
+ARCHIVE_GAME_L10N_PATH='app'
+ARCHIVE_GAME_L10N_FILES='./kagedata/lang/en'
+
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='./data ./kagedata ./kapedata ./config.xml ./exportedfunctions.lua'
 
@@ -71,14 +74,17 @@ APP_MAIN_EXE='./bout.exe'
 APP_MAIN_ICON='./bout.exe'
 APP_MAIN_ICON_RES='16 32 48 64'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_L10N PKG_DATA PKG_BIN'
+
+PKG_L10N_ID="${GAME_ID}-l10n-en"
+PKG_L10N_DESCRIPTION='English localization'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine:amd64 | wine, wine32 | wine-bin | wine1.6-i386 | wine1.4-i386 | wine-staging-i386"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine"
+PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -115,18 +121,17 @@ extract_data_from "$SOURCE_ARCHIVE"
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
+PKG='PKG_L10N'
+organize_data 'GAME_L10N' "$PATH_GAME"
+rmdir "$PLAYIT_WORKDIR/gamedata/app/kagedata/lang"
+
 PKG='PKG_DATA'
-organize_data 'DOC'      "$PATH_DOC"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
-(
-        cd "$PKG_BIN_PATH"
-        cp --link --parents --recursive "./$PATH_ICON_BASE" "$PKG_DATA_PATH"
-        rm --recursive "./$PATH_ICON_BASE"
-        rmdir --ignore-fail-on-non-empty --parents "./${PATH_ICON_BASE%/*}"
-)
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
