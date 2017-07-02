@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.2
+script_version=20170702.1
 
 # Set game-specific variables
 
@@ -60,14 +60,26 @@ ARCHIVE_GOG_PART4='setup_the_dark_eye_chains_of_satinav_2.0.0.4-4.bin'
 ARCHIVE_GOG_PART4_MD5='555d8af3bb598ed4c481e3e3d63b0221'
 ARCHIVE_GOG_PART4_TYPE='innosetup'
 
-ARCHIVE_DOC1_PATH='app'
-ARCHIVE_DOC1_FILES='./documents/licenses'
+ARCHIVE_DOC1_PATH='app/documents/licenses'
+ARCHIVE_DOC1_FILES='./*'
 
 ARCHIVE_DOC2_PATH='tmp'
-ARCHIVE_DOC2_FILES='./tmp/*.txt'
+ARCHIVE_DOC2_FILES='./*.txt'
 
-ARCHIVE_GAME_PATH='app'
-ARCHIVE_GAME_FILES='./audiere.dll ./avcodec-53.dll ./avformat-53.dll ./avutil-51.dll ./banner.jpg ./characters ./config.ini ./data.vis ./documents ./folder.jpg ./language.xml ./lua ./satinav.exe ./scenes ./sdl.dll ./swscale-2.dll ./videos ./visionaireconfigurationtool.exe ./zlib1.dll'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./audiere.dll ./avcodec-53.dll ./avformat-53.dll ./avutil-51.dll ./config.ini ./satinav.exe ./sdl.dll ./swscale-2.dll ./visionaireconfigurationtool.exe ./zlib1.dll'
+
+ARCHIVE_GAME_SCENES_PATH='app'
+ARCHIVE_GAME_SCENES_FILES='./scenes'
+
+ARCHIVE_GAME_CHARACTERS_PATH='app'
+ARCHIVE_GAME_CHARACTERS_FILES='./characters'
+
+ARCHIVE_GAME_VIDEOS_PATH='app'
+ARCHIVE_GAME_VIDEOS_FILES='./videos'
+
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./banner.jpg ./data.vis ./folder.jpg ./language.xml ./lua'
 
 CONFIG_FILES='./*.ini ./*.xml'
 
@@ -76,11 +88,23 @@ APP_MAIN_EXE='./satinav.exe'
 APP_MAIN_ICON='./satinav.exe'
 APP_MAIN_ICON_RES='16 24 32 48 256'
 
-PACKAGES_LIST='PKG_MAIN'
+PACKAGES_LIST='PKG_SCENES PKG_CHARACTERS PKG_VIDEOS PKG_DATA PKG_BIN'
 
-PKG_MAIN_ARCH='32'
-PKG_MAIN_DEPS_DEB='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
-PKG_MAIN_DEPS_ARCH='wine'
+PKG_SCENES_ID="${GAME_ID}-scenes"
+PKG_SCENES_DESCRIPTION='scenes'
+
+PKG_CHARACTERS_ID="${GAME_ID}-characters"
+PKG_CHARACTERS_DESCRIPTION='characters'
+
+PKG_VIDEOS_ID="${GAME_ID}-videos"
+PKG_VIDEOS_DESCRIPTION='videos'
+
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_SCENES_ID, $PKG_CHARACTERS_ID, $PKG_VIDEOS_ID, $PKG_DATA_ID, wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_SCENES_ID $PKG_CHARACTERS_ID $PKG_VIDEOS_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -116,16 +140,32 @@ ARCHIVE='ARCHIVE_GOG'
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-organize_data 'DOC1' "$PATH_DOC"
-organize_data 'DOC2' "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
+PKG='PKG_BIN'
+organize_data 'GAME_BIN' "$PATH_GAME"
 
+PKG='PKG_SCENES'
+organize_data 'GAME_SCENES' "$PATH_GAME"
+
+PKG='PKG_CHARACTERS'
+organize_data 'GAME_CHARACTERS' "$PATH_GAME"
+
+PKG='PKG_VIDEOS'
+organize_data 'GAME_VIDEOS' "$PATH_GAME"
+
+PKG='PKG_DATA'
+organize_data 'DOC1'      "$PATH_DOC"
+organize_data 'DOC2'      "$PATH_DOC"
+organize_data 'GAME_DATA' "$PATH_GAME"
+
+PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
