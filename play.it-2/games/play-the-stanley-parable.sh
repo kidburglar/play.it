@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170702.1
 
 # Set game-specific variables
 
@@ -46,8 +46,7 @@ ARCHIVES_LIST='ARCHIVE_HUMBLE'
 ARCHIVE_HUMBLE='The_Stanley_Parable_Setup.tar'
 ARCHIVE_HUMBLE_MD5='10a98d7fb93017eb666281bf2d3da28d'
 ARCHIVE_HUMBLE_SIZE='2100000'
-ARCHIVE_HUMBLE_VERSION='1.0-humble1'
-ARCHIVE_HUMBLE_TYPE='tar'
+ARCHIVE_HUMBLE_VERSION='1.0-humble161007'
 
 ARCHIVE_DOC_PATH='data'
 ARCHIVE_DOC_FILES='./thirdpartylegalnotices.doc'
@@ -56,11 +55,7 @@ ARCHIVE_GAME_BIN_PATH='data'
 ARCHIVE_GAME_BIN_FILES='./bin thestanleyparable/bin ./stanley_linux'
 
 ARCHIVE_GAME_DATA_PATH='data'
-ARCHIVE_GAME_DATA_FILES='./fontconfig ./platform ./stanley.png ./thestanleyparable'
-
-DATA_DIRS='anoxdata/logs anoxdata/save'
-DATA_FILES='./anox.log anoxdata/nokill.*'
-CONFIG_FILES='./*.ini'
+ARCHIVE_GAME_DATA_FILES='./platform ./stanley.png ./thestanleyparable'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='stanley_linux'
@@ -114,8 +109,7 @@ PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -131,16 +125,22 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+if ! [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
-write_metadata
+write_metadata 'PKG_DATA'
+rm "$postinst" "$prerm"
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
