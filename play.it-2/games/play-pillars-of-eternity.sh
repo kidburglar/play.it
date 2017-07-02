@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20170702.2
 
 # Set game-specific variables
 
@@ -46,7 +46,7 @@ ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 ARCHIVE_GOG='gog_pillars_of_eternity_2.16.0.20.sh'
 ARCHIVE_GOG_MD5='0d21cf95bda070bdbfbe3e79f8fc32d6'
 ARCHIVE_GOG_SIZE='15000000'
-ARCHIVE_GOG_VERSION='3.06-gog2.16.0.20'
+ARCHIVE_GOG_VERSION='3.06.1254-gog2.16.0.20'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
 ARCHIVE_GOG_OLD='gog_pillars_of_eternity_2.15.0.19.sh'
