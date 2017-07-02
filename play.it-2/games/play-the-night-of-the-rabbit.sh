@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170613.1
+script_version=20170702.1
 
 # Set game-specific variables
 
@@ -42,7 +42,6 @@ GAME_ID='the-night-of-the-rabbit'
 GAME_NAME='The Night of the Rabbit'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
-
 
 ARCHIVE_GOG='setup_the_night_of_the_rabbit_2.1.0.5-1.bin'
 ARCHIVE_GOG_MD5='565c8c59266eced8483ad579ecf3c454'
@@ -54,19 +53,22 @@ ARCHIVE_GOG_PART1='setup_the_night_of_the_rabbit_2.1.0.5-2.bin'
 ARCHIVE_GOG_PART1_MD5='403e06a8e8aef71989bf550369244373'
 ARCHIVE_GOG_PART1_TYPE='rar'
 
-ARCHIVE_DOC_PATH='game'
-ARCHIVE_DOC_FILES='./documents'
+ARCHIVE_DOC_PATH='game/documents/licenses'
+ARCHIVE_DOC_FILES='./*'
 
 ARCHIVE_GAME_BIN1_PATH='game'
-ARCHIVE_GAME_BIN1_FILES='./avcodec-54.dll ./avformat-54.dll ./avutil-52.dll ./libsndfile-1.dll ./lua ./openal32.dll ./rabbit.exe ./sdl2.dll ./swresample-0.dll ./swscale-2.dll ./visionaireconfigurationtool.exe ./zlib1.dll'
-ARCHIVE_GAME_BIN2_PATH='support/app/'
+ARCHIVE_GAME_BIN1_FILES='./avcodec-54.dll ./avformat-54.dll ./avutil-52.dll ./libsndfile-1.dll ./openal32.dll ./rabbit.exe ./sdl2.dll ./swresample-0.dll ./swscale-2.dll ./visionaireconfigurationtool.exe ./zlib1.dll'
+ARCHIVE_GAME_BIN2_PATH='support/app'
 ARCHIVE_GAME_BIN2_FILES='./config.ini'
+
+ARCHIVE_GAME_SCENES_PATH='game'
+ARCHIVE_GAME_SCENES_FILES='./scenes'
 
 ARCHIVE_GAME_VIDEO_PATH='game'
 ARCHIVE_GAME_VIDEO_FILES='./videos'
 
 ARCHIVE_GAME_DATA_PATH='game'
-ARCHIVE_GAME_DATA_FILES=' ./banner.jpg ./characters ./data.vis ./folder.jpg ./languages.xml ./scenes'
+ARCHIVE_GAME_DATA_FILES='./banner.jpg ./characters ./data.vis ./folder.jpg ./languages.xml ./lua'
 
 CONFIG_FILES='./config.ini'
 
@@ -75,7 +77,10 @@ APP_MAIN_EXE='./rabbit.exe'
 APP_MAIN_ICON='./rabbit.exe'
 APP_MAIN_ICON_RES='16 24 32 48 256'
 
-PACKAGES_LIST='PKG_VIDEO PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_SCENES PKG_VIDEO PKG_DATA PKG_BIN'
+
+PKG_SCENES_ID="${GAME_ID}-scenes"
+PKG_SCENES_DESCRIPTION='scenes'
 
 PKG_VIDEO_ID="${GAME_ID}-videos"
 PKG_VIDEO_DESCRIPTION='videos'
@@ -84,8 +89,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_VIDEO_ID, $PKG_DATA_ID, wine:amd64 | wine, wine32 | wine-bin | wine1.6-i386 | wine1.4-i386 | wine-staging-i386"
-PKG_BIN_DEPS_ARCH="$PKG_VIDEO_ID $PKG_DATA_ID wine"
+PKG_BIN_DEPS_DEB="$PKG_SCENES_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_SCENES_ID $PKG_VIDEO_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -122,6 +127,9 @@ PKG='PKG_BIN'
 organize_data 'GAME_BIN1' "$PATH_GAME"
 organize_data 'GAME_BIN2' "$PATH_GAME"
 
+PKG='PKG_SCENES'
+organize_data 'GAME_SCENES' "$PATH_GAME"
+
 PKG='PKG_VIDEO'
 organize_data 'GAME_VIDEO' "$PATH_GAME"
 
@@ -137,6 +145,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
