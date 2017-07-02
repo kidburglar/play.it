@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170628.1
+script_version=20170702.1
 
 # Set game-specific variables
 
-GAME_ID='memoria'
-GAME_NAME='Memoria'
+GAME_ID='the-dark-eye-memoria'
+GAME_NAME='The Dark Eye: Memoria'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
