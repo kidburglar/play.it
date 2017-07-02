@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170615.1
+script_version=20170702.1
 
 # Set game-specific variables
 
@@ -168,14 +168,25 @@ res="$APP_MAIN_ICON2_RES"
 PATH_ICON2="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON1" "$PATH_ICON2"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON1" "$PATH_ICON1/$GAME_ID.png"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON2" "$PATH_ICON2/$GAME_ID.png"
+if ! [ -e "$PATH_ICON1/$GAME_ID.png" ] && [ -e "$PATH_GAME/$APP_MAIN_ICON1" ]; then
+	mkdir --parents "$PATH_ICON1"
+	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON1" "$PATH_ICON1/$GAME_ID.png"
+fi
+if ! [ -e "$PATH_ICON2/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON2"
+	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON2" "$PATH_ICON2/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON1/$GAME_ID.png" "$PATH_ICON2/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON1" "$PATH_ICON2"
+if [ -e "$PATH_ICON1/$GAME_ID.png" ]; then
+	rm "$PATH_ICON1/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON1"
+fi
+if [ -e "$PATH_ICON2/$GAME_ID.png" ]; then
+	rm "$PATH_ICON2/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON2"
+fi
 EOF
 
 write_metadata 'PKG_BIN'
