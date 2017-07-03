@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170703.1
+script_version=20170703.2
 
 # Set game-specific variables
 
-GAME_ID='tri'
-GAME_NAME='Tri'
+GAME_ID='tri-of-friendship-of-madness'
+GAME_NAME='TRI: Of Friendship and Madness'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
