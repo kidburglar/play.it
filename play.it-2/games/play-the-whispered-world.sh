@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# The Whispered World: Special Edition
+# The Whispered World
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -38,8 +38,8 @@ script_version=20170611.1
 
 # Set game-specific variables
 
-GAME_ID='the-whispered-world-special-edition'
-GAME_NAME='The Whispered World: Special Edition'
+GAME_ID='the-whispered-world'
+GAME_NAME='The Whispered World'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
@@ -57,11 +57,14 @@ ARCHIVE_DOC2_FILES='./*'
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./TWWSE ./config.ini ./libs64'
 
+ARCHIVE_GAME_SCENES_PATH='data/noarch/game'
+ARCHIVE_GAME_SCENES_FILES='./scenes'
+
 ARCHIVE_GAME_VIDEO_PATH='data/noarch/game'
 ARCHIVE_GAME_VIDEO_FILES='./videos'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./characters ./data.vis ./lua ./scenes'
+ARCHIVE_GAME_DATA_FILES='./characters ./data.vis ./lua'
 
 CONFIG_FILES='./config.ini'
 
@@ -72,7 +75,10 @@ APP_MAIN_LIBS='libs64'
 APP_MAIN_ICON='data/noarch/support/icon.png'
 APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_VIDEO PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_SCENES PKG_VIDEO PKG_DATA PKG_BIN'
+
+PKG_SCENES_ID="${GAME_ID}-scenes"
+PKG_SCENES_DESCRIPTION='scenes'
 
 PKG_VIDEO_ID="${GAME_ID}-videos"
 PKG_VIDEO_DESCRIPTION='videos'
@@ -81,8 +87,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_VIDEO_ID, $PKG_DATA_ID, libgl1-mesa-glx | libgl1, libopenal1"
-PKG_BIN_DEPS_ARCH="$PKG_VIDEO_ID $PKG_DATA_ID libgl openal"
+PKG_BIN_DEPS_DEB="$PKG_SCENES_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libgl1-mesa-glx | libgl1, libopenal1"
+PKG_BIN_DEPS_ARCH="$PKG_SCENES_ID $PKG_VIDEO_ID $PKG_DATA_ID libgl openal"
 
 # Load common functions
 
@@ -108,6 +114,9 @@ extract_data_from "$SOURCE_ARCHIVE"
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
+
+PKG='PKG_SCENES'
+organize_data 'GAME_SCENES' "$PATH_GAME"
 
 PKG='PKG_VIDEO'
 organize_data 'GAME_VIDEO' "$PATH_GAME"
