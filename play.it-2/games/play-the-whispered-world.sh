@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170703.1
 
 # Set game-specific variables
 
@@ -47,6 +47,9 @@ ARCHIVE_GOG='gog_the_whispered_world_special_edition_2.0.0.1.sh'
 ARCHIVE_GOG_MD5='485368f130f2d82f564a0159cd497437'
 ARCHIVE_GOG_SIZE='2200000'
 ARCHIVE_GOG_VERSION='3.2.0418-gog2.0.0.1'
+
+ARCHIVE_ICONS='the-whispered-world_icons.tar.gz'
+ARCHIVE_ICONS_MD5='3ec301bf71cf279aa8de91c136e16388'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -66,14 +69,17 @@ ARCHIVE_GAME_VIDEO_FILES='./videos'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./characters ./data.vis ./lua'
 
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./256x256'
+
 CONFIG_FILES='./config.ini'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_PRERUN='mkdir --parents "$HOME/.local/share/Daedalic Entertainment GmbH/The Whispered World Special Edition/Savegames"'
 APP_MAIN_EXE='TWWSE'
 APP_MAIN_LIBS='libs64'
-APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
+APP_MAIN_ICON_GOG_RES='256'
 
 PACKAGES_LIST='PKG_SCENES PKG_VIDEO PKG_DATA PKG_BIN'
 
@@ -108,9 +114,21 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
@@ -126,10 +144,14 @@ organize_data 'DOC1'      "$PATH_DOC"
 organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	res="$APP_MAIN_ICON_GOG_RES"
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
