@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170703.1
+script_version=20170703.2
 
 # Set game-specific variables
 
@@ -60,6 +60,10 @@ ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host'
 
+ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
+ARCHIVE_GAME_ASSETS_FILES='./WFTO*_Data/*.assets*'
+
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_DATA_FILES='./WFTO*_Data'
@@ -73,14 +77,17 @@ APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='WFTO*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN'
+
+PKG_ASSETS_ID="${GAME_ID}-assets"
+PKG_ASSETS_DESCRIPTION='assets'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs libgl libxcursor"
+PKG_BIN_DEPS_DEB="$PKG_ASSETS_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxcursor1"
+PKG_BIN_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID glibc gcc-libs libgl libxcursor"
 
 # Load common functions
 
@@ -110,8 +117,11 @@ organize_data 'GAME_BIN' "$PATH_GAME"
 chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host
 chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
 
+PKG='PKG_ASSETS'
+organize_data 'GAME_ASSETS' "$PATH_GAME"
+
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_GAME"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 (
@@ -156,7 +166,7 @@ EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN'
+write_metadata 'PKG_ASSETS' 'PKG_BIN'
 build_pkg
 
 # Clean up
