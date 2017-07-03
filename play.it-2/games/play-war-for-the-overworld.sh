@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.1
+script_version=20170703.1
 
 # Set game-specific variables
 
@@ -58,7 +58,7 @@ ARCHIVE_DOC_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host* ./WFTO*_Data/CoherentUI_Host/linux/lib*'
+ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
@@ -141,13 +141,17 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+if ! [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
