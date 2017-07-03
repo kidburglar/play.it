@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170703.1
 
 # Set game-specific variables
 
@@ -72,12 +72,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libglu1-mesa | libglu1, libx11-6, libxcursor1, libxrandr2, libxau6"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor lib32-libxrandr lib32-libxext lib32-libxcb lib32-libxrender lib32-libxfixes "
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-glu lib32-libxcursor lib32-libxrandr"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu libxcursor libxrandr libxext libxcb libxrender libxfixes"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc glu libxcursor libxrandr"
 
 # Load common functions
 
@@ -124,13 +124,17 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+if ! [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
