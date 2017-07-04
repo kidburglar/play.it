@@ -9,7 +9,7 @@ print_instructions_deb() {
 	fi
 	if [ $debian_version_major -ge 2 ] ||\
 	   [ $debian_version_major = 1 ] &&\
-	   [ $debian_version_minor -ge 1 ]; then
+	   [ ${debian_version_minor%~*} -ge 1 ]; then
 		print_instructions_deb_apt "$@"
 	else
 		print_instructions_deb_dpkg "$@"
