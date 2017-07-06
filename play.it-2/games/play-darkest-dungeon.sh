@@ -34,29 +34,34 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.1
+script_version=20170706.1
 
 # Set game-specific variables
 
 GAME_ID='darkest-dungeon'
 GAME_NAME='Darkest Dungeon'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='gog_darkest_dungeon_2.12.0.12.sh'
-ARCHIVE_GOG_MD5='0d809acc7b82fe7b280026e04f95f669'
+ARCHIVE_GOG='gog_darkest_dungeon_2.13.0.13.sh'
+ARCHIVE_GOG_MD5='bea41d27a9b050872ebaa9c93cf0df12'
 ARCHIVE_GOG_SIZE='2100000'
-ARCHIVE_GOG_VERSION='20108-gog2.12.0.12'
+ARCHIVE_GOG_VERSION='20235-gog2.13.0.13'
 
-ARCHIVE_GOG_OLD='gog_darkest_dungeon_2.11.0.11.sh'
-ARCHIVE_GOG_OLD_MD5='6e59b1b59e1b4c5444c87a46d93c8308'
+ARCHIVE_GOG_OLD='gog_darkest_dungeon_2.12.0.12.sh'
+ARCHIVE_GOG_OLD_MD5='0d809acc7b82fe7b280026e04f95f669'
 ARCHIVE_GOG_OLD_SIZE='2100000'
-ARCHIVE_GOG_OLD_VERSION='19990-gog2.11.0.11'
+ARCHIVE_GOG_OLD_VERSION='20108-gog2.12.0.12'
 
-ARCHIVE_GOG_OLDER='gog_darkest_dungeon_2.10.0.10.sh'
-ARCHIVE_GOG_OLDER_MD5='f8fa42b354731886f9b69e1d0e78b3b7'
-ARCHIVE_GOG_OLDER_SIZE='2000000'
-ARCHIVE_GOG_OLDER_VERSION='17687-gog2.10.0.10'
+ARCHIVE_GOG_OLDER='gog_darkest_dungeon_2.11.0.11.sh'
+ARCHIVE_GOG_OLDER_MD5='6e59b1b59e1b4c5444c87a46d93c8308'
+ARCHIVE_GOG_OLDER_SIZE='2100000'
+ARCHIVE_GOG_OLDER_VERSION='19990-gog2.11.0.11'
+
+ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_2.10.0.10.sh'
+ARCHIVE_GOG_OLDEST_MD5='f8fa42b354731886f9b69e1d0e78b3b7'
+ARCHIVE_GOG_OLDEST_SIZE='2000000'
+ARCHIVE_GOG_OLDEST_VERSION='17687-gog2.10.0.10'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -98,11 +103,11 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
 PKG_BIN32_DEPS_DEB="$PKG_AUDIO_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libsdl2-2.0-0"
-PKG_BIN32_DEPS_ARCH="$PKG_AUDIO_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-sdl2"
+PKG_BIN32_DEPS_ARCH="$PKG_AUDIO_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_AUDIO_ID $PKG_VIDEO_ID $PKG_DATA_ID sdl2"
+PKG_BIN64_DEPS_ARCH="$PKG_AUDIO_ID $PKG_VIDEO_ID $PKG_DATA_ID glibs gcc-libs sdl2"
 
 # Load common functions
 
@@ -126,12 +131,11 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-(
-	cd "$PLAYIT_WORKDIR/gamedata/data/noarch/game"
-	rm --force --recursive 'localization/ps4' 'localization/psv'
-	rm --force --recursive 'shaders_ps4' 'shaders_psv'
-	rm --force --recursive 'video_ps4' 'video_psv'
-)
+for dir in 'localization/ps4' 'localization/psv'\
+           'shaders_ps4'      'shaders_psv'\
+           'video_ps4'        'video_psv'; do
+	rm --force --recursive "$PLAYIT_WORKDIR/gamedata/data/noarch/game/$dir"
+done
 
 PKG='PKG_BIN32'
 organize_data 'GAME_BIN32' "$PATH_GAME"
