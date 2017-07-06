@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170706.1
+script_version=20170706.2
 
 # Set game-specific variables
 
@@ -63,6 +63,8 @@ ARCHIVE_GOG_OLDEST_MD5='f8fa42b354731886f9b69e1d0e78b3b7'
 ARCHIVE_GOG_OLDEST_SIZE='2000000'
 ARCHIVE_GOG_OLDEST_VERSION='17687-gog2.10.0.10'
 
+DATA_DIRS='./logs'
+
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
 
@@ -87,6 +89,7 @@ ARCHIVE_GAME_DATA_FILES='./*'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='darkest.bin.x86'
 APP_MAIN_EXE_BIN64='darkest.bin.x86_64'
+APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
 APP_MAIN_ICON='Icon.bmp'
 APP_MAIN_ICON_RES='128'
 
