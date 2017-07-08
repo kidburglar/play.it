@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20170708.1
 
 # Set game-specific variables
 
@@ -69,8 +69,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libnss3, libgtk2.0-0"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-nss lib32-gtk2"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libnss3, libgtk2.0-0, libxml2"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-nss lib32-gtk2 lib32-libxml2"
 
 # Load common functions
 
@@ -113,16 +113,20 @@ write_launcher 'APP_MAIN'
 cat > "$postinst" << EOF
 for res in $APP_MAIN_ICON_RES; do
 	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	mkdir --parents "\$PATH_ICON"
-	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON_PATH/b\${res}.png" "\$PATH_ICON/$GAME_ID.png"
+	if ! [ -e "\$PATH_ICON/$GAME_ID.png" ]; then
+		mkdir --parents "\$PATH_ICON"
+		ln --symbolic "$PATH_GAME/$APP_MAIN_ICON_PATH/b\${res}.png" "\$PATH_ICON/$GAME_ID.png"
+	fi
 done
 EOF
 
 cat > "$prerm" << EOF
 for res in $APP_ICON_RES; do
 	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	rm "\$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "\$PATH_ICON"
+	if [ -e "\$PATH_ICON/$GAME_ID.png" ]; then
+		rm "\$PATH_ICON/$GAME_ID.png"
+		rmdir --parents --ignore-fail-on-non-empty "\$PATH_ICON"
+	fi
 done
 EOF
 
