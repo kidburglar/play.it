@@ -30,7 +30,7 @@ set_archive_error_not_found() {
 	else
 		case "${LANG%_*}" in
 			('fr')
-				string='Aucun des fichiers suivant n’est présent :\n'
+				string='Aucun des fichiers suivants n’est présent :\n'
 			;;
 			('en'|*)
 				string='None of the following files could be found:\n'
