@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170708.1
+script_version=20170708.2
 
 # Set game-specific variables
 
@@ -62,6 +62,10 @@ ARCHIVE_GAME_BIN64_PATH_HUMBLE='SkullGirls'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE_OLD='data/x86_64'
 ARCHIVE_GAME_BIN64_FILES='./SkullGirls.x86_64-pc-linux-gnu ./lib/x86_64-pc-linux-gnu'
 
+ARCHIVE_GAME_UI_PATH_HUMBLE='SkullGirls'
+ARCHIVE_GAME_UI_PATH_HUMBLE_OLD='data/noarch'
+ARCHIVE_GAME_UI_FILES='./data01/ui*.gfs'
+
 ARCHIVE_GAME_DATA_PATH_HUMBLE='SkullGirls'
 ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD='data/noarch'
 ARCHIVE_GAME_DATA_FILES='./*.txt ./data01 ./Icon.png ./Salmon'
@@ -72,18 +76,21 @@ APP_MAIN_EXE_BIN64='SkullGirls.x86_64-pc-linux-gnu'
 APP_MAIN_ICON='Icon.png'
 APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_UI PKG_DATA PKG_BIN32 PKG_BIN64'
+
+PKG_UI_ID="${GAME_ID}-ui"
+PKG_UI_DESCRIPTION='user interface'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libsdl2-mixer-2.0-0, libsdl2-2.0-0"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-sdl2_mixer"
+PKG_BIN32_DEPS_DEB="$PKG_UI_ID, $PKG_DATA_ID, libc6, libstdc++6, libsdl2-mixer-2.0-0, libsdl2-2.0-0"
+PKG_BIN32_DEPS_ARCH="$PKG_UI_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-sdl2_mixer"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 sdl2_mixer"
+PKG_BIN64_DEPS_ARCH="$PKG_UI_ID, $PKG_DATA_ID glibc gcc-libs sdl2 sdl2_mixer"
 
 # Load common functions
 
@@ -106,6 +113,9 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+
+PKG='PKG_UI'
+organize_data 'GAME_UI' "$PATH_GAME"
 
 PKG='PKG_DATA'
 organize_data 'GAME_DATA' "$PATH_GAME"
@@ -145,7 +155,7 @@ EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_UI' 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
@@ -156,8 +166,8 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 printf '\n'
 printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
+print_instructions 'PKG_UI' 'PKG_DATA' 'PKG_BIN32'
 printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions 'PKG_UI' 'PKG_DATA' 'PKG_BIN64'
 
 exit 0
