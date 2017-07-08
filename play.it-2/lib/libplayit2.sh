@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.0.1~dev
-library_revision=20170625.1
+library_version=2.0.1
+library_revision=20170708.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -211,7 +211,7 @@ set_archive_error_not_found() {
 	else
 		case "${LANG%_*}" in
 			('fr')
-				string='Aucun des fichiers suivant n’est présent :\n'
+				string='Aucun des fichiers suivants n’est présent :\n'
 			;;
 			('en'|*)
 				string='None of the following files could be found:\n'
@@ -476,8 +476,12 @@ check_deps() {
 	if [ "${APP_MAIN_ICON##*.}" = 'bmp' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS convert"
 	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ] ||\
+	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
+	fi
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
+		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
 	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in
@@ -880,13 +884,13 @@ while [ $# -gt 0 ]; do
 			exit 0
 		;;
 		('--checksum='*|\
-		'--checksum'|\
-		'--compression='*|\
-		'--compression'|\
-		'--prefix='*|\
-		'--prefix'|\
-		'--package='*|\
-		'--package')
+		 '--checksum'|\
+		 '--compression='*|\
+		 '--compression'|\
+		 '--prefix='*|\
+		 '--prefix'|\
+		 '--package='*|\
+		 '--package')
 			if [ "${1%=*}" != "${1#*=}" ]; then
 				option="$(printf '%s' "${1%=*}" | sed 's/^--//')"
 				value="${1#*=}"
@@ -920,16 +924,18 @@ if [ ! "$OPTION_PACKAGE" ]; then
 	unset GUESSED_HOST_OS
 	if [ -e '/etc/os-release' ]; then
 		GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-	elif [ -e '/etc/issue' ]; then
-		GUESSED_HOST_OS="$(head --lines=1 '/etc/issue' | cut --delimiter=' ' --fields=1 | tr [:upper:] [:lower:])"
 	elif which lsb_release >/dev/null 2>&1; then
 		GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
 	fi
 	case "$GUESSED_HOST_OS" in
-		('debian'|'ubuntu')
+		('debian'|\
+		 'ubuntu'|\
+		 'linuxmint'|\
+		 'handylinux')
 			DEFAULT_OPTION_PACKAGE='deb'
 		;;
-		('arch')
+		('arch'|\
+		 'manjaro'|'manjarolinux')
 			DEFAULT_OPTION_PACKAGE='arch'
 		;;
 		(*)
@@ -1113,13 +1119,8 @@ extract_data_from_print() {
 
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: (PLAYIT_WORKDIR) (PKG) (PKG_PATH)
+# NEEDED VARS: PLAYIT_WORKDIR PKG PKG_PATH
 organize_data() {
-	[ $# = 2 ] || return 1
-	[ "$PLAYIT_WORKDIR" ] || return 1
-	[ $PKG ] || return 1
-	[ -n "$(eval printf -- '%b' \"\$${PKG}_PATH\")" ] || return 1
-
 	local archive_path
 	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
 		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
@@ -1245,7 +1246,7 @@ extract_and_sort_icons_from() {
 # USAGE: move_icons_to $pkg
 # NEEDED VARS: PATH_ICON_BASE PKG
 move_icons_to() {
-	local source_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	(
 		cd "$source_path"
@@ -1301,7 +1302,14 @@ print_instructions_arch() {
 # USAGE: print_instructions_deb $pkg[…]
 # CALLS: print_instructions_deb_apt print_instructions_deb_dpkg
 print_instructions_deb() {
-	if [ -e /etc/debian_version ] && cat /etc/debian_version | grep --invert-match '[^0-9.]' 1>/dev/null && [ $(cut -d'.' -f1 /etc/debian_version) -ge 9 ]; then
+	if which apt >/dev/null 2>&1; then
+		debian_version="$(apt --version | cut --delimiter=' ' --fields=2)"
+		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
+		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"
+	fi
+	if [ $debian_version_major -ge 2 ] ||\
+	   [ $debian_version_major = 1 ] &&\
+	   [ ${debian_version_minor%~*} -ge 1 ]; then
 		print_instructions_deb_apt "$@"
 	else
 		print_instructions_deb_dpkg "$@"
