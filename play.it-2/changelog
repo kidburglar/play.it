@@ -1,0 +1,13 @@
+2.0.1
+
+  * Test the validity of options values early in the script execution to throw
+    an error before any potentially long task
+
+  * Print 'OK' on potentially long tasks completion without a visual
+    progression indicator
+
+  * If host OS auto-detection failed, display a warning before falling back on
+    deb format
+
+  * On all distributions providing apt >= 1.1, installation instructions show
+    apt usage instead of dpkg + apt-get

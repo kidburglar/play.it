@@ -37,8 +37,12 @@ check_deps() {
 	if [ "${APP_MAIN_ICON##*.}" = 'bmp' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS convert"
 	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ] ||\
+	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
+	fi
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
+		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
 	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in

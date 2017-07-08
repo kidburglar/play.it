@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.0.0
-library_revision=20170614.1
+library_version=2.0.1
+library_revision=20170708.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -77,6 +77,12 @@ set_standard_permissions() {
 	done
 }
 
+# print OK
+# USAGE: print_ok
+print_ok() {
+	printf '\t\033[1;32mOK\033[0m\n'
+}
+
 # print a localized error message
 # USAGE: print_error
 # NEEDED VARS: (LANG)
@@ -92,6 +98,22 @@ print_error() {
 	esac
 	printf '\n\033[1;31m%s\033[0m\n' "$string"
 	exec 1>&2
+}
+
+# print a localized warning message
+# USAGE: print_warning
+# NEEDED VARS: (LANG)
+print_warning() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='Avertissement :'
+		;;
+		('en'|*)
+			string='Warning:'
+		;;
+	esac
+	printf '\n\033[1;33m%s\033[0m\n' "$string"
 }
 
 # convert files name to lower case
@@ -189,7 +211,7 @@ set_archive_error_not_found() {
 	else
 		case "${LANG%_*}" in
 			('fr')
-				string='Aucun des fichiers suivant n’est présent :\n'
+				string='Aucun des fichiers suivants n’est présent :\n'
 			;;
 			('en'|*)
 				string='None of the following files could be found:\n'
@@ -349,6 +371,7 @@ file_checksum() {
 	case "$OPTION_CHECKSUM" in
 		('md5')
 			file_checksum_md5 "$1"
+			print_ok
 		;;
 		('none')
 			return 0
@@ -383,10 +406,10 @@ file_checksum_print() {
 	local string
 	case "${LANG%_*}" in
 		('fr')
-			string='Contrôle de l’intégrité de %s\n'
+			string='Contrôle de l’intégrité de %s'
 		;;
 		('en'|*)
-			string='Checking integrity of %s\n'
+			string='Checking integrity of %s'
 		;;
 	esac
 	printf "$string" "$(basename "$1")"
@@ -453,8 +476,12 @@ check_deps() {
 	if [ "${APP_MAIN_ICON##*.}" = 'bmp' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS convert"
 	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ] ||\
+	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
+	fi
+	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
+		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
 	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in
@@ -827,7 +854,13 @@ if [ $version_major_library -ne $version_major_target ] || [ $version_minor_libr
 	exit 1
 fi
 
-# Set default values for common vars
+# Set allowed values for common options
+
+ALLOWED_VALUES_CHECKSUM='none md5'
+ALLOWED_VALUES_COMPRESSION='none gzip xz'
+ALLOWED_VALUES_PACKAGE='arch deb'
+
+# Set default values for common options
 
 DEFAULT_OPTION_CHECKSUM='md5'
 DEFAULT_OPTION_COMPRESSION='none'
@@ -835,19 +868,6 @@ DEFAULT_OPTION_PREFIX='/usr/local'
 DEFAULT_OPTION_PACKAGE='deb'
 unset winecfg_desktop
 unset winecfg_launcher
-
-# Try to detect the host distribution through lsb_release
-
-if which lsb_release >/dev/null 2>&1; then
-	case "$(lsb_release --id --short)" in
-		('Debian'|'Ubuntu')
-			DEFAULT_OPTION_PACKAGE='deb'
-		;;
-		('Arch')
-			DEFAULT_OPTION_PACKAGE='arch'
-		;;
-	esac
-fi
 
 # Parse arguments given to the script
 
@@ -864,13 +884,13 @@ while [ $# -gt 0 ]; do
 			exit 0
 		;;
 		('--checksum='*|\
-		'--checksum'|\
-		'--compression='*|\
-		'--compression'|\
-		'--prefix='*|\
-		'--prefix'|\
-		'--package='*|\
-		'--package')
+		 '--checksum'|\
+		 '--compression='*|\
+		 '--compression'|\
+		 '--prefix='*|\
+		 '--prefix'|\
+		 '--package='*|\
+		 '--package')
 			if [ "${1%=*}" != "${1#*=}" ]; then
 				option="$(printf '%s' "${1%=*}" | sed 's/^--//')"
 				value="${1#*=}"
@@ -898,12 +918,85 @@ while [ $# -gt 0 ]; do
 	shift 1
 done
 
+# Try to detect the host distribution through lsb_release
+
+if [ ! "$OPTION_PACKAGE" ]; then
+	unset GUESSED_HOST_OS
+	if [ -e '/etc/os-release' ]; then
+		GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
+	elif which lsb_release >/dev/null 2>&1; then
+		GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
+	fi
+	case "$GUESSED_HOST_OS" in
+		('debian'|\
+		 'ubuntu'|\
+		 'linuxmint'|\
+		 'handylinux')
+			DEFAULT_OPTION_PACKAGE='deb'
+		;;
+		('arch'|\
+		 'manjaro'|'manjarolinux')
+			DEFAULT_OPTION_PACKAGE='arch'
+		;;
+		(*)
+			print_warning
+			case "${LANG%_*}" in
+				('fr')
+					string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
+					string2='Le format de paquet %s sera utilisé par défaut.\n'
+				;;
+				('en'|*)
+					string1='Most pertinent package format auto-detection failed.\n'
+					string2='%s package format will be used by default.\n'
+				;;
+			esac
+			printf "$string1"
+			printf "$string2" "$DEFAULT_OPTION_PACKAGE"
+			printf '\n'
+		;;
+	esac
+fi
+
 # Set options not already set by script arguments to default values
 
 for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
 	if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 		export OPTION_$option="$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")"
 	fi
+done
+
+# Check options values validity
+
+check_option_validity() {
+	local name="$1"
+	local value="$(eval printf -- '%b' \"\$OPTION_$option\")"
+	local allowed_values="$(eval printf -- '%b' \"\$ALLOWED_VALUES_$option\")"
+	for allowed_value in $allowed_values; do
+		if [ "$value" = "$allowed_value" ]; then
+			return 0
+		fi
+	done
+	print_error
+	local string1
+	local string2
+	case "${LANG%_*}" in
+		('fr')
+			string1='%s n’est pas une valeur valide pour --%s.\n'
+			string2='Lancez le script avec l’option --%s=help pour une liste des valeurs acceptés.\n'
+		;;
+		('en'|*)
+			string1='%s is not a valid value for --%s.\n'
+			string2='Run the script with the option --%s=help to get a list of supported values.\n'
+		;;
+	esac
+	printf "$string1" "$value" "$(printf '%s' $option | tr [:upper:] [:lower:])"
+	printf "$string2" "$(printf '%s' $option | tr [:upper:] [:lower:])"
+	printf '\n'
+	exit 1
+}
+
+for option in 'CHECKSUM' 'COMPRESSION' 'PACKAGE'; do
+	check_option_validity "$option"
 done
 
 # Check script dependencies
@@ -952,10 +1045,10 @@ extract_data_from() {
 	for file in "$@"; do
 		extract_data_from_print "$(basename "$file")"
 
-
 		local destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
-		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
+		local archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+		case "$archive_type" in
 			('7z')
 				extract_7z "$file" "$destination"
 			;;
@@ -963,6 +1056,7 @@ extract_data_from() {
 				dpkg-deb --extract "$file" "$destination"
 			;;
 			('innosetup')
+				printf '\n'
 				innoextract --extract --lowercase --output-dir "$destination" --progress=1 --silent "$file"
 			;;
 			('mojosetup')
@@ -1000,6 +1094,10 @@ extract_data_from() {
 				liberror 'ARCHIVE_TYPE' 'extract_data_from'
 			;;
 		esac
+
+		if [ "$archive_type" != 'innosetup' ]; then
+			print_ok
+		fi
 	done
 }
 
@@ -1010,10 +1108,10 @@ extract_data_from() {
 extract_data_from_print() {
 	case "${LANG%_*}" in
 		('fr')
-			string='Extraction des données de %s\n'
+			string='Extraction des données de %s'
 		;;
 		('en'|*)
-			string='Extracting data from %s \n'
+			string='Extracting data from %s'
 		;;
 	esac
 	printf "$string" "$1"
@@ -1021,13 +1119,8 @@ extract_data_from_print() {
 
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: (PLAYIT_WORKDIR) (PKG) (PKG_PATH)
+# NEEDED VARS: PLAYIT_WORKDIR PKG PKG_PATH
 organize_data() {
-	[ $# = 2 ] || return 1
-	[ "$PLAYIT_WORKDIR" ] || return 1
-	[ $PKG ] || return 1
-	[ -n "$(eval printf -- '%b' \"\$${PKG}_PATH\")" ] || return 1
-
 	local archive_path
 	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
 		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
@@ -1153,7 +1246,7 @@ extract_and_sort_icons_from() {
 # USAGE: move_icons_to $pkg
 # NEEDED VARS: PATH_ICON_BASE PKG
 move_icons_to() {
-	local source_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	(
 		cd "$source_path"
@@ -1207,7 +1300,37 @@ print_instructions_arch() {
 
 # print installation instructions for Debian
 # USAGE: print_instructions_deb $pkg[…]
+# CALLS: print_instructions_deb_apt print_instructions_deb_dpkg
 print_instructions_deb() {
+	if which apt >/dev/null 2>&1; then
+		debian_version="$(apt --version | cut --delimiter=' ' --fields=2)"
+		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
+		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"
+	fi
+	if [ $debian_version_major -ge 2 ] ||\
+	   [ $debian_version_major = 1 ] &&\
+	   [ ${debian_version_minor%~*} -ge 1 ]; then
+		print_instructions_deb_apt "$@"
+	else
+		print_instructions_deb_dpkg "$@"
+	fi
+}
+
+# print installation instructions for Debian with apt
+# USAGE: print_instructions_deb_apt $pkg[…]
+# CALLED BY: print_instructions_deb
+print_instructions_deb_apt() {
+	printf 'apt install'
+	for pkg in $@; do
+		printf ' %s' "$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+	done
+	printf '\n'
+}
+
+# print installation instructions for Debian with dpkg + apt-get
+# USAGE: print_instructions_deb_dpkg $pkg[…]
+# CALLED BY: print_instructions_deb
+print_instructions_deb_dpkg() {
 	printf 'dpkg -i'
 	for pkg in $@; do
 		printf ' %s' "$(eval printf -- '%b' \"\$${pkg}_PKG\")"
@@ -1820,6 +1943,8 @@ build_pkg() {
 				liberror 'OPTION_PACKAGE' 'build_pkg'
 			;;
 		esac
+
+		print_ok
 	done
 }
 
@@ -1831,10 +1956,10 @@ pkg_print() {
 	local string
 	case "${LANG%_*}" in
 		('fr')
-			string='Construction de %s\n'
+			string='Construction de %s'
 		;;
 		('en'|*)
-			string='Building %s\n'
+			string='Building %s'
 		;;
 	esac
 	printf "$string" "$1"
@@ -1935,7 +2060,7 @@ pkg_build_arch() {
 		;;
 		('none') ;;
 		(*)
-			liberror 'OPTION_PACKAGE' 'pkg_build_arch'
+			liberror 'OPTION_COMPRESSION' 'pkg_build_arch'
 		;;
 	esac
 
@@ -2047,7 +2172,7 @@ pkg_build_deb() {
 			dpkg_options="-Z$OPTION_COMPRESSION"
 		;;
 		(*)
-			liberror 'OPTION_PACKAGE' 'pkg_build_deb'
+			liberror 'OPTION_COMPRESSION' 'pkg_build_deb'
 		;;
 	esac
 

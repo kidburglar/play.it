@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170610.1
+script_version=20170701.1
 
 # Set game-specific variables
 
 GAME_ID='baldurs-gate-ee'
 GAME_NAME='Baldur’s Gate - Enhanced Edition'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_baldur_s_gate_enhanced_edition_2.5.0.7.sh'
-ARCHIVE_GOG_MD5='37ece59534ca63a06f4c047d64b82df9'
+ARCHIVE_GOG='gog_baldur_s_gate_enhanced_edition_2.5.0.9.sh'
+ARCHIVE_GOG_MD5='224be273fd2ec1eb0246f407dda16bc4'
 ARCHIVE_GOG_SIZE='3200000'
-ARCHIVE_GOG_VERSION='2.3.67.3-gog2.5.0.7'
+ARCHIVE_GOG_VERSION='2.3.67.3-gog2.5.0.9'
+
+ARCHIVE_GOG_OLD='gog_baldur_s_gate_enhanced_edition_2.5.0.7.sh'
+ARCHIVE_GOG_OLD_MD5='37ece59534ca63a06f4c047d64b82df9'
+ARCHIVE_GOG_OLD_SIZE='3200000'
+ARCHIVE_GOG_OLD_VERSION='2.3.67.3-gog2.5.0.7'
 
 ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
