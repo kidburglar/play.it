@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170708.1
+script_version=20170709.1
 
 # Set game-specific variables
 
@@ -59,7 +59,7 @@ ARCHIVE_GAME_DATA_FILES='./bin/*.xml ./bin/*.swf ./bin/data'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='bin/adl'
-APP_MAIN_OPTIONS='bin/BotaniculaLinux-app.xml'
+APP_MAIN_OPTIONS='bin/BotaniculaLinux-app.xml -nodebug'
 APP_MAIN_ICON_PATH='bin/data/icons'
 APP_MAIN_ICON_RES='16 32 36 48 57 72 114 128 256 512'
 
