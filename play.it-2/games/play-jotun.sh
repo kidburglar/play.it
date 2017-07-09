@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170615.2
+script_version=20170709.1
 
 # Set game-specific variables
 
@@ -63,6 +63,7 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_PRERUN='pulseaudio --start'
 APP_MAIN_EXE_BIN32='Jotun.x86'
 APP_MAIN_EXE_BIN64='Jotun.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
@@ -75,12 +76,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa | libgl1, libxcursor1, libxrandr2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-libgl lib32-libxcursor lib32-libxrandr"
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa | libgl1, libxcursor1, libxrandr2, pulseaudio:amd64 | pulseaudio"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-libgl lib32-libxcursor lib32-libxrandr pulseaudio"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID libgl libxcursor libxrandr"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID libgl libxcursor libxrandr pulseaudio"
 
 # Load common functions
 
@@ -128,13 +129,17 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
