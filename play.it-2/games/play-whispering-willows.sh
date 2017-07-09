@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170704.1
+script_version=20170709.1
 
 # Set game-specific variables
 
@@ -46,7 +46,7 @@ ARCHIVES_LIST='ARCHIVE_HUMBLE'
 ARCHIVE_HUMBLE='LINUX_NO_STEAM.rar'
 ARCHIVE_HUMBLE_MD5='56c078a0208769ab2222f7e1cc0e0d57'
 ARCHIVE_HUMBLE_SIZE='1900000'
-ARCHIVE_HUMBLE_VERSION='1.0-humble151125'
+ARCHIVE_HUMBLE_VERSION='1.26-humble151125'
 ARCHIVE_HUMBLE_TYPE='rar'
 
 ARCHIVE_GAME_BIN32_PATH='LINUX_NO_STEAM'
