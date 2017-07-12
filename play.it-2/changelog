@@ -1,6 +1,9 @@
-2.0.4
+2.1.0
 
   * Display an error when calling a script with unsupported arguments
+
+  * New function easing the management of icons provided by post-installation
+    links
 
 2.0.3
 
