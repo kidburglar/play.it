@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170709.1
+script_version=20170715.1
 
 # Set game-specific variables
 
 GAME_ID='jotun'
 GAME_NAME='Jotun'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_jotun_2.1.0.2.sh'
-ARCHIVE_GOG_MD5='3f6976f56a4da1d6f274407b1342de7f'
+ARCHIVE_GOG='gog_jotun_2.2.0.4.sh'
+ARCHIVE_GOG_MD5='451d27e2e3747ed137e6ec5f3956c5da'
 ARCHIVE_GOG_SIZE='4200000'
-ARCHIVE_GOG_VERSION='1.0-gog2.1.0.2'
+ARCHIVE_GOG_VERSION='20161221-gog2.2.0.4'
+
+ARCHIVE_GOG_OLD='gog_jotun_2.1.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='3f6976f56a4da1d6f274407b1342de7f'
+ARCHIVE_GOG_OLD_SIZE='4200000'
+ARCHIVE_GOG_OLD_VERSION='1.0-gog2.1.0.2'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
