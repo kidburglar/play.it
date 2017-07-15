@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170715.1
+script_version=20170715.2
 
 # Set game-specific variables
 
@@ -170,6 +170,12 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
+
+
+# Allow persistent logging via output redirection to work
+
+sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
+sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
 
 # Build package
 
