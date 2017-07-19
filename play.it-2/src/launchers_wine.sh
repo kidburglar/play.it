@@ -39,7 +39,7 @@ write_bin_build_wine() {
 	cat >> "$file" <<- 'EOF'
 	export WINEPREFIX WINEARCH WINEDEBUG WINEDLLOVERRIDES
 	if ! [ -e "$WINEPREFIX" ]; then
-	  mkdir --parents "$WINEPREFIX"
+	  mkdir --parents "${WINEPREFIX%/*}"
 	  wineboot --init 2>/dev/null
 	  rm "$WINEPREFIX/dosdevices/z:"
 	EOF
