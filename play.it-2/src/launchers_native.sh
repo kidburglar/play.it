@@ -3,17 +3,22 @@
 # CALLED BY: write_bin_run
 write_bin_run_native() {
 	cat >> "$file" <<- 'EOF'
-	# Run the game
+	# Copy the game binary into the user prefix
 
-	cd "$PATH_PREFIX"
-	rm --force "$APP_EXE"
 	if [ -e "$PATH_DATA/$APP_EXE" ]; then
 	  source_dir="$PATH_DATA"
 	else
 	  source_dir="$PATH_GAME"
 	fi
-	mkdir --parents "$(dirname $APP_EXE)"
-	cp "$source_dir/$APP_EXE" "$APP_EXE"
+
+	(
+	  cd "$source_dir"
+	  cp --parents --remove-destination "$APP_EXE" "$PATH_PREFIX"
+	)
+
+	# Run the game
+
+	cd "$PATH_PREFIX"
 	EOF
 
 	if [ "$app_prerun" ]; then
