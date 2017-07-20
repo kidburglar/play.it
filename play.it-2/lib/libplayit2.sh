@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.0.1
-library_revision=20170708.1
+library_version=2.0.2
+library_revision=20170720.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1721,17 +1721,22 @@ write_bin_run_dosbox() {
 # CALLED BY: write_bin_run
 write_bin_run_native() {
 	cat >> "$file" <<- 'EOF'
-	# Run the game
+	# Copy the game binary into the user prefix
 
-	cd "$PATH_PREFIX"
-	rm --force "$APP_EXE"
 	if [ -e "$PATH_DATA/$APP_EXE" ]; then
 	  source_dir="$PATH_DATA"
 	else
 	  source_dir="$PATH_GAME"
 	fi
-	mkdir --parents "$(dirname $APP_EXE)"
-	cp "$source_dir/$APP_EXE" "$APP_EXE"
+
+	(
+	  cd "$source_dir"
+	  cp --parents --remove-destination "$APP_EXE" "$PATH_PREFIX"
+	)
+
+	# Run the game
+
+	cd "$PATH_PREFIX"
 	EOF
 
 	if [ "$app_prerun" ]; then
@@ -1822,7 +1827,7 @@ write_bin_build_wine() {
 	cat >> "$file" <<- 'EOF'
 	export WINEPREFIX WINEARCH WINEDEBUG WINEDLLOVERRIDES
 	if ! [ -e "$WINEPREFIX" ]; then
-	  mkdir --parents "$WINEPREFIX"
+	  mkdir --parents "${WINEPREFIX%/*}"
 	  wineboot --init 2>/dev/null
 	  rm "$WINEPREFIX/dosdevices/z:"
 	EOF
