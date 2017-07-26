@@ -34,23 +34,25 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20160501.1
+script_version=20170726.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unar'
+SCRIPT_DEPS_HARD='fakeroot innoextract realpath'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='vampire-the-masquerade-bloodlines'
 GAME_ID_SHORT='bloodlines'
 GAME_NAME='Vampire: The Masquerade - Bloodlines'
 
-GAME_ARCHIVE1='setup_vtm_bloodlines_2.0.0.7-1.bin'
-GAME_ARCHIVE1_MD5='9099faa1e6444ac58e8ecc00a6c3b1e9'
-GAME_ARCHIVE_FULLSIZE='4000000'
-PKG_REVISION='gog2.0.0.7'
+GAME_ARCHIVE1='setup_vtmb_1.2_(up_9.7_basic)_(11362).exe'
+GAME_ARCHIVE1_MD5='62b8db3b054595fb46bd8eaa5f8ae7bc'
+GAME_ARCHIVE1_FILE2='setup_vtmb_1.2_(up_9.7_basic)_(11362)-1.bin'
+GAME_ARCHIVE1_FILE2_MD5='4177042d5a6e03026d52428e900e6137'
+GAME_ARCHIVE_FULLSIZE='4100000'
+PKG_REVISION='gog11362'
 
-INSTALLER_PATH='game'
+INSTALLER_PATH='app'
 INSTALLER_JUNK='./goggame-* ./webcache.zip'
 INSTALLER_DOC='./*.pdf ./*.txt docs/*'
 INSTALLER_GAME='./*'
@@ -72,8 +74,8 @@ APP1_EXE='./vampire.exe'
 APP1_EXE_OPTIONS='-game unofficial_patch'
 APP1_ICON='./vampire.exe'
 APP1_ICON_RES='32x32'
-APP1_NAME="${GAME_NAME} (Unofficial Patch 9.5)"
-APP1_NAME_FR="${GAME_NAME} (Unofficial Patch 9.5)"
+APP1_NAME="${GAME_NAME} (Unofficial Patch 9.7)"
+APP1_NAME_FR="${GAME_NAME} (Unofficial Patch 9.7)"
 APP1_CAT='Game'
 
 APP2_ID="${GAME_ID}_vanilla"
@@ -147,12 +149,16 @@ PATH_ICON_BASE='/usr/local/share/icons/hicolor'
 
 printf '\n'
 set_target '1' 'gog.com'
+set_target_extra 'GAME_ARCHIVE1_FILE2' '' "${GAME_ARCHIVE1_FILE2}"
 printf '\n'
 
 # Check target file integrity
 
 if [ "${GAME_ARCHIVE_CHECKSUM}" = 'md5sum' ]; then
-	checksum "${GAME_ARCHIVE}" 'defaults' "${GAME_ARCHIVE1_MD5}"
+	printf '%s…\n' "$(l10n 'checksum_multiple')"
+	checksum "${GAME_ARCHIVE}" 'quiet' "${GAME_ARCHIVE1_MD5}"
+	checksum "${GAME_ARCHIVE1_FILE2}" 'quiet' "${GAME_ARCHIVE1_FILE2_MD5}"
+	print done
 fi
 
 # Extract game data
@@ -160,7 +166,7 @@ fi
 build_pkg_dirs '1' "${PATH_BIN}" "${PATH_DOC}" "${PATH_DESK}" "${PATH_GAME}"
 print wait
 
-extract_data 'unar_passwd' "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'quiet,tolower' 2>/dev/null
+extract_data 'inno' "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'quiet'
 
 cd "${PKG_TMPDIR}/${INSTALLER_PATH}"
 for file in ${INSTALLER_JUNK}; do
