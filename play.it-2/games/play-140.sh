@@ -34,54 +34,63 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170626.1
+script_version=20170726.1
 
 # Set game-specific variables
 
 GAME_ID='140-game'
 GAME_NAME='140'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE ARCHIVE_GOG_OLD ARCHIVE_HUMBLE_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE ARCHIVE_GOG_OLD ARCHIVE_HUMBLE_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='gog_140_2.1.0.2.sh'
-ARCHIVE_GOG_MD5='6139b77721657a919085aea9f13cf42b'
+ARCHIVE_GOG='gog_140_2.2.0.3.sh'
+ARCHIVE_GOG_MD5='03e760fa1b667059db7713a9e6c06b6d'
 ARCHIVE_GOG_SIZE='130000'
-ARCHIVE_GOG_VERSION='2.0.20170619-gog2.1.0.2'
+ARCHIVE_GOG_VERSION='2.0.20170719r370-gog2.2.0.3'
 
 ARCHIVE_HUMBLE='140-nodrm-linux-2017-06-20.zip'
 ARCHIVE_HUMBLE_MD5='5bbc48b203291ca9a0b141e3d07dacbe'
 ARCHIVE_HUMBLE_SIZE='130000'
 ARCHIVE_HUMBLE_VERSION='2.0.20170619-humble170620'
 
-ARCHIVE_GOG_OLD='gog_140_2.0.0.1.sh'
-ARCHIVE_GOG_OLD_MD5='49ec4cff5fa682517e640a2d0eb282c8'
-ARCHIVE_GOG_OLD_SIZE='110000'
-ARCHIVE_GOG_OLD_VERSION='2.0-gog2.0.0.1'
+ARCHIVE_GOG_OLD='gog_140_2.1.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='6139b77721657a919085aea9f13cf42b'
+ARCHIVE_GOG_OLD_SIZE='130000'
+ARCHIVE_GOG_OLD_VERSION='2.0.20170619-gog2.1.0.2'
 
 ARCHIVE_HUMBLE_OLD='140_Linux.zip'
 ARCHIVE_HUMBLE_OLD_MD5='0829eb743010653633571b3da20502a8'
 ARCHIVE_HUMBLE_OLD_SIZE='110000'
 ARCHIVE_HUMBLE_OLD_VERSION='2.0-humble160914'
 
+ARCHIVE_GOG_OLDER='gog_140_2.0.0.1.sh'
+ARCHIVE_GOG_OLDER_MD5='49ec4cff5fa682517e640a2d0eb282c8'
+ARCHIVE_GOG_OLDER_SIZE='110000'
+ARCHIVE_GOG_OLDER_VERSION='2.0-gog2.0.0.1'
+
 ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_BIN32_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE='linux'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE_OLD='.'
 ARCHIVE_GAME_BIN32_FILES='./140.x86 ./140Linux.x86 ./140_Data/*/x86 ./140Linux_Data/*/x86'
 
 ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN64_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_BIN64_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE='linux'
 ARCHIVE_GAME_BIN64_PATH_HUMBLE_OLD='.'
 ARCHIVE_GAME_BIN64_FILES='./140.x86_64 ./140Linux.x86_64 ./140_Data/*/x86_64 ./140Linux_Data/*/x86_64'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='linux'
 ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD='.'
 ARCHIVE_GAME_DATA_FILES='./140_Data ./140Linux_Data'
 
 DATA_DIRS='./logs'
+DATA_FILES='./140.sav'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_PRERUN='pulseaudio --start'
@@ -100,11 +109,11 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
 PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1, pulseaudio"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-alsa-lib lib32-libxcursor pulseaudio"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-alsa-lib lib32-libxcursor pulseaudio"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu alsa-lib libxcursor pulseaudio"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs glu alsa-lib libxcursor pulseaudio"
 
 # Load common functions
 
@@ -142,7 +151,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-if [ "${SOURCE_ARCHIVE##*/}" = "$ARCHIVE_GOG_OLD" ] ||\
+if [ "${SOURCE_ARCHIVE##*/}" = "$ARCHIVE_GOG_OLDER" ] ||\
    [ "${SOURCE_ARCHIVE##*/}" = "$ARCHIVE_HUMBLE_OLD" ]; then
 	APP_MAIN_EXE_BIN32="$APP_MAIN_EXE_BIN32_OLD"
 	APP_MAIN_EXE_BIN64="$APP_MAIN_EXE_BIN64_OLD"
@@ -160,13 +169,17 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --force --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --force --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm --force "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm --force "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
@@ -176,7 +189,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

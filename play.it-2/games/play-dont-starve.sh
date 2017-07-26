@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20170717.1
 
 # Set game-specific variables
 
@@ -120,10 +120,12 @@ for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
 
+# Set working directory to the directory containing the game binary before running it
+
 sed --in-place 's|cd "$PATH_PREFIX"|cd "$PATH_PREFIX/${APP_EXE%/*}"|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
 sed --in-place 's|cd "$PATH_PREFIX"|cd "$PATH_PREFIX/${APP_EXE%/*}"|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|./$APP_EXE|./${APP_EXE##*/}|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|./$APP_EXE|./${APP_EXE##*/}|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+sed --in-place 's|"\./$APP_EXE" \($APP_OPTIONS $@\)|"./${APP_EXE##*/}" \1|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
+sed --in-place 's|"\./$APP_EXE" \($APP_OPTIONS $@\)|"./${APP_EXE##*/}" \1|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
 
 # Build package
 
