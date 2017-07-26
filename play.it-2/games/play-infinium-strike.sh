@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170605.1
+script_version=20170726.1
 
 # Set game-specific variables
 
 GAME_ID='infinium-strike'
 GAME_NAME='Infinium Strike'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_infinium_strike_2.1.0.2.sh'
-ARCHIVE_GOG_MD5='57725aad8ba419d80788412f8f33f030'
+ARCHIVE_GOG='gog_infinium_strike_2.1.0.3.sh'
+ARCHIVE_GOG_MD5='c19f2032aae3011dc38cc85e7153fb44'
 ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.0.5-gog2.1.0.2'
+ARCHIVE_GOG_VERSION='1.0.5-gog2.1.0.3'
+
+ARCHIVE_GOG_OLD='gog_infinium_strike_2.1.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='57725aad8ba419d80788412f8f33f030'
+ARCHIVE_GOG_OLD_SIZE='2500000'
+ARCHIVE_GOG_OLD_VERSION='1.0.5-gog2.1.0.2'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -124,13 +129,17 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
