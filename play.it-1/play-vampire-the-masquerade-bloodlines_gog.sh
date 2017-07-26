@@ -28,62 +28,70 @@
 ###
 
 ###
-# conversion script for the Dragonsphere installer sold on GOG.com
-# build a .deb package from the .sh MojoSetup installer
-# tested on Debian, should work on any .deb-based distribution
+# conversion script for the Vampire the Masquerade: Bloodlines installer sold on GOG
+# build a .deb package from the Windows installer
 #
 # send your bug reports to vv221@dotslashplay.it
-# start the e-mail subject by "./play.it" to avoid it being flagged as spam
 ###
 
-script_version=20160225.1
+script_version=20170726.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot innoextract realpath'
+SCRIPT_DEPS_SOFT='icotool wrestool'
 
-GAME_ID='dragonsphere'
-GAME_ID_SHORT='sphere'
-GAME_NAME='Dragonsphere'
+GAME_ID='vampire-the-masquerade-bloodlines'
+GAME_ID_SHORT='bloodlines'
+GAME_NAME='Vampire: The Masquerade - Bloodlines'
 
-GAME_ARCHIVE1='gog_dragonsphere_2.0.0.2.sh'
-GAME_ARCHIVE1_MD5='babc8b0ada6577bd494af8fbb7be0269'
-GAME_ARCHIVE_FULLSIZE='91000'
-PKG_REVISION='gog2.0.0.2'
+GAME_ARCHIVE1='setup_vtmb_1.2_(up_9.7_basic)_(11362).exe'
+GAME_ARCHIVE1_MD5='62b8db3b054595fb46bd8eaa5f8ae7bc'
+GAME_ARCHIVE1_FILE2='setup_vtmb_1.2_(up_9.7_basic)_(11362)-1.bin'
+GAME_ARCHIVE1_FILE2_MD5='4177042d5a6e03026d52428e900e6137'
+GAME_ARCHIVE_FULLSIZE='4100000'
+PKG_REVISION='gog11362'
 
-INSTALLER_DOC='data/noarch/docs/*'
-INSTALLER_GAME='data/noarch/data/game.gog data/noarch/data/game.ins data/noarch/data/dragon/*'
-
-GAME_IMAGE='./game.ins'
+INSTALLER_PATH='app'
+INSTALLER_JUNK='./goggame-* ./webcache.zip'
+INSTALLER_DOC='./*.pdf ./*.txt docs/*'
+INSTALLER_GAME='./*'
 
 GAME_CACHE_DIRS=''
 GAME_CACHE_FILES=''
-GAME_CACHE_FILES_POST=''
-GAME_CONFIG_DIRS=''
-GAME_CONFIG_FILES='./config.dra'
-GAME_CONFIG_FILES_POST=''
-GAME_DATA_DIRS=''
-GAME_DATA_FILES='./SAVES.DIR'
-GAME_DATA_FILES_POST='./DRAG*.SAV'
+GAME_CACHE_FILES_POST='unofficial_patch/*.tmp vampire/*.tmp'
+GAME_CONFIG_DIRS='unofficial_patch/cfg vampire/cfg'
+GAME_CONFIG_FILES=''
+GAME_CONFIG_FILES_POST='unofficial_patch/vidcfg.bin vampire/vidcfg.bin'
+GAME_DATA_DIRS='unofficial_patch/maps/graphs unofficial_patch/python unofficial_patch/save vampire/maps/graphs vampire/python vampire/save'
+GAME_DATA_FILES=''
+GAME_DATA_FILES_POST=''
 
 APP_COMMON_ID="${GAME_ID_SHORT}-common.sh"
 
 APP1_ID="${GAME_ID}"
-APP1_EXE='./mainmenu.exe'
-APP1_ICON='./data/noarch/support/icon.png'
-APP1_ICON_RES='256x256'
-APP1_NAME="${GAME_NAME}"
-APP1_NAME_FR="${GAME_NAME}"
+APP1_EXE='./vampire.exe'
+APP1_EXE_OPTIONS='-game unofficial_patch'
+APP1_ICON='./vampire.exe'
+APP1_ICON_RES='32x32'
+APP1_NAME="${GAME_NAME} (Unofficial Patch 9.7)"
+APP1_NAME_FR="${GAME_NAME} (Unofficial Patch 9.7)"
 APP1_CAT='Game'
 
+APP2_ID="${GAME_ID}_vanilla"
+APP2_EXE='./vampire.exe'
+APP2_NAME="${GAME_NAME} (vanilla 1.2)"
+APP2_NAME_FR="${GAME_NAME} (vanilla 1.2)"
+APP2_CAT='Game'
+
 PKG1_ID="${GAME_ID}"
-PKG1_ARCH='all'
-PKG1_VERSION='1.0'
+PKG1_VERSION='1.2'
+PKG1_ARCH='i386'
 PKG1_CONFLICTS=''
-PKG1_DEPS='dosbox'
+PKG1_DEPS='wine:amd64 | wine, wine32 | wine-bin | wine1.6-i386 | wine1.4-i386 | wine-staging-i386'
 PKG1_RECS=''
 PKG1_DESC="${GAME_NAME}
- package built from GOG.com installer
+ package built from GOG.com Windows installer
  ./play.it script version ${script_version}"
 
 # Load common functions
@@ -128,6 +136,7 @@ set_compression
 set_prefix
 
 check_deps_hard ${SCRIPT_DEPS_HARD}
+check_deps_soft ${SCRIPT_DEPS_SOFT}
 
 game_mkdir 'PKG_TMPDIR' "$(mktemp -u ${GAME_ID_SHORT}.XXXXX)" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG1_VERSION}-${PKG_REVISION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
@@ -136,57 +145,95 @@ PATH_BIN="${PKG_PREFIX}/games"
 PATH_DESK='/usr/local/share/applications'
 PATH_DOC="${PKG_PREFIX}/share/doc/${GAME_ID}"
 PATH_GAME="${PKG_PREFIX}/share/games/${GAME_ID}"
-PATH_ICON="/usr/local/share/icons/hicolor/${APP1_ICON_RES}/apps"
+PATH_ICON_BASE='/usr/local/share/icons/hicolor'
 
 printf '\n'
-
 set_target '1' 'gog.com'
-
+set_target_extra 'GAME_ARCHIVE1_FILE2' '' "${GAME_ARCHIVE1_FILE2}"
 printf '\n'
 
 # Check target file integrity
 
 if [ "${GAME_ARCHIVE_CHECKSUM}" = 'md5sum' ]; then
-	checksum "${GAME_ARCHIVE}" 'defaults' "${GAME_ARCHIVE1_MD5}"
+	printf '%s…\n' "$(l10n 'checksum_multiple')"
+	checksum "${GAME_ARCHIVE}" 'quiet' "${GAME_ARCHIVE1_MD5}"
+	checksum "${GAME_ARCHIVE1_FILE2}" 'quiet' "${GAME_ARCHIVE1_FILE2_MD5}"
+	print done
 fi
 
 # Extract game data
 
-build_pkg_dirs '1' "${PATH_BIN}" "${PATH_DESK}" "${PATH_DOC}" "${PATH_GAME}" "${PATH_ICON}"
+build_pkg_dirs '1' "${PATH_BIN}" "${PATH_DOC}" "${PATH_DESK}" "${PATH_GAME}"
+print wait
 
-extract_data 'mojo' "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'fix_rights,tolower'
+extract_data 'inno' "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'quiet'
+
+cd "${PKG_TMPDIR}/${INSTALLER_PATH}"
+for file in ${INSTALLER_JUNK}; do
+	rm -rf "${file}"
+done
 
 for file in ${INSTALLER_DOC}; do
-	mv "${PKG_TMPDIR}"/${file} "${PKG1_DIR}${PATH_DOC}"
+	mv "${file}" "${PKG1_DIR}${PATH_DOC}"
 done
+rmdir docs
 
 for file in ${INSTALLER_GAME}; do
-	mv "${PKG_TMPDIR}"/${file} "${PKG1_DIR}${PATH_GAME}"
+	mv "${file}" "${PKG1_DIR}${PATH_GAME}"
 done
+cd - 1>/dev/null
 
-sed -i 's/GAME.GOG/game.gog/' "${PKG1_DIR}${PATH_GAME}/${GAME_IMAGE}"
-
-mv "${PKG_TMPDIR}/${APP1_ICON}" "${PKG1_DIR}${PATH_ICON}/${GAME_ID}.png"
+if [ "${NO_ICON}" = '0' ]; then
+	extract_icons "${APP1_ID}" "${APP1_ICON}" "${APP1_ICON_RES}" "${PKG_TMPDIR}"
+fi
 
 rm -rf "${PKG_TMPDIR}"
+print done
 
 # Write launchers
 
-write_bin_dosbox_common "${PKG1_DIR}${PATH_BIN}/${APP_COMMON_ID}"
-write_bin_dosbox "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE}" '' '' "${APP1_NAME}"
+write_bin_wine_common "${PKG1_DIR}${PATH_BIN}/${APP_COMMON_ID}"
+write_bin_wine_cfg "${PKG1_DIR}${PATH_BIN}/${GAME_ID_SHORT}-winecfg"
+write_bin_wine "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE}" "${APP1_EXE_OPTIONS}" '' "${APP1_NAME}"
+write_bin_wine "${PKG1_DIR}${PATH_BIN}/${APP2_ID}" "${APP2_EXE}" '' '' "${APP2_NAME}"
 
-write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_NAME_FR}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop" "${APP1_CAT}" 'dosbox'
-
+write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_NAME_FR}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop" "${APP1_CAT}" 'wine'
+write_desktop "${APP2_ID}" "${APP2_NAME}" "${APP2_NAME_FR}" "${PKG1_DIR}${PATH_DESK}/${APP2_ID}.desktop" "${APP2_CAT}" 'wine'
 printf '\n'
 
 # Build package
 
 write_pkg_debian "${PKG1_DIR}" "${PKG1_ID}" "${PKG1_VERSION}-${PKG_REVISION}" "${PKG1_ARCH}" "${PKG1_CONFLICTS}" "${PKG1_DEPS}" "${PKG1_RECS}" "${PKG1_DESC}"
 
+if [ "${NO_ICON}" = '0' ]; then
+	file="${PKG1_DIR}/DEBIAN/postinst"
+	cat > "${file}" <<- EOF
+	#!/bin/sh -e
+	for res in ${APP1_ICON_RES}; do
+	  path_icon="${PATH_ICON_BASE}/\${res}/apps"
+	  ln -s "./${APP1_ID}.png" "\${path_icon}/${APP2_ID}.png"
+	done
+	exit 0
+	EOF
+	sed -i 's/  /\t/' "${file}"
+	chmod 755 "${file}"
+
+	file="${PKG1_DIR}/DEBIAN/prerm"
+	cat > "${file}" <<- EOF
+	#!/bin/sh -e
+	for res in ${APP1_ICON_RES}; do
+	  path_icon="${PATH_ICON_BASE}/\${res}/apps"
+	  rm -f "\${path_icon}/${APP2_ID}.png"
+	done
+	exit 0
+	EOF
+	sed -i 's/  /\t/' "${file}"
+	chmod 755 "${file}"
+fi
+
 build_pkg "${PKG1_DIR}" "${PKG1_DESC}" "${PKG_COMPRESSION}"
 
 print_instructions "${PKG1_DESC}" "${PKG1_DIR}"
-
 printf '\n%s ;)\n\n' "$(l10n 'have_fun')"
 
 exit 0
