@@ -36,7 +36,7 @@
 # start the e-mail subject by "./play.it" to avoid it being flagged as spam
 ###
 
-script_version=20160225.1
+script_version=20170726.1
 
 # Set game-specific variables
 
@@ -46,10 +46,10 @@ GAME_ID='dragonsphere'
 GAME_ID_SHORT='sphere'
 GAME_NAME='Dragonsphere'
 
-GAME_ARCHIVE1='gog_dragonsphere_2.0.0.2.sh'
-GAME_ARCHIVE1_MD5='babc8b0ada6577bd494af8fbb7be0269'
+GAME_ARCHIVE1='gog_dragonsphere_2.0.0.3.sh'
+GAME_ARCHIVE1_MD5='9dd42821c144aa87fd01b595607471c9'
 GAME_ARCHIVE_FULLSIZE='91000'
-PKG_REVISION='gog2.0.0.2'
+PKG_REVISION='gog2.0.0.3'
 
 INSTALLER_DOC='data/noarch/docs/*'
 INSTALLER_GAME='data/noarch/data/game.gog data/noarch/data/game.ins data/noarch/data/dragon/*'
