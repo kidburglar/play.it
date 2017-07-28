@@ -11,6 +11,9 @@
   * The library can now be loaded without implying that it has been called by
     a ./play.it script
 
+  * New script 'play.it' automatically loading the adequate game-specific
+    script for the archive given in argument
+
 2.0.3
 
   * Fix error displayed when building .deb packages on systems without apt

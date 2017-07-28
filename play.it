@@ -1,0 +1,64 @@
+#!/bin/sh -e
+
+set -o errexit
+
+INPUT_FILE="$1"
+shift 1
+
+LIB_ONLY=true
+
+if [ -z "$PLAYIT_LIB2" ]; then
+	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
+	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	elif [ -e './libplayit2.sh' ]; then
+		PLAYIT_LIB2='./libplayit2.sh'
+	elif [ -e './play.it-2/lib/libplayit2.sh' ]; then
+		PLAYIT_LIB2='./play.it-2/lib/libplayit2.sh'
+	else
+		printf '\n\033[1;31mError:\033[0m\n'
+		printf 'libplayit2.sh not found.\n'
+		return 1
+	fi
+fi
+. "$PLAYIT_LIB2"
+
+check_deps 'md5sum'
+
+if [ ! -f "$INPUT_FILE" ]; then
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='%s n’est pas un fichier valide\n'
+		;;
+		('en'|*)
+			string='%s is not a valid file\n'
+		;;
+	esac
+	printf "$string" "$INPUT_FILE"
+	return 1
+fi
+
+FILE_MD5="$(md5sum $INPUT_FILE | cut --delimiter=' ' --fields=1)"
+SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" "$(dirname $0)"/play.it-* | sort --reverse | head --lines=1)"
+
+if [ -z "$SCRIPT" ]; then
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='Impossible de trouver un script pour la somme MD5 %s\n'
+		;;
+		('en'|*)
+			string='Could not find script for hash %s\n'
+		;;
+	esac
+	printf "$string" "$FILE_MD5"
+	return 1
+fi
+
+export PLAYIT_LIB="$(dirname "$0")/play.it-1/play-anything.sh"
+export PLAYIT_LIB2
+
+"$SCRIPT" "$INPUT_FILE" --checksum=none "$@"
+
+exit 0
