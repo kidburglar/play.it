@@ -29,50 +29,58 @@ set -o errexit
 ###
 
 ###
-# HuniePop
+# A Bird Story
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170727.1
+script_version=20170706.1
 
 # Set game-specific variables
 
-GAME_ID='huniepop'
-GAME_NAME='HuniePop'
+GAME_ID='a-bird-story'
+GAME_NAME='A Bird Story'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_huniepop_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='020cd6a015bd79a907f6c607102d797a'
-ARCHIVE_GOG_SIZE='940000'
-ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.2'
+ARCHIVE_GOG='gog_a_bird_story_2.0.0.2.sh'
+ARCHIVE_GOG_MD5='8f93d19265394a5fba61aeec23cabb8e'
+ARCHIVE_GOG_SIZE='180000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC1_PATH='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono ./*_Data/Plugins'
+ARCHIVE_DOC2_PATH='data/noarch/game'
+ARCHIVE_DOC2_FILES='./legal ./LICENSE.txt'
+
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./ABirdStory.x86 ./lib'
+
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./ABirdStory.amd64 ./lib64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data/*'
-
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_FILES='./Audio.dat ./croptextures ./Game.ini ./Game.rgssad ./icon.png ./mkxp.conf ./preload'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./HuniePop.x86'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE_BIN32='ABirdStory.x86'
+APP_MAIN_EXE_BIN64='ABirdStory.amd64'
+APP_MAIN_ICON='icon.png'
+APP_MAIN_ICON_RES='48'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lsb-release lib32-libxcursor"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libvorbisfile3, libopenal1, libsdl2-2.0-0, libsdl2-image-2.0-0"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libvorbis lib32-openal lib32-sdl2 lib32-sdl2_image"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libvorbis openal sdl2 sdl2_image"
 
 # Load common functions
 
@@ -96,19 +104,24 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+PKG='PKG_BIN32'
+organize_data 'GAME_BIN32' "$PATH_GAME"
+
+PKG='PKG_BIN64'
+organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
+organize_data 'DOC1' "$PATH_DOC"
+organize_data 'DOC2' "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
@@ -116,30 +129,30 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON"
-	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
-fi
+mkdir --parents "$PATH_ICON"
+ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
 EOF
 
 cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
-	rm "$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
-fi
+rm "$PATH_ICON/$GAME_ID.png"
+rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
 EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
 
-rm --recursive "$PLAYIT_WORKDIR"
+rm --recursive "${PLAYIT_WORKDIR}"
 
-#print instructions
+# Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0

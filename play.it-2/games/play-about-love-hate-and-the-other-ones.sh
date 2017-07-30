@@ -29,50 +29,55 @@ set -o errexit
 ###
 
 ###
-# HuniePop
+# About Love, Hate and the Other Ones
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170727.1
+script_version=20170720.1
 
 # Set game-specific variables
 
-GAME_ID='huniepop'
-GAME_NAME='HuniePop'
+GAME_ID='about-love-hate-and-the-other-ones'
+GAME_NAME='About Love, Hate and the Other Ones'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_huniepop_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='020cd6a015bd79a907f6c607102d797a'
-ARCHIVE_GOG_SIZE='940000'
-ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.2'
+ARCHIVE_HUMBLE='aboutloveandhate-1.3.1.deb'
+ARCHIVE_HUMBLE_MD5='65c314a2a970b5c787d4e7e2a837e211'
+ARCHIVE_HUMBLE_SIZE='570000'
+ARCHIVE_HUMBLE_VERSION='1.3.1-humble150312'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_PATH='usr/local/games/loveandhate'
+ARCHIVE_DOC_FILES='./README'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono ./*_Data/Plugins'
+ARCHIVE_GAME_BIN32_PATH='usr/local/games/loveandhate/bin32'
+ARCHIVE_GAME_BIN32_FILES='./loveandhate'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data/*'
+ARCHIVE_GAME_BIN64_PATH='usr/local/games/loveandhate/bin64'
+ARCHIVE_GAME_BIN64_FILES='./loveandhate'
 
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_PATH='usr/local/games/loveandhate'
+ARCHIVE_GAME_DATA_FILES='./bin'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./HuniePop.x86'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE_BIN32='loveandhate'
+APP_MAIN_EXE_BIN64='loveandhate'
+APP_MAIN_ICON_PATH='usr/share/icons/hicolor'
+APP_MAIN_ICON_RES='16 24 32 48 64 128 256'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lsb-release lib32-libxcursor"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa | libgl1, libxcursor1, libxrandr2"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libgl lib32-libxcursor lib32-libxrandr"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libgl libxcursor libxrandr"
 
 # Load common functions
 
@@ -96,50 +101,45 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+PKG='PKG_BIN32'
+organize_data 'GAME_BIN32' "$PATH_GAME"
+
+PKG='PKG_BIN64'
+organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
+for res in $APP_MAIN_ICON_RES; do
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_PATH/${res}x${res}/apps/loveandhate.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+done
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-
-cat > "$postinst" << EOF
-if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON"
-	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
-fi
-EOF
-
-cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
-	rm "$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
-fi
-EOF
-
-write_metadata 'PKG_DATA'
-rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "$PLAYIT_WORKDIR"
+rm --recursive "${PLAYIT_WORKDIR}"
 
-#print instructions
+# Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0

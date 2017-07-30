@@ -29,41 +29,39 @@ set -o errexit
 ###
 
 ###
-# HuniePop
+# Antichamber
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170727.1
+script_version=20170722.2
 
 # Set game-specific variables
 
-GAME_ID='huniepop'
-GAME_NAME='HuniePop'
+GAME_ID='antichamber'
+GAME_NAME='Antichamber'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_huniepop_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='020cd6a015bd79a907f6c607102d797a'
-ARCHIVE_GOG_SIZE='940000'
-ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.2'
+ARCHIVE_HUMBLE='antichamber_1.01_linux_1392664980.sh'
+ARCHIVE_HUMBLE_MD5='37bca01c411d813c8729259b7db2dba0'
+ARCHIVE_HUMBLE_SIZE='690000'
+ARCHIVE_HUMBLE_VERSION='1.01-humble1'
+ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_PATH='data/noarch'
+ARCHIVE_DOC_FILES='./*.txt ./README.linux'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono ./*_Data/Plugins'
+ARCHIVE_GAME_BIN_PATH='data/x86'
+ARCHIVE_GAME_BIN_FILES='./Binaries'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data/*'
-
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_PATH='data/noarch'
+ARCHIVE_GAME_DATA_FILES='./*'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./HuniePop.x86'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE='Binaries/Linux/UDKGame-Linux'
+APP_MAIN_ICON='AntichamberIcon.png'
+APP_MAIN_ICON_RES='256'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
@@ -71,8 +69,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lsb-release lib32-libxcursor"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa | libgl1, libvorbisfile3, libsdl2-mixer-2.0-0, libsdl2-2.0-0, libogg0"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-libgl lib32-libvorbis lib32-gcc-libs lib32-sdl2_mixer lib32-libogg lib32-sdl2"
 
 # Load common functions
 
@@ -100,7 +98,7 @@ PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
+organize_data 'DOC'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -109,6 +107,8 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
+sed --in-place 's|"./$APP_EXE" \($APP_OPTIONS $@\)|cd "${APP_EXE%/*}"\n"./${APP_EXE##*/}" \1|' "${PKG_BIN_PATH}${PATH_BIN}/$GAME_ID"
 
 # Build package
 
@@ -138,7 +138,7 @@ build_pkg
 
 rm --recursive "$PLAYIT_WORKDIR"
 
-#print instructions
+# Print instructions
 
 print_instructions
 

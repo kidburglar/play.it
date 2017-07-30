@@ -29,38 +29,35 @@ set -o errexit
 ###
 
 ###
-# HuniePop
+# Thomas Was Alone
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170727.1
+script_version=20170715.1
 
 # Set game-specific variables
 
-GAME_ID='huniepop'
-GAME_NAME='HuniePop'
+GAME_ID='thomas-was-alone'
+GAME_NAME='Thomas Was Alone'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_huniepop_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='020cd6a015bd79a907f6c607102d797a'
-ARCHIVE_GOG_SIZE='940000'
-ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.2'
+ARCHIVE_HUMBLE='thomaswasalone-linux-1369349552.tar'
+ARCHIVE_HUMBLE_MD5='e7f8e766188718e16880b1137c430f35'
+ARCHIVE_HUMBLE_SIZE='250000'
+ARCHIVE_HUMBLE_VERSION='1.0-humble1'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='thomasLinuxStandalone'
+ARCHIVE_GAME_BIN_FILES='./thomasWasAlone ./*_Data/*/x86'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono ./*_Data/Plugins'
-
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data/*'
+ARCHIVE_GAME_DATA_PATH='thomasLinuxStandalone'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./HuniePop.x86'
+APP_MAIN_EXE_BIN='thomasWasAlone'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
@@ -71,8 +68,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lsb-release lib32-libxcursor"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libglu1-mesa | libglu1"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libxcursor lib32-glu lib32-gcc-libs"
 
 # Load common functions
 
@@ -95,12 +92,12 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -116,14 +113,14 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
+if [ ! -e "${PATH_ICON}/${GAME_ID}.png" ]; then
 	mkdir --parents "$PATH_ICON"
 	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
 fi
 EOF
 
 cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+if [ -e "${PATH_ICON}/${GAME_ID}.png" ]; then
 	rm "$PATH_ICON/$GAME_ID.png"
 	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
 fi
@@ -138,7 +135,7 @@ build_pkg
 
 rm --recursive "$PLAYIT_WORKDIR"
 
-#print instructions
+# Print instructions
 
 print_instructions
 
