@@ -8,6 +8,9 @@
   * New application type allowing to run native games without using a
     ./play.it prefix
 
+  * The library can now be loaded without implying that it has been called by
+    a ./play.it script
+
 2.0.3
 
   * Fix error displayed when building .deb packages on systems without apt
