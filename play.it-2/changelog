@@ -5,6 +5,9 @@
   * New function easing the management of icons provided by post-installation
     links
 
+  * New application type allowing to run native games without using a
+    ./play.it prefix
+
 2.0.3
 
   * Fix error displayed when building .deb packages on systems without apt

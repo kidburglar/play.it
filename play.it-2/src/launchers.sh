@@ -10,7 +10,7 @@ write_launcher() {
 # write launcher script
 # USAGE: write_bin $app[…]
 # NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CACHE_DIRS CACHE_FILES CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
-# CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_scummvm write_bin_run_wine write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
+# CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
@@ -46,7 +46,8 @@ write_bin() {
 				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
 			fi
 
-			if [ "$app_type" = 'native' ]; then
+			if [ "$app_type" = 'native' ] ||\
+			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
 			fi
 		fi
@@ -70,6 +71,8 @@ write_bin() {
 		# Write launcher
 		if [ "$app_type" = 'scummvm' ]; then
 			write_bin_set_scummvm
+		elif [ "$app_type" = 'native_no-prefix' ]; then
+			write_bin_set_native_noprefix
 		else
 			# Set executable, options and libraries
 			if [ "$app_id" != "${GAME_ID}_winecfg" ]; then
@@ -251,6 +254,9 @@ write_bin() {
 			('native')
 				write_bin_run_native
 			;;
+			('native_no-prefix')
+				write_bin_run_native_noprefix
+			;;
 			('scummvm')
 				write_bin_run_scummvm
 			;;
@@ -259,7 +265,7 @@ write_bin() {
 			;;
 		esac
 
-		if [ $app_type != 'scummvm' ]; then
+		if [ $app_type != 'scummvm' ] && [ $app_type != 'native_no-prefix' ]; then
 			cat >> "$file" <<- 'EOF'
 			clean_userdir "$PATH_CACHE" "$CACHE_FILES"
 			clean_userdir "$PATH_CONFIG" "$CONFIG_FILES"
