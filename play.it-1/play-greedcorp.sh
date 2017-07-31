@@ -39,7 +39,7 @@ script_version=20161031.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath tar'
+SCRIPT_DEPS_HARD='fakeroot tar'
 
 GAME_ID='greedcorp'
 GAME_ID_SHORT='greedcorp'

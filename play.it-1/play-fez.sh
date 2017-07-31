@@ -39,7 +39,7 @@ script_version=20170219.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 SCRIPT_DEPS_SOFT='convert'
 
 GAME_ID='fez'

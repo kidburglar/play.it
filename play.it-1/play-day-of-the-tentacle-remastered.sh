@@ -38,7 +38,7 @@ script_version=20161019.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='day-of-the-tentacle-remastered'
 GAME_ID_SHORT='dott'

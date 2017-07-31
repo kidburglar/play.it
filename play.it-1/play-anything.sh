@@ -29,7 +29,7 @@
 
 ###
 # common functions for ./play.it scripts
-# library version 1.14.6
+# library version 1.14.7
 #
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -285,7 +285,7 @@ else
 fi
 if [ "${icon##*.}" = 'exe' ]; then
 	wrestool -o "${target}" -t 14 -x "${PKG1_DIR}${PATH_GAME}"/${icon}
-	icotool -o "${target}" -x "$(realpath "${target}"/*.ico | head -n1)" 2>/dev/null
+	icotool -o "${target}" -x "$(readlink --canonicalize "${target}"/*.ico | head -n1)" 2>/dev/null
 	rm "${target}"/*.ico
 elif [ "${icon##*.}" = 'ico' ]; then
 	icotool -o "${target}" -x "${PKG1_DIR}${PATH_GAME}/${icon}" 2>/dev/null
@@ -1482,7 +1482,7 @@ local deps="$6"
 local recs="$7"
 local desc="$8"
 local extra_infos="$9"
-local size="$(du -cks $(realpath "$dir"/* | grep -v DEBIAN$) | tail -n1 | cut -f1)"
+local size="$(du -cks $(readlink --canonicalize "$dir"/* | grep -v DEBIAN$) | tail -n1 | cut -f1)"
 local maint="$(whoami)@$(hostname)"
 local target="${dir}/DEBIAN/control"
 if [ "${extra_infos}" = 'arch' ]; then

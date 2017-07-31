@@ -40,7 +40,7 @@
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='samurai-shodown-2'
 GAME_ID_SHORT='samsho2'

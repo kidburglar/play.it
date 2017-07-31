@@ -40,7 +40,7 @@
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot innoextract realpath'
+SCRIPT_DEPS_HARD='fakeroot innoextract'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='tropico-2'

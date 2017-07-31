@@ -38,7 +38,7 @@ script_version=20170205.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath tar'
+SCRIPT_DEPS_HARD='fakeroot tar'
 
 GAME_ID='never-alone'
 GAME_ID_SHORT='never-alone'

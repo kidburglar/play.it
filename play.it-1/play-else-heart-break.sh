@@ -38,7 +38,7 @@ script_version=20170218.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='else-heart-break'
 GAME_NAME='else Heart.Break()'

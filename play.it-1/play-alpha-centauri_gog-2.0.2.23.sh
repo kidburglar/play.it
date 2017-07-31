@@ -38,7 +38,7 @@ script_version=20160424.2
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath innoextract dos2unix'
+SCRIPT_DEPS_HARD='fakeroot innoextract dos2unix'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='alpha-centauri'

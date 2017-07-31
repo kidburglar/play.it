@@ -38,7 +38,7 @@ script_version=20170203.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='bastion'
 GAME_ID_SHORT='bastion'

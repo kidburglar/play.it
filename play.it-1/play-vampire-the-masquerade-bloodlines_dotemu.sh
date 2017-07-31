@@ -38,7 +38,7 @@ script_version=20160427.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unar unzip'
+SCRIPT_DEPS_HARD='fakeroot unar unzip'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='vampire-the-masquerade-bloodlines'

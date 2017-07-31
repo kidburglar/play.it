@@ -38,7 +38,7 @@ script_version=20160911.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='master-of-orion-2'
 GAME_ID_SHORT='moo2'

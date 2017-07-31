@@ -38,7 +38,7 @@ script_version=20170318.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='pillars-of-eternity'
 GAME_NAME='Pillars of Eternity'

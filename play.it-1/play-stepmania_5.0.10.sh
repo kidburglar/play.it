@@ -40,7 +40,7 @@
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 SCRIPT_DEPS_SOFT='icotool'
 
 GAME_ID='stepmania'

@@ -109,7 +109,7 @@ game_mkdir 'PKG_TMPDIR' "$(mktemp -u ${GAME_ID}.XXXXX)" "$((${GAME_ARCHIVE_FULLS
 game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG_VERSION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 fetch_args "$@"
 printf '\n'
-check_deps 'fakeroot realpath unzip'
+check_deps 'fakeroot unzip'
 printf '\n'
 set_checksum
 set_compression
