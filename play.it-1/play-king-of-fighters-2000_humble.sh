@@ -38,7 +38,7 @@ script_version=20160401.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='king-of-fighters-2000'
 GAME_ID_SHORT='kof2000'

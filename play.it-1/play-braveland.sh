@@ -39,7 +39,7 @@ script_version=20161108.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='braveland'
 GAME_ID_SHORT='braveland'

@@ -112,7 +112,7 @@ game_mkdir 'PKG_TMPDIR' "$(mktemp -u ${GAME_ID_SHORT}.XXXXX)" "$((${GAME_ARCHIVE
 game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG1_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 fetch_args "$@"
 printf '\n'
-check_deps 'fakeroot realpath unzip'
+check_deps 'fakeroot unzip'
 printf '\n'
 set_checksum
 set_compression
@@ -141,7 +141,7 @@ printf '\n%s…\n' "$(l10n 'extract_data_generic')"
 print wait
 extract_data 'zip' "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'quiet'
 rm -rf "${PKG_TMPDIR}/__MACOSX"
-GAME_ARCHIVE="$(realpath "${PKG_TMPDIR}"/*.tar.gz)"
+GAME_ARCHIVE="$(readlink --canonicalize "${PKG_TMPDIR}"/*.tar.gz)"
 extract_data 'tar' ${GAME_ARCHIVE} "${PKG_TMPDIR}" 'fix_rights,quiet'
 mv "${PKG_TMPDIR}"/*/* "${PKG1_DIR}${PATH_GAME}"
 ln -s "${PATH_GAME}/${APP1_ICON}" "${PKG1_DIR}${PATH_ICON}/${GAME_ID}.png"

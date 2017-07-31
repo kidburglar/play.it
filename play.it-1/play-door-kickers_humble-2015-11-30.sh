@@ -38,7 +38,7 @@ script_version=20160420.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='door-kickers'
 GAME_ID_SHORT='dkickers'

@@ -40,7 +40,7 @@
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 SCRIPT_DEPS_SOFT='icotool'
 
 GAME_ID='the-settlers-2'

@@ -39,7 +39,7 @@ script_version=20170523.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='octodad-dadliest-catch'
 GAME_ID_SHORT='octodad'

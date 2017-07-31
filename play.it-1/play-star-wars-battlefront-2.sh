@@ -34,11 +34,11 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20161109.1
+script_version=20170731.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='star-wars-battlefront-2'
 GAME_ID_SHORT='swbf2'
@@ -215,8 +215,8 @@ mkdir -p "${PKG_BIN_DIR}/${PATH_DESK}"
 mkdir -p "${PKG_DATA_DIR}/${PATH_DOC}"
 
 mkdir --parents "${PKG_TMPDIR}"
-ln --symbolic "$(realpath ${GAME_ARCHIVE})" "${PKG_TMPDIR}/${GAME_ID_SHORT}.r01"
-ln --symbolic "$(realpath ${GAME_ARCHIVE2})" "${PKG_TMPDIR}/${GAME_ID_SHORT}.r02"
+ln --symbolic "$(readlink --canonicalize ${GAME_ARCHIVE})" "${PKG_TMPDIR}/${GAME_ID_SHORT}.r01"
+ln --symbolic "$(readlink --canonicalize ${GAME_ARCHIVE2})" "${PKG_TMPDIR}/${GAME_ID_SHORT}.r02"
 GAME_ARCHIVE="${PKG_TMPDIR}/${GAME_ID_SHORT}.r01"
 
 extract_data "${GAME_ARCHIVE_TYPE}" "${GAME_ARCHIVE}" "${PKG_TMPDIR}" 'quiet,tolower'

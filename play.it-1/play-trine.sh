@@ -38,7 +38,7 @@ script_version=20160917.1
 
 # Setting game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='trine'
 GAME_ID_SHORT='trine'

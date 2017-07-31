@@ -38,7 +38,7 @@ script_version=20170516.2
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='baldurs-gate-2-ee'
 GAME_NAME='Baldur’s Gate 2 - Enhanced Edition'

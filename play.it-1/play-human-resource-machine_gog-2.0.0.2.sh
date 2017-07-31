@@ -38,7 +38,7 @@ script_version=20160506.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='realpath unzip fakeroot'
+SCRIPT_DEPS_HARD='unzip fakeroot'
 
 GAME_ID='human-resource-machine'
 GAME_ID_SHORT='hrmachine'

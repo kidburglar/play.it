@@ -38,7 +38,7 @@ script_version=20160612.2
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='pier-solar-hd'
 GAME_ID_SHORT='piersolar'

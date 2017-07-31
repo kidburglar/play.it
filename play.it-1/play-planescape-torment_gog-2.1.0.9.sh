@@ -38,7 +38,7 @@ script_version=20160627.1
 
 # Setting game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 SCRIPT_DEPS_HARD_LINUX='unzip'
 SCRIPT_DEPS_HARD_WIN='innoextract'
 SCRIPT_DEPS_SOFT='icotool wrestool'

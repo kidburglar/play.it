@@ -38,7 +38,7 @@ script_version=20170218.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='dust-an-elysian-tale'
 GAME_NAME='Dust: An Elysian Tale'

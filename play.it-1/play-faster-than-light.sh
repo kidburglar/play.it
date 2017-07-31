@@ -38,7 +38,7 @@ script_version=20160914.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 SCRIPT_DEPS_SOFT='convert'
 
 GAME_ID='faster-than-light'

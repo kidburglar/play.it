@@ -38,7 +38,7 @@ script_version=20161207.3
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unar'
+SCRIPT_DEPS_HARD='fakeroot unar'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='neverwinter-nights'

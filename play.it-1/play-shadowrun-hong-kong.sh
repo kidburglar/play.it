@@ -122,7 +122,7 @@ game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG_VERSION}_${PKG1_ARCH}" "$((${GAME_ARCHIV
 game_mkdir 'PKG2_DIR' "${PKG2_ID}_${PKG_VERSION}_${PKG2_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 fetch_args "$@"
 printf '\n'
-check_deps 'fakeroot realpath unzip'
+check_deps 'fakeroot unzip'
 printf '\n'
 set_checksum
 set_compression

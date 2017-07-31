@@ -113,7 +113,7 @@ printf '\n'
 game_mkdir 'PKG_TMPDIR' "$(mktemp -u ${GAME_ID_SHORT}.XXXXX)" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG1_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 fetch_args "$@"
-check_deps 'fakeroot innoextract realpath' 'icotool'
+check_deps 'fakeroot innoextract' 'icotool'
 printf '\n'
 set_checksum
 set_compression

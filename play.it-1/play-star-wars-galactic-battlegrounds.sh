@@ -39,7 +39,7 @@ script_version=20161126.2
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath'
+SCRIPT_DEPS_HARD='fakeroot'
 
 GAME_ID='star-wars-galactic-battlegrounds'
 GAME_ID_SHORT='swgb'

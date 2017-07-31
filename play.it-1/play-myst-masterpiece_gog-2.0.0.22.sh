@@ -38,7 +38,7 @@ script_version=20170405.1
 
 # Setting game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath innoextract'
+SCRIPT_DEPS_HARD='fakeroot innoextract'
 SCRIPT_DEPS_SOFT='icotool wrestool'
 
 GAME_ID='myst'

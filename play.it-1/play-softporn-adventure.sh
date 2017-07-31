@@ -38,7 +38,7 @@ script_version=20160827.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='softporn-adventure'
 GAME_ID_SHORT='softporn'

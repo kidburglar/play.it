@@ -38,7 +38,7 @@ script_version=20170207.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='crypt-of-the-necrodancer'
 GAME_NAME='Crypt Of The Necrodancer'

@@ -38,7 +38,7 @@ script_version=20170516.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS_HARD='fakeroot realpath unzip'
+SCRIPT_DEPS_HARD='fakeroot unzip'
 
 GAME_ID='icewind-dale-ee'
 GAME_NAME='Icewind Dale - Enhanced Edition'
