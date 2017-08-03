@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170728.1
+script_version=20170803.1
 
 # Set game-specific variables
 
@@ -74,6 +74,10 @@ APP_MAIN_ICON_RES='256'
 
 PACKAGES_LIST='PKG_MAIN'
 
+PKG_MAIN_ID="$GAME_ID"
+PKG_MAIN_ID_EN="${GAME_ID}-en"
+PKG_MAIN_ID_FR="${GAME_ID}-fr"
+PKG_MAIN_PROVIDE="$PKG_MAIN_ID"
 PKG_MAIN_ARCH='32'
 PKG_MAIN_DEPS_DEB="$PKG_DATA_ID, dosbox"
 PKG_MAIN_DEPS_ARCH="$PKG_DATA_ID dosbox"
