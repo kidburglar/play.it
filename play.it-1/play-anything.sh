@@ -29,7 +29,7 @@
 
 ###
 # common functions for ./play.it scripts
-# library version 1.14.7
+# library version 1.14.8
 #
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -479,7 +479,13 @@ local desc="$1"
 shift 1
 printf '%s %s %s:\ndpkg -i' "$(l10n 'install_instructions_1')" "$(printf '%s' "${desc}" | head -n1)" "$(l10n 'install_instructions_2')"
 while [ -n "$1" ]; do
-	printf ' %s' "${PWD}/${1##*/}.deb"
+	local str_format
+	if [ -n "$(printf '%s' "$1" | grep ' ')" ]; then
+		str_format=' "%s"'
+	else
+		str_format=' %s'
+	fi
+	printf "$str_format" "${PWD}/${1##*/}.deb"
 	shift 1
 done
 printf '\napt-get install -f\n'
