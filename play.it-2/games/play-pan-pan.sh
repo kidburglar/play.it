@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170716.1
+script_version=20170803.1
 
 # Set game-specific variables
 
 GAME_ID='pan-pan'
-GAME_NAME='Pan Pan'
+GAME_NAME='Pan-Pan'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
@@ -63,7 +63,8 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN='PAN-PAN.x86_64'
+APP_MAIN_PRERUN='pulseaudio --start'
+APP_MAIN_EXE='PAN-PAN.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
@@ -74,8 +75,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libgl1-mesa | libgl1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID glibc libxcursor libgl gcc-libs libxrandr"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libgl1-mesa | libgl1, libxrandr2, pulseaudio"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID glibc libxcursor libgl gcc-libs libxrandr pulseaudio"
 
 # Load common functions
 
