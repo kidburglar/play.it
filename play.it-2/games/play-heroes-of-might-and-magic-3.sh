@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170726.1
+script_version=20170803.1
 
 # Set game-specific variables
 
@@ -109,9 +109,19 @@ APP_EDITOR_CAMPAIGN_NAME="$GAME_NAME - campaign editor"
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_PROVIDE="${GAME_ID}-music"
+PKG_DATA_ID_EN="${PKG_DATA_ID}-en"
+PKG_DATA_ID_EN_OLD="$PKG_DATA_ID_EN"
+PKG_DATA_ID_FR="${PKG_DATA_ID}-fr"
+PKG_DATA_ID_FR_OLD="$PKG_DATA_ID_FR"
+PKG_DATA_PROVIDE="${PKG_DATA_ID}"
 PKG_DATA_DESCRIPTION='data'
 
+PKG_BIN_ID="$GAME_ID"
+PKG_BIN_ID_EN="${PKG_BIN_ID}-en"
+PKG_BIN_ID_EN_OLD="$PKG_BIN_ID_EN"
+PKG_BIN_ID_FR="${PKG_BIN_ID}-fr"
+PKG_BIN_ID_FR_OLD="$PKG_BIN_ID_FR"
+PKG_BIN_PROVIDE="$PKG_BIN_ID"
 PKG_BIN_ARCH='32'
 PKG_BIN_DEPS_DEB="$PKG_DATA_ID, winetricks, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
 PKG_BIN_DEPS_ARCH="$PKG_DATA_ID winetricks wine"
