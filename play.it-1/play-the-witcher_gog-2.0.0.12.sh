@@ -32,7 +32,7 @@
 # build a .deb package from the Windows installer
 # tested on Debian, should work on any .deb-based distribution
 #
-# script version 20161113.1
+# script version 20140804.1
 #
 # send your bug reports to vv221@dotslashplay.it
 # start the e-mail subject by "./play.it" to avoid it being flagged as spam
@@ -199,6 +199,9 @@ REGEDIT 4
 "IsDjinniInstalled"=dword:00000001
 "Language"="3"
 "RegionVersion"="WE"
+
+[HKEY_CURRENT_USER\Software\Wine\Direct3D]
+"CheckFloatConstants"="enabled"
 EOF
 print done
 
