@@ -1,3 +1,12 @@
+2.0.3
+
+  * Fix error displayed when building .deb packages on systems without apt
+
+  * Better handling of spaces in directories names when displaying
+    installation instructions
+
+  * Work around WINE bug 41639
+
 2.0.2
 
   * Fix a bug with the copy of the game binary in the user prefix for some
