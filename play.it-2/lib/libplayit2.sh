@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.0.2
-library_revision=20170720.1
+library_version=2.0.3
+library_revision=20170805.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1291,9 +1291,17 @@ print_instructions() {
 # print installation instructions for Arch Linux
 # USAGE: print_instructions_arch $pkg[…]
 print_instructions_arch() {
+	local pkg_path
+	local str_format
 	printf 'pacman -U'
 	for pkg in $@; do
-		printf ' %s' "$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+			str_format=' "%s"'
+		else
+			str_format=' %s'
+		fi
+		printf "$str_format" "$pkg_path"
 	done
 	printf '\n'
 }
@@ -1306,11 +1314,13 @@ print_instructions_deb() {
 		debian_version="$(apt --version | cut --delimiter=' ' --fields=2)"
 		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
 		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"
-	fi
-	if [ $debian_version_major -ge 2 ] ||\
-	   [ $debian_version_major = 1 ] &&\
-	   [ ${debian_version_minor%~*} -ge 1 ]; then
-		print_instructions_deb_apt "$@"
+		if [ $debian_version_major -ge 2 ] ||\
+		   [ $debian_version_major = 1 ] &&\
+		   [ ${debian_version_minor%~*} -ge 1 ]; then
+			print_instructions_deb_apt "$@"
+		else
+			print_instructions_deb_dpkg "$@"
+		fi
 	else
 		print_instructions_deb_dpkg "$@"
 	fi
@@ -1318,25 +1328,39 @@ print_instructions_deb() {
 
 # print installation instructions for Debian with apt
 # USAGE: print_instructions_deb_apt $pkg[…]
+# CALLS: print_instructions_deb_common
 # CALLED BY: print_instructions_deb
 print_instructions_deb_apt() {
 	printf 'apt install'
-	for pkg in $@; do
-		printf ' %s' "$(eval printf -- '%b' \"\$${pkg}_PKG\")"
-	done
-	printf '\n'
+	print_instructions_deb_common $@
 }
 
 # print installation instructions for Debian with dpkg + apt-get
 # USAGE: print_instructions_deb_dpkg $pkg[…]
+# CALLS: print_instructions_deb_common
 # CALLED BY: print_instructions_deb
 print_instructions_deb_dpkg() {
 	printf 'dpkg -i'
+	print_instructions_deb_common $@
+	printf 'apt-get install -f\n'
+}
+
+# print installation instructions for Debian (common part)
+# USAGE: print_instructions_deb_common $pkg[…]
+# CALLED BY: print_instructions_deb_apt print_instructions_deb_dpkg
+print_instructions_deb_common() {
+	local pkg_path
+	local str_format
 	for pkg in $@; do
-		printf ' %s' "$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+			str_format=' "%s"'
+		else
+			str_format=' %s'
+		fi
+		printf "$str_format" "$pkg_path"
 	done
 	printf '\n'
-	printf 'apt-get install -f\n'
 }
 
 # alias calling write_bin() and write_desktop()
@@ -1810,11 +1834,14 @@ write_bin_winecfg() {
 # CALLED BY: write_bin
 write_bin_set_wine() {
 	cat >> "$file" <<- 'EOF'
-	WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
+	export WINEARCH='win32'
+	export WINEDEBUG='-all'
+	export WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
+	export WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
+	# Work around WINE bug 41639
+	export FREETYPE_PROPERTIES="truetype:interpreter-version=35"
+
 	PATH_PREFIX="$WINEPREFIX/drive_c/$GAME_ID"
-	WINEARCH='win32'
-	WINEDEBUG='-all'
-	WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
 
 	EOF
 }
@@ -1825,7 +1852,6 @@ write_bin_set_wine() {
 # CALLED BY: write_bin
 write_bin_build_wine() {
 	cat >> "$file" <<- 'EOF'
-	export WINEPREFIX WINEARCH WINEDEBUG WINEDLLOVERRIDES
 	if ! [ -e "$WINEPREFIX" ]; then
 	  mkdir --parents "${WINEPREFIX%/*}"
 	  wineboot --init 2>/dev/null
