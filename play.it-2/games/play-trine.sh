@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20170804.1
 
 # Set game-specific variables
 
@@ -47,6 +47,9 @@ ARCHIVE_GOG='gog_trine_enchanted_edition_2.0.0.2.sh'
 ARCHIVE_GOG_MD5='0e8d2338b568222b28cf3c31059b4960'
 ARCHIVE_GOG_SIZE='1500000'
 ARCHIVE_GOG_VERSION='2.12.508-gog2.0.0.2'
+
+ARCHIVE_LIBPNG='libpng_1.2_32-bit.tar.gz'
+ARCHIVE_LIBPNG_MD5='15156525b3c6040571f320514a0caa80'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -73,8 +76,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libgtk2.0-0, libpng12-0, libasound2-plugins, libopenal1, libvorbisfile3"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-gtk2 lib32-libpng12 lib32-alsa-lib lib32-openal lib32-libvorbis"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libgtk2.0-0, libasound2-plugins, libopenal1, libvorbisfile3"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-gtk2 lib32-alsa-lib lib32-openal lib32-libvorbis"
 
 # Load common functions
 
@@ -94,6 +97,11 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Use libpng 1.2 32-bit archive
+
+set_archive 'LIBPNG' 'ARCHIVE_LIBPNG'
+ARCHIVE='ARCHIVE_GOG'
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
@@ -108,6 +116,18 @@ organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Include libpng into the game directory
+
+if [ "$LIBPNG" ]; then
+	dir='libs'
+	ARCHIVE='LIBPNG'
+	extract_data_from "$LIBPNG"
+	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
+	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}/$dir"
+	APP_MAIN_LIBS="$dir"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
+
 # Write launchers
 
 PKG='PKG_BIN'
@@ -120,18 +140,35 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
+fi
 EOF
 
 cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+	rm "$PATH_ICON/$GAME_ID.png"
+	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
+fi
 EOF
 
 write_metadata 'PKG_DATA'
-rm "$postinst" "$prerm"
+
+cat > "$postinst" << EOF
+if [ ! -e "$PATH_GAME/libs/libpng12.so.0" ]; then
+	ln --symbolic ./libpng12.so.0.50.0 "$PATH_GAME/libs/libpng12.so.0"
+fi
+EOF
+
+cat > "$prerm" << EOF
+if [ -e "$PATH_GAME/libs/libpng12.so.0" ]; then
+	rm "$PATH_GAME/libs/libpng12.so.0"
+fi
+EOF
+
 write_metadata 'PKG_BIN'
+
 build_pkg
 
 # Clean up
