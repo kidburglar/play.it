@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170703.2
+script_version=20170809.1
 
 # Set game-specific variables
 
 GAME_ID='war-for-the-overworld'
 GAME_NAME='War for the Overworld'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_war_for_the_overworld_2.2.0.3.sh'
-ARCHIVE_GOG_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG='gog_war_for_the_overworld_2.5.0.6.sh'
+ARCHIVE_GOG_MD5='f003d58cea1b2c5416a4af059768d77b'
 ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.6.2f3-gog2.2.0.3'
+ARCHIVE_GOG_VERSION='1.6.3-gog2.5.0.6'
+
+ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.2.0.3.sh'
+ARCHIVE_GOG_OLD_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG_OLD_SIZE='2500000'
+ARCHIVE_GOG_OLD_VERSION='1.6.2f3-gog2.2.0.3'
 
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
