@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170804.1
+script_version=20170812.1
 
 # Set game-specific variables
 
@@ -48,6 +48,9 @@ ARCHIVE_HUMBLE_MD5='4d463482418c2d9917c56df3bbde6eea'
 ARCHIVE_HUMBLE_SIZE='60000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble160601'
 
+ARCHIVE_ICONS='melodys-escape_icons.tar.gz'
+ARCHIVE_ICONS_MD5='656fce13728d399e557fd72c3a6bc244'
+
 ARCHIVE_DOC_PATH="Melody's Escape"
 ARCHIVE_DOC_FILES='./Licenses ./README.txt'
 
@@ -56,6 +59,9 @@ ARCHIVE_GAME_BIN_FILES='./MelodysEscape.bin.x86 ./lib ./*.dll ./FNA.dll.config .
 
 ARCHIVE_GAME_DATA_PATH="Melody's Escape"
 ARCHIVE_GAME_DATA_FILES='./BassPlugins ./BundledMusic ./Calibration ./Content ./Mods ./mono'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128 ./256x256'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='MelodysEscape.bin.x86'
@@ -87,9 +93,21 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
@@ -97,6 +115,10 @@ organize_data 'GAME_BIN' "$PATH_GAME"
 PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
+
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -107,8 +129,7 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
