@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170716.2
+script_version=20170812.1
 
 # Set game-specific variables
 
@@ -47,6 +47,9 @@ ARCHIVE_GOG='gog_j_u_l_i_a_among_the_stars_2.0.0.1.sh'
 ARCHIVE_GOG_MD5='58becebfaf5a3705fe3f34d5531298d3'
 ARCHIVE_GOG_SIZE='3100000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
+
+ARCHIVE_ICONS='julia-among-the-stars_icons.tar.gz'
+ARCHIVE_ICONS_MD5='8e9e8ec585123eb3b6e5d31723b7909c'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -63,14 +66,17 @@ ARCHIVE_GAME_BIN64_FILES='./julia64 ./lib64'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./*.dcp ./DLC ./wme.log'
 
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128'
+
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='julia'
 APP_MAIN_EXE_BIN64='julia64'
 APP_MAIN_LIBS_BIN32='./lib'
 APP_MAIN_LIBS_BIN64='./lib64'
 APP_MAIN_OPTIONS='-ignore _sd'
-APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
+APP_MAIN_ICON_GOG_RES='256'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -103,9 +109,21 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN32'
 organize_data 'GAME_BIN32' "$PATH_GAME"
@@ -118,10 +136,14 @@ organize_data 'DOC1' "$PATH_DOC"
 organize_data 'DOC2' "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	res="$APP_MAIN_ICON_GOG_RES"
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -133,8 +155,7 @@ done
 
 # Build package
 
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
