@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170627.1
+script_version=20170812.1
 
 # Set game-specific variables
 
@@ -48,11 +48,17 @@ ARCHIVE_HUMBLE_MD5='243918907eea486fdc820b7cac0c260b'
 ARCHIVE_HUMBLE_SIZE='130000'
 ARCHIVE_HUMBLE_VERSION='1.10-humble1'
 
+ARCHIVE_ICONS='solar-2_icons.tar.gz'
+ARCHIVE_ICONS_MD5='d8f8557a575cb5b5824d72718428cd33'
+
 ARCHIVE_GAME_BIN_PATH='Solar2'
 ARCHIVE_GAME_BIN_FILES='./Solar2.bin.x86 ./Solar2.exe ./lib ./*.dll ./*.config ./display.txt'
 
 ARCHIVE_GAME_DATA_PATH='Solar2'
 ARCHIVE_GAME_DATA_FILES='./Languages ./mono ./MonoContent'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64'
 
 DATA_DIRS='./Languages'
 
@@ -86,15 +92,31 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
 organize_data 'GAME_DATA' "$PATH_GAME"
+
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
