@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170812.1
+script_version=20170818.1
 
 # Set game-specific variables
 
@@ -64,10 +64,12 @@ ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN64_FILES='./julia64 ./lib64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*.dcp ./DLC ./wme.log'
+ARCHIVE_GAME_DATA_FILES='./*.dcp ./DLC'
 
 ARCHIVE_ICONS_PATH='.'
 ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128'
+
+DATA_FILES='./wme.log'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='julia'
