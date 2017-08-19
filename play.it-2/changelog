@@ -1,3 +1,7 @@
+2.0.4
+
+  * Display an error when calling a script with unsupported arguments
+
 2.0.3
 
   * Fix error displayed when building .deb packages on systems without apt

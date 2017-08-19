@@ -78,6 +78,16 @@ while [ $# -gt 0 ]; do
 			unset value
 		;;
 		('--'*)
+			print_error
+			case "${LANG%_*}" in
+				('fr')
+					string='Option inconnue : %s\n'
+				;;
+				('en'|*)
+					string='Unkown option: %s\n'
+				;;
+			esac
+			printf "$string" "$1"
 			return 1
 		;;
 		(*)
