@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170812.1
+script_version=20170819.1
 
 # Set game-specific variables
 
@@ -52,14 +52,15 @@ ARCHIVE_ICONS='solar-2_icons.tar.gz'
 ARCHIVE_ICONS_MD5='d8f8557a575cb5b5824d72718428cd33'
 
 ARCHIVE_GAME_BIN_PATH='Solar2'
-ARCHIVE_GAME_BIN_FILES='./Solar2.bin.x86 ./Solar2.exe ./lib ./*.dll ./*.config ./display.txt'
+ARCHIVE_GAME_BIN_FILES='./Solar2.bin.x86 ./Solar2.exe ./*.dll ./*.config ./display.txt ./mono ./lib/libmad.so.0.2.1 ./lib/libmikmod.so.2.0.4 ./lib/libmono-2.0.so.1 ./lib/libopenal.so.1.13.0 ./lib/libSDL_mixer-1.2.so.0.10.1'
 
 ARCHIVE_GAME_DATA_PATH='Solar2'
-ARCHIVE_GAME_DATA_FILES='./Languages ./mono ./MonoContent'
+ARCHIVE_GAME_DATA_FILES='./Languages ./MonoContent'
 
 ARCHIVE_ICONS_PATH='.'
 ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64'
 
+CONFIG_FILES='./display.txt'
 DATA_DIRS='./Languages'
 
 APP_MAIN_TYPE='native'
@@ -101,6 +102,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 if [ "$ICONS_PACK" ]; then
 	(
 		ARCHIVE='ICONS_PACK'
@@ -127,7 +129,45 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-write_metadata
+cat > "$postinst" << EOF
+if ! [ -e "$PATH_GAME/lib/libmad.so.0" ]; then
+        ln --symbolic ./libmad.so.0.2.1 "$PATH_GAME/lib/libmad.so.0"
+fi
+if ! [ -e "$PATH_GAME/lib/libmikmod.so.2" ]; then
+        ln --symbolic ./libmikmod.so.2.0.4 "$PATH_GAME/lib/libmikmod.so.2"
+fi
+if ! [ -e "$PATH_GAME/lib/libmono-2.0.so" ]; then
+        ln --symbolic ./libmono-2.0.so.1 "$PATH_GAME/lib/libmono-2.0.so"
+fi
+if ! [ -e "$PATH_GAME/lib/libopenal.so.1" ]; then
+        ln --symbolic ./libopenal.so.1.13.0 "$PATH_GAME/lib/libopenal.so.1"
+fi
+if ! [ -e "$PATH_GAME/lib/libSDL_mixer-1.2.so.0" ]; then
+        ln --symbolic ./libSDL_mixer-1.2.so.0.10.1 "$PATH_GAME/lib/libSDL_mixer-1.2.so.0"
+fi
+EOF
+
+cat > "$prerm" << EOF
+if [ -e "$PATH_GAME/lib/libmad.so.0" ]; then
+        rm "$PATH_GAME/lib/libmad.so.0"
+fi
+if [ -e "$PATH_GAME/lib/libmikmod.so.2" ]; then
+        rm "$PATH_GAME/lib/libmikmod.so.2"
+fi
+if [ -e "$PATH_GAME/lib/libmono-2.0.so" ]; then
+        rm "$PATH_GAME/lib/libmono-2.0.so"
+fi
+if [ -e "$PATH_GAME/lib/libopenal.so.1" ]; then
+        rm "$PATH_GAME/lib/libopenal.so.1"
+fi
+if [ -e "$PATH_GAME/lib/libSDL_mixer-1.2.so.0" ]; then
+        rm "$PATH_GAME/lib/libSDL_mixer-1.2.so.0"
+fi
+EOF
+
+write_metadata 'PKG_BIN'
+rm "$postinst" "$prerm"
+write_metadata 'PKG_DATA'
 build_pkg
 
 # Clean up
