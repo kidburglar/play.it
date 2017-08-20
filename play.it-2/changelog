@@ -1,5 +1,10 @@
 2.1.0
 
+  * First fully installable version of ./play.it
+
+  * New script 'play.it' automatically loading the adequate game-specific
+    script for the archive given in argument
+
   * Display an error when calling a script with unsupported arguments
 
   * New function easing the management of icons provided by post-installation
@@ -9,10 +14,7 @@
     ./play.it prefix
 
   * The library can now be loaded without implying that it has been called by
-    a ./play.it script
-
-  * New script 'play.it' automatically loading the adequate game-specific
-    script for the archive given in argument
+    a ./play.it script, making it easier to use by third-party projects
 
 2.0.3
 

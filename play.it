@@ -40,7 +40,7 @@ if [ ! -f "$INPUT_FILE" ]; then
 fi
 
 FILE_MD5="$(md5sum $INPUT_FILE | cut --delimiter=' ' --fields=1)"
-SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" "$(dirname $0)"/play.it-* | sort --reverse | head --lines=1)"
+SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
 
 if [ -z "$SCRIPT" ]; then
 	print_error
@@ -56,7 +56,7 @@ if [ -z "$SCRIPT" ]; then
 	return 1
 fi
 
-export PLAYIT_LIB="$(dirname "$0")/play.it-1/play-anything.sh"
+export PLAYIT_LIB=~/.local/share/play.it/play.it-1/play-anything.sh
 export PLAYIT_LIB2
 
 "$SCRIPT" "$INPUT_FILE" --checksum=none "$@"
