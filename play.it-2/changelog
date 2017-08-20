@@ -1,3 +1,21 @@
+2.1.0
+
+  * First fully installable version of ./play.it
+
+  * New script 'play.it' automatically loading the adequate game-specific
+    script for the archive given in argument
+
+  * Display an error when calling a script with unsupported arguments
+
+  * New function easing the management of icons provided by post-installation
+    links
+
+  * New application type allowing to run native games without using a
+    ./play.it prefix
+
+  * The library can now be loaded without implying that it has been called by
+    a ./play.it script, making it easier to use by third-party projects
+
 2.0.3
 
   * Fix error displayed when building .deb packages on systems without apt
