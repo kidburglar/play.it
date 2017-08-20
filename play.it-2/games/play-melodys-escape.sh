@@ -29,74 +29,51 @@ set -o errexit
 ###
 
 ###
-# Heroes of Might and Magic IV
+# Melody’s Escape
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170806.1
+script_version=20170812.1
 
 # Set game-specific variables
 
-GAME_ID='heroes-of-might-and-magic-4'
-GAME_NAME='Heroes of Might and Magic IV'
+GAME_ID='melodys-escape'
+GAME_NAME='Melody’s Escape'
 
-ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG_EN='setup_homm4_complete_2.0.0.12.exe'
-ARCHIVE_GOG_EN_MD5='74de66eb408bb2916dd0227781ba96dc'
-ARCHIVE_GOG_EN_VERSION='3.0-gog2.0.0.12'
-ARCHIVE_GOG_EN_SIZE='1100000'
+ARCHIVE_HUMBLE='Melodys_Escape_Linux.zip'
+ARCHIVE_HUMBLE_MD5='4d463482418c2d9917c56df3bbde6eea'
+ARCHIVE_HUMBLE_SIZE='60000'
+ARCHIVE_HUMBLE_VERSION='1.0-humble160601'
 
-ARCHIVE_GOG_FR='setup_homm4_complete_french_2.1.0.14.exe'
-ARCHIVE_GOG_FR_MD5='2af96eb28226e563bbbcd62771f3a319'
-ARCHIVE_GOG_FR_VERSION='3.0-gog2.1.0.14'
-ARCHIVE_GOG_FR_SIZE='1100000'
+ARCHIVE_ICONS='melodys-escape_icons.tar.gz'
+ARCHIVE_ICONS_MD5='656fce13728d399e557fd72c3a6bc244'
 
-ARCHIVE_DOC1_PATH='tmp'
-ARCHIVE_DOC1_FILES='./*eula.txt'
+ARCHIVE_DOC_PATH="Melody's Escape"
+ARCHIVE_DOC_FILES='./Licenses ./README.txt'
 
-ARCHIVE_DOC2_PATH='app'
-ARCHIVE_DOC2_FILES='./*.chm ./*.pdf ./*.txt'
+ARCHIVE_GAME_BIN_PATH="Melody's Escape"
+ARCHIVE_GAME_BIN_FILES='./MelodysEscape.bin.x86 ./lib ./*.dll ./FNA.dll.config ./*.so ./MelodysEscape.exe'
 
-ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./*.exe ./binkw32.dll ./drvmgt.dll ./mss32.dll ./mp3dec.asi data/*.dll'
+ARCHIVE_GAME_DATA_PATH="Melody's Escape"
+ARCHIVE_GAME_DATA_FILES='./BassPlugins ./BundledMusic ./Calibration ./Content ./Mods ./mono'
 
-ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./data ./maps'
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128 ./256x256'
 
-DATA_DIRS='./games ./maps'
-DATA_FILES='./data/high_scores.dat ./*.log'
-
-APP_WINETRICKS='vd=1280x1024'
-
-APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='./heroes4.exe'
-APP_MAIN_ICON='./heroes4.exe'
-APP_MAIN_ICON_RES='16 32'
-
-APP_EDITOR_TYPE='wine'
-APP_EDITOR_ID="${GAME_ID}_edit"
-APP_EDITOR_EXE='./campaign_editor.exe'
-APP_EDITOR_ICON='./campaign_editor.exe'
-APP_EDITOR_ICON_RES='48 64'
-APP_EDITOR_NAME="$GAME_NAME - campaign editor"
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='MelodysEscape.bin.x86'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_ID_GOG_EN="${PKG_DATA_ID}-en"
-PKG_DATA_ID_GOG_FR="${PKG_DATA_ID}-fr"
-PKG_DATA_PROVIDE="$PKG_DATA_ID"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_ID="$GAME_ID"
-PKG_BIN_ID_GOG_EN="${PKG_BIN_ID}-en"
-PKG_BIN_ID_GOG_FR="${PKG_BIN_ID}-fr"
-PKG_BIN_PROVIDE="$PKG_BIN_ID"
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, winetricks, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID winetricks wine"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc"
 
 # Load common functions
 
@@ -116,28 +93,39 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN' 'APP_EDITOR'
-move_icons_to 'PKG_DATA'
+if [ "$ICONS_PACK" ]; then
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
 PKG='PKG_BIN'
-write_launcher 'APP_MAIN' 'APP_EDITOR'
+write_launcher 'APP_MAIN'
 
 # Build package
 
@@ -148,7 +136,7 @@ build_pkg
 
 rm --recursive "$PLAYIT_WORKDIR"
 
-# Print instructions
+#print instructions
 
 print_instructions
 

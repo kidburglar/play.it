@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# Jazzpunk
+# The Blackwell Epiphany
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -38,34 +38,39 @@ script_version=20170812.1
 
 # Set game-specific variables
 
-GAME_ID='jazzpunk'
-GAME_NAME='Jazzpunk'
+GAME_ID='the-blackwell-epiphany'
+GAME_NAME='The Blackwell Epiphany'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_HUMBLE='Jazzpunk-July6-2014-Linux.zip'
-ARCHIVE_HUMBLE_MD5='50ad5722cafe16dc384e83a4a4e19480'
-ARCHIVE_HUMBLE_SIZE='1600000'
-ARCHIVE_HUMBLE_VERSION='140706-humble140708'
+ARCHIVE_GOG='gog_blackwell_epiphany_2.0.0.2.sh'
+ARCHIVE_GOG_MD5='058091975ee359d7bc0f9d9848052296'
+ARCHIVE_GOG_SIZE='1500000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_ICONS='the-blackwell-epiphany_icons.tar.gz'
+ARCHIVE_ICONS_MD5='e0067ab5130b89148344c3dffaaab3e0'
 
-ARCHIVE_GAME_BIN32_PATH='./'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_BIN64_PATH='./'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./lib ./Epiphany.bin.x86'
 
-ARCHIVE_GAME_DATA_PATH='./'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./lib64 ./Epiphany.bin.x86_64'
+
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*'
 
 ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./128x128 ./256x256'
+ARCHIVE_ICONS_FILES='./16x16 ./24x24 ./32x32 ./48x48 ./256x256'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Jazzpunk.x86'
-APP_MAIN_EXE_BIN64='./Jazzpunk.x86_64'
+APP_MAIN_EXE_BIN32='Epiphany.bin.x86'
+APP_MAIN_EXE_BIN64='Epiphany.bin.x86_64'
+APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
+APP_MAIN_ICON_GOG_RES='256'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -73,12 +78,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor"
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgcc1, libsdl2-2.0-0, libtheora0, libpcre3, libglib2.0-0, libharfbuzz0b, libpng16-16, libbz2-1.0, zlib1g, libfreetype6, libvorbisfile3, libogg0"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-gcc-libs lib32-sdl2 lib32-libtheora lib32-pcre lib32-glib2 lib32-harfbuzz lib32-libpng lib32-bzip2 lib32-zlib lib32-freetype2 lib32-libogg"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID gcc-libs sdl2 libtheora pcre glib2 harfbuzz libpng bzip2 zlib freetype2 libvorbis libogg"
 
 # Load common functions
 
@@ -121,10 +126,16 @@ PKG='PKG_BIN64'
 organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
+organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 if [ "$ICONS_PACK" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	res="$APP_MAIN_ICON_GOG_RES"
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -142,7 +153,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

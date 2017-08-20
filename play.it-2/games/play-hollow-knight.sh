@@ -29,57 +29,46 @@ set -o errexit
 ###
 
 ###
-# Windward
+# Hollow Knight
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170809.1
+script_version=20170811.1
 
 # Set game-specific variables
 
-GAME_ID='war-for-the-overworld'
-GAME_NAME='War for the Overworld'
+GAME_ID='hollow-knight'
+GAME_NAME='Hollow Knight'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_war_for_the_overworld_2.5.0.6.sh'
-ARCHIVE_GOG_MD5='f003d58cea1b2c5416a4af059768d77b'
-ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.6.3-gog2.5.0.6'
+ARCHIVE_GOG='gog_hollow_knight_2.1.0.2.sh'
+ARCHIVE_GOG_MD5='0d18baf29d5552dc094ca2bfe5fcaae6'
+ARCHIVE_GOG_SIZE='9200000'
+ARCHIVE_GOG_VERSION='1.0.3.1-gog2.1.0.2'
 
-ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.2.0.3.sh'
-ARCHIVE_GOG_OLD_MD5='45522631c0feef1e115d01a638156171'
-ARCHIVE_GOG_OLD_SIZE='2500000'
-ARCHIVE_GOG_OLD_VERSION='1.6.2f3-gog2.2.0.3'
+ARCHIVE_DOC1_PATH='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
-ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
-ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
-ARCHIVE_HUMBLE_SIZE='2500000'
-ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
+ARCHIVE_DOC2_PATH='data/noarch/support'
+ARCHIVE_DOC2_FILES='./*.txt'
 
-ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./hollow_knight.x86_64 ./*_Data/*/x86'
 
-ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host'
+ARCHIVE_GAME_ASSETS_PATH='data/noarch/game'
+ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets ./*_Data/*.assets.resS'
 
-ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_ASSETS_FILES='./WFTO*_Data/*.assets*'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_DATA_FILES='./WFTO*_Data'
-
-DATA_DIRS='./logs ./WFTO*_Data/GameData'
+DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_GOG='WFTOGame.x86_64'
-APP_MAIN_EXE_HUMBLE='WFTO.x86_64'
+APP_MAIN_EXE_BIN='hollow_knight.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='WFTO*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN'
@@ -90,9 +79,9 @@ PKG_ASSETS_DESCRIPTION='assets'
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_ASSETS_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID glibc gcc-libs libgl libxcursor"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_ASSETS_ID, $PKG_DATA_ID, libc6, libxcursor1, libglu1-mesa | libglu1, libxrandr2"
+PKG_BIN_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID glibc libxcursor glu gcc-libs libxrandr"
 
 # Load common functions
 
@@ -119,33 +108,17 @@ extract_data_from "$SOURCE_ARCHIVE"
 PKG='PKG_BIN'
 organize_data 'GAME_BIN' "$PATH_GAME"
 
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
-
 PKG='PKG_ASSETS'
 organize_data 'GAME_ASSETS' "$PATH_GAME"
 
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
+organize_data 'DOC1'      "$PATH_DOC"
+organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-
-(
-	cd "${PKG_DATA_PATH}${PATH_GAME}"/WFTO*_Data/uiresources/maps
-	mv 'Stonegate.unity.png' 'stonegate.unity.png'
-)
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
-
-case "$ARCHIVE" in
-	('ARCHIVE_GOG')
-		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
-	;;
-	('ARCHIVE_HUMBLE')
-		APP_MAIN_EXE="$APP_MAIN_EXE_HUMBLE"
-	;;
-esac
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
@@ -156,14 +129,14 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-if ! [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+if [ ! -e "${PATH_ICON}/${GAME_ID}.png" ]; then
 	mkdir --parents "$PATH_ICON"
 	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
 fi
 EOF
 
 cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
+if [ -e "${PATH_ICON}/${GAME_ID}.png" ]; then
 	rm "$PATH_ICON/$GAME_ID.png"
 	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
 fi

@@ -29,43 +29,55 @@ set -o errexit
 ###
 
 ###
-# Jazzpunk
+# Reus
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170812.1
+script_version=20170810.1
 
 # Set game-specific variables
 
-GAME_ID='jazzpunk'
-GAME_NAME='Jazzpunk'
+GAME_ID='reus'
+GAME_NAME='Reus'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
-ARCHIVE_HUMBLE='Jazzpunk-July6-2014-Linux.zip'
-ARCHIVE_HUMBLE_MD5='50ad5722cafe16dc384e83a4a4e19480'
-ARCHIVE_HUMBLE_SIZE='1600000'
-ARCHIVE_HUMBLE_VERSION='140706-humble140708'
+ARCHIVE_GOG='gog_reus_2.0.0.2.sh'
+ARCHIVE_GOG_MD5='25fe7ec93305e804558e4ef8a31fbbf8'
+ARCHIVE_GOG_SIZE='480000'
+ARCHIVE_GOG_VERSION='1.5.1-gog2.0.0.2'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_HUMBLE='reus_linux_1389636757-bin'
+ARCHIVE_HUMBLE_MD5='9914e7fcb5f3b761941169ae13ec205c'
+ARCHIVE_HUMBLE_SIZE='380000'
+ARCHIVE_HUMBLE_TYPE='mojosetup'
+ARCHIVE_HUMBLE_VERSION='0.beta-humble140113'
 
-ARCHIVE_GAME_BIN32_PATH='./'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_DOC1_PATH_GOG='data/noarch/game'
+ARCHIVE_DOC1_PATH_HUMBLE='data'
+ARCHIVE_DOC1_FILES='./Linux.README'
 
-ARCHIVE_GAME_BIN64_PATH='./'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_DOC2_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC2_FILES='./*'
 
-ARCHIVE_GAME_DATA_PATH='./'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
+ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN32_PATH_HUMBLE='data'
+ARCHIVE_GAME_BIN32_FILES='./Reus.bin.x86 ./lib'
 
-ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./128x128 ./256x256'
+ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN64_PATH_HUMBLE='data'
+ARCHIVE_GAME_BIN64_FILES='./Reus.bin.x86_64 ./lib64'
+
+ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='data'
+ARCHIVE_GAME_DATA_FILES='./*.dll ./*.dll.config ./Audio ./Cursors ./Effects ./Fonts ./MainMenu ./mono ./monoconfig ./monomachineconfig ./Particles ./Reus.bmp ./Reus.exe ./Settings ./Skeletons ./Textures ./UI'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Jazzpunk.x86'
-APP_MAIN_EXE_BIN64='./Jazzpunk.x86_64'
+APP_MAIN_EXE_BIN32='Reus.bin.x86'
+APP_MAIN_EXE_BIN64='Reus.bin.x86_64'
+APP_MAIN_ICON='Reus.bmp'
+APP_MAIN_ICON_RES='512'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -73,12 +85,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor"
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libfreetype6, libogg0, libopenal1, libsdl2-2.0-0, libtheora0, libvorbis0a"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-freetype2 lib32-libogg lib32-openal lib32-sdl2 lib32-libtheora lib32-libvorbis"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs freetype2 libogg openal sdl2 libtheora libvorbis"
 
 # Load common functions
 
@@ -98,21 +110,9 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Try to load icons archive
-
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
-ARCHIVE="$ARCHIVE_MAIN"
-
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
-	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
-	)
-fi
 
 PKG='PKG_BIN32'
 organize_data 'GAME_BIN32' "$PATH_GAME"
@@ -121,11 +121,15 @@ PKG='PKG_BIN64'
 organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
+organize_data 'DOC1'      "$PATH_DOC"
+organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-if [ "$ICONS_PACK" ]; then
-	organize_data 'ICONS' "$PATH_ICON_BASE"
-fi
+extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
+res="$APP_MAIN_ICON_RES"
+PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -142,7 +146,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

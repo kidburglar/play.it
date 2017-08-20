@@ -29,56 +29,51 @@ set -o errexit
 ###
 
 ###
-# Jazzpunk
+# Solar 2
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170812.1
+script_version=20170819.1
 
 # Set game-specific variables
 
-GAME_ID='jazzpunk'
-GAME_NAME='Jazzpunk'
+GAME_ID='solar-2'
+GAME_NAME='Solar 2'
 
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_HUMBLE='Jazzpunk-July6-2014-Linux.zip'
-ARCHIVE_HUMBLE_MD5='50ad5722cafe16dc384e83a4a4e19480'
-ARCHIVE_HUMBLE_SIZE='1600000'
-ARCHIVE_HUMBLE_VERSION='140706-humble140708'
+ARCHIVE_HUMBLE='solar2-linux-1.10_1409159048.tar.gz'
+ARCHIVE_HUMBLE_MD5='243918907eea486fdc820b7cac0c260b'
+ARCHIVE_HUMBLE_SIZE='130000'
+ARCHIVE_HUMBLE_VERSION='1.10-humble1'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_ICONS='solar-2_icons.tar.gz'
+ARCHIVE_ICONS_MD5='d8f8557a575cb5b5824d72718428cd33'
 
-ARCHIVE_GAME_BIN32_PATH='./'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_GAME_BIN_PATH='Solar2'
+ARCHIVE_GAME_BIN_FILES='./Solar2.bin.x86 ./Solar2.exe ./*.dll ./*.config ./display.txt ./mono ./lib/libmad.so.0.2.1 ./lib/libmikmod.so.2.0.4 ./lib/libmono-2.0.so.1 ./lib/libopenal.so.1.13.0 ./lib/libSDL_mixer-1.2.so.0.10.1'
 
-ARCHIVE_GAME_BIN64_PATH='./'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
-
-ARCHIVE_GAME_DATA_PATH='./'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
+ARCHIVE_GAME_DATA_PATH='Solar2'
+ARCHIVE_GAME_DATA_FILES='./Languages ./MonoContent'
 
 ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./128x128 ./256x256'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64'
+
+CONFIG_FILES='./display.txt'
+DATA_DIRS='./Languages'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Jazzpunk.x86'
-APP_MAIN_EXE_BIN64='./Jazzpunk.x86_64'
+APP_MAIN_EXE='Solar2.bin.x86'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc"
 
 # Load common functions
 
@@ -107,6 +102,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 if [ "$ICONS_PACK" ]; then
 	(
 		ARCHIVE='ICONS_PACK'
@@ -114,11 +110,8 @@ if [ "$ICONS_PACK" ]; then
 	)
 fi
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
+PKG='PKG_BIN'
+organize_data 'GAME_BIN' "$PATH_GAME"
 
 PKG='PKG_DATA'
 organize_data 'GAME_DATA' "$PATH_GAME"
@@ -131,25 +124,58 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
-write_metadata
+cat > "$postinst" << EOF
+if ! [ -e "$PATH_GAME/lib/libmad.so.0" ]; then
+        ln --symbolic ./libmad.so.0.2.1 "$PATH_GAME/lib/libmad.so.0"
+fi
+if ! [ -e "$PATH_GAME/lib/libmikmod.so.2" ]; then
+        ln --symbolic ./libmikmod.so.2.0.4 "$PATH_GAME/lib/libmikmod.so.2"
+fi
+if ! [ -e "$PATH_GAME/lib/libmono-2.0.so" ]; then
+        ln --symbolic ./libmono-2.0.so.1 "$PATH_GAME/lib/libmono-2.0.so"
+fi
+if ! [ -e "$PATH_GAME/lib/libopenal.so.1" ]; then
+        ln --symbolic ./libopenal.so.1.13.0 "$PATH_GAME/lib/libopenal.so.1"
+fi
+if ! [ -e "$PATH_GAME/lib/libSDL_mixer-1.2.so.0" ]; then
+        ln --symbolic ./libSDL_mixer-1.2.so.0.10.1 "$PATH_GAME/lib/libSDL_mixer-1.2.so.0"
+fi
+EOF
+
+cat > "$prerm" << EOF
+if [ -e "$PATH_GAME/lib/libmad.so.0" ]; then
+        rm "$PATH_GAME/lib/libmad.so.0"
+fi
+if [ -e "$PATH_GAME/lib/libmikmod.so.2" ]; then
+        rm "$PATH_GAME/lib/libmikmod.so.2"
+fi
+if [ -e "$PATH_GAME/lib/libmono-2.0.so" ]; then
+        rm "$PATH_GAME/lib/libmono-2.0.so"
+fi
+if [ -e "$PATH_GAME/lib/libopenal.so.1" ]; then
+        rm "$PATH_GAME/lib/libopenal.so.1"
+fi
+if [ -e "$PATH_GAME/lib/libSDL_mixer-1.2.so.0" ]; then
+        rm "$PATH_GAME/lib/libSDL_mixer-1.2.so.0"
+fi
+EOF
+
+write_metadata 'PKG_BIN'
+rm "$postinst" "$prerm"
+write_metadata 'PKG_DATA'
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
-# Print instructions
+#print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

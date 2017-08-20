@@ -29,60 +29,52 @@ set -o errexit
 ###
 
 ###
-# Windward
+# Anima: Gate of Memories
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170809.1
+script_version=20170811.2
 
 # Set game-specific variables
 
-GAME_ID='war-for-the-overworld'
-GAME_NAME='War for the Overworld'
+GAME_ID='anima-gate-of-memories'
+GAME_NAME='Anima: Gate of Memories'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_war_for_the_overworld_2.5.0.6.sh'
-ARCHIVE_GOG_MD5='f003d58cea1b2c5416a4af059768d77b'
-ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.6.3-gog2.5.0.6'
+ARCHIVE_GOG='gog_anima_gate_of_memories_2.0.0.1.sh'
+ARCHIVE_GOG_MD5='681d05255e1a162947af69d3e7537748'
+ARCHIVE_GOG_SIZE='8900000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
+ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.2.0.3.sh'
-ARCHIVE_GOG_OLD_MD5='45522631c0feef1e115d01a638156171'
-ARCHIVE_GOG_OLD_SIZE='2500000'
-ARCHIVE_GOG_OLD_VERSION='1.6.2f3-gog2.2.0.3'
-
-ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
-ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
-ARCHIVE_HUMBLE_SIZE='2500000'
-ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
-
-ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
 
-ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_ASSETS_FILES='./WFTO*_Data/*.assets*'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_DATA_FILES='./WFTO*_Data'
+ARCHIVE_GAME_ASSETS_PATH='data/noarch/game'
+ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets ./*_Data/*.assets.resS'
 
-DATA_DIRS='./logs ./WFTO*_Data/GameData'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
+
+DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_GOG='WFTOGame.x86_64'
-APP_MAIN_EXE_HUMBLE='WFTO.x86_64'
+APP_MAIN_PRERUN='pulseaudio --start'
+APP_MAIN_EXE_BIN32='GoMLinux.x86'
+APP_MAIN_EXE_BIN64='GoMLinux.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='WFTO*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_ASSETS_ID="${GAME_ID}-assets"
 PKG_ASSETS_DESCRIPTION='assets'
@@ -90,9 +82,13 @@ PKG_ASSETS_DESCRIPTION='assets'
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_ASSETS_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID glibc gcc-libs libgl libxcursor"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS_DEB="$PKG_ASSETS_ID, $PKG_DATA_ID, libc6, libglu1-mesa | libglu1, libxcursor1, libxrandr2, pulseaudio:amd64 | pulseaudio"
+PKG_BIN32_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID lib32-glu lib32-libxcursor lib32-libxrandr pulseaudio"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_ARCH="$PKG_ASSETS_ID $PKG_DATA_ID glu libxcursor libxrandr pulseaudio"
 
 # Load common functions
 
@@ -116,11 +112,11 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+PKG='PKG_BIN32'
+organize_data 'GAME_BIN32' "$PATH_GAME"
 
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
+PKG='PKG_BIN64'
+organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_ASSETS'
 organize_data 'GAME_ASSETS' "$PATH_GAME"
@@ -129,26 +125,13 @@ PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
-(
-	cd "${PKG_DATA_PATH}${PATH_GAME}"/WFTO*_Data/uiresources/maps
-	mv 'Stonegate.unity.png' 'stonegate.unity.png'
-)
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-case "$ARCHIVE" in
-	('ARCHIVE_GOG')
-		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
-	;;
-	('ARCHIVE_HUMBLE')
-		APP_MAIN_EXE="$APP_MAIN_EXE_HUMBLE"
-	;;
-esac
-
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
@@ -156,30 +139,30 @@ res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 
 cat > "$postinst" << EOF
-if ! [ -e "$PATH_ICON/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON"
-	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
-fi
+mkdir --parents "$PATH_ICON"
+ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
 EOF
 
 cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
-	rm "$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
-fi
+rm "$PATH_ICON/$GAME_ID.png"
+rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
 EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_ASSETS' 'PKG_BIN'
+write_metadata 'PKG_ASSETS' 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
 
-rm --recursive "$PLAYIT_WORKDIR"
+rm --recursive "${PLAYIT_WORKDIR}"
 
 # Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_ASSETS' 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_ASSETS' 'PKG_DATA' 'PKG_BIN64'
 
 exit 0

@@ -29,43 +29,56 @@ set -o errexit
 ###
 
 ###
-# Jazzpunk
+# J.U.L.I.A Among the Stars
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170812.1
+script_version=20170818.1
 
 # Set game-specific variables
 
-GAME_ID='jazzpunk'
-GAME_NAME='Jazzpunk'
+GAME_ID='julia-among-the-stars'
+GAME_NAME='J.U.L.I.A Among the Stars'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_HUMBLE='Jazzpunk-July6-2014-Linux.zip'
-ARCHIVE_HUMBLE_MD5='50ad5722cafe16dc384e83a4a4e19480'
-ARCHIVE_HUMBLE_SIZE='1600000'
-ARCHIVE_HUMBLE_VERSION='140706-humble140708'
+ARCHIVE_GOG='gog_j_u_l_i_a_among_the_stars_2.0.0.1.sh'
+ARCHIVE_GOG_MD5='58becebfaf5a3705fe3f34d5531298d3'
+ARCHIVE_GOG_SIZE='3100000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_ICONS='julia-among-the-stars_icons.tar.gz'
+ARCHIVE_ICONS_MD5='8e9e8ec585123eb3b6e5d31723b7909c'
 
-ARCHIVE_GAME_BIN32_PATH='./'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_DOC1_PATH='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
-ARCHIVE_GAME_BIN64_PATH='./'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_DOC2_PATH='data/noarch/support'
+ARCHIVE_DOC2_FILES='./*.txt'
 
-ARCHIVE_GAME_DATA_PATH='./'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./julia ./lib'
+
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./julia64 ./lib64'
+
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*.dcp ./DLC'
 
 ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./128x128 ./256x256'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128'
+
+DATA_FILES='./wme.log'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Jazzpunk.x86'
-APP_MAIN_EXE_BIN64='./Jazzpunk.x86_64'
+APP_MAIN_EXE_BIN32='julia'
+APP_MAIN_EXE_BIN64='julia64'
+APP_MAIN_LIBS_BIN32='./lib'
+APP_MAIN_LIBS_BIN64='./lib64'
+APP_MAIN_OPTIONS='-ignore _sd'
+APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
+APP_MAIN_ICON_GOG_RES='256'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -73,12 +86,12 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor"
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libharfbuzz0b, libpcre3, libbz2-1.0, libfreetype6, libsdl2-2.0-0, libasound2-plugins, libpulse0"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-pcre lib32-harfbuzz lib32-bzip2 lib32-gcc-libs lib32-freetype2 lib32-sld2 lib32-alsa-plugins lib32-libpulse"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc glu pcre harfbuzz bzip2 gcc-libs freetype2 sdl2 alsa-plugins libpulse"
 
 # Load common functions
 
@@ -121,10 +134,17 @@ PKG='PKG_BIN64'
 organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
+organize_data 'DOC1' "$PATH_DOC"
+organize_data 'DOC2' "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 if [ "$ICONS_PACK" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	res="$APP_MAIN_ICON_GOG_RES"
+	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
+	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"

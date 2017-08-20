@@ -29,74 +29,55 @@ set -o errexit
 ###
 
 ###
-# Heroes of Might and Magic IV
+# Startopia
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170806.1
+script_version=20170810.1
 
 # Set game-specific variables
 
-GAME_ID='heroes-of-might-and-magic-4'
-GAME_NAME='Heroes of Might and Magic IV'
+GAME_ID='startopia'
+GAME_NAME='Startopia'
 
-ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG_EN='setup_homm4_complete_2.0.0.12.exe'
-ARCHIVE_GOG_EN_MD5='74de66eb408bb2916dd0227781ba96dc'
-ARCHIVE_GOG_EN_VERSION='3.0-gog2.0.0.12'
-ARCHIVE_GOG_EN_SIZE='1100000'
-
-ARCHIVE_GOG_FR='setup_homm4_complete_french_2.1.0.14.exe'
-ARCHIVE_GOG_FR_MD5='2af96eb28226e563bbbcd62771f3a319'
-ARCHIVE_GOG_FR_VERSION='3.0-gog2.1.0.14'
-ARCHIVE_GOG_FR_SIZE='1100000'
+ARCHIVE_GOG='setup_startopia_2.0.0.17.exe'
+ARCHIVE_GOG_MD5='4fe8d194afc1012e136ed3e82f1de171'
+ARCHIVE_GOG_VERSION='1.01b-gog2.0.0.17'
+ARCHIVE_GOG_SIZE='600000'
 
 ARCHIVE_DOC1_PATH='tmp'
 ARCHIVE_DOC1_FILES='./*eula.txt'
 
 ARCHIVE_DOC2_PATH='app'
-ARCHIVE_DOC2_FILES='./*.chm ./*.pdf ./*.txt'
+ARCHIVE_DOC2_FILES='./eula ./weblinks ./*.html ./*.pdf ./*.rtf ./*.txt'
 
 ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./*.exe ./binkw32.dll ./drvmgt.dll ./mss32.dll ./mp3dec.asi data/*.dll'
+ARCHIVE_GAME_BIN_FILES='./binkw32.dll ./startopia.exe ./startopia.ini'
 
 ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./data ./maps'
+ARCHIVE_GAME_DATA_FILES='./cardid.tom ./data ./intro ./languageinis ./missions ./startopia.jpg ./text'
 
-DATA_DIRS='./games ./maps'
-DATA_FILES='./data/high_scores.dat ./*.log'
-
-APP_WINETRICKS='vd=1280x1024'
+CONFIG_FILES='./startopia.ini'
+DATA_DIRS='./profiles'
+DATA_FILES='./*.txt'
 
 APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='./heroes4.exe'
-APP_MAIN_ICON='./heroes4.exe'
-APP_MAIN_ICON_RES='16 32'
-
-APP_EDITOR_TYPE='wine'
-APP_EDITOR_ID="${GAME_ID}_edit"
-APP_EDITOR_EXE='./campaign_editor.exe'
-APP_EDITOR_ICON='./campaign_editor.exe'
-APP_EDITOR_ICON_RES='48 64'
-APP_EDITOR_NAME="$GAME_NAME - campaign editor"
+APP_MAIN_EXE='startopia.exe'
+APP_MAIN_ICON='startopia.exe'
+APP_MAIN_ICON_RES='32'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_ID_GOG_EN="${PKG_DATA_ID}-en"
-PKG_DATA_ID_GOG_FR="${PKG_DATA_ID}-fr"
-PKG_DATA_PROVIDE="$PKG_DATA_ID"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
 PKG_BIN_ID="$GAME_ID"
-PKG_BIN_ID_GOG_EN="${PKG_BIN_ID}-en"
-PKG_BIN_ID_GOG_FR="${PKG_BIN_ID}-fr"
-PKG_BIN_PROVIDE="$PKG_BIN_ID"
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, winetricks, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID winetricks wine"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -121,7 +102,7 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+organize_data 'GAME_BIN'   "$PATH_GAME"
 
 PKG='PKG_DATA'
 organize_data 'DOC1'      "$PATH_DOC"
@@ -129,7 +110,7 @@ organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN' 'APP_EDITOR'
+extract_and_sort_icons_from 'APP_MAIN'
 move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -137,7 +118,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 # Write launchers
 
 PKG='PKG_BIN'
-write_launcher 'APP_MAIN' 'APP_EDITOR'
+write_launcher 'APP_MAIN'
 
 # Build package
 
