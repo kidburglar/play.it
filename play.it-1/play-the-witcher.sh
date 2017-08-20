@@ -32,7 +32,7 @@
 # build a .deb package from the Windows installer
 # tested on Debian, should work on any .deb-based distribution
 #
-# script version 20161113.1
+# script version 20170813.1
 #
 # send your bug reports to vv221@dotslashplay.it
 # start the e-mail subject by "./play.it" to avoid it being flagged as spam
@@ -45,23 +45,16 @@ GAME_ID_SHORT='witcher1'
 GAME_NAME='The Witcher'
 GAME_NAME_LONG='The Witcher: Enhanced Edition'
 
-GAME_ARCHIVE1='setup_the_witcher_enhanced_edition_2.0.0.12.exe'
-GAME_ARCHIVE1_MD5='66ffe865f34e71ef2beb961748873459'
-GAME_ARCHIVE1_FILE2='setup_the_witcher_enhanced_edition_2.0.0.12-1.bin'
-GAME_ARCHIVE1_FILE2_MD5='6d24dcb24f4776889e03715044ca8da0'
-GAME_ARCHIVE1_FILE3='setup_the_witcher_enhanced_edition_2.0.0.12-2.bin'
-GAME_ARCHIVE1_FILE3_MD5='3060962cd3ef2ec68a9c02fdeb5ce839'
-GAME_ARCHIVE1_FILE4='setup_the_witcher_enhanced_edition_2.0.0.12-3.bin'
-GAME_ARCHIVE1_FILE4_MD5='602a920d5e2c05437f70c5600911aca8'
-GAME_ARCHIVE1_FILE5='setup_the_witcher_enhanced_edition_2.0.0.12-4.bin'
-GAME_ARCHIVE1_FILE5_MD5='296605a9b5e7acba6a59cd17b98a84c6'
-GAME_ARCHIVE1_FILE6='setup_the_witcher_enhanced_edition_2.0.0.12-5.bin'
-GAME_ARCHIVE1_FILE6_MD5='a820dc0f09afefead9e06a9c37491c1b'
-GAME_ARCHIVE1_FILE7='setup_the_witcher_enhanced_edition_2.0.0.12-6.bin'
-GAME_ARCHIVE1_FILE7_MD5='e5261e0eff49b83f48a384ece3050106'
+GAME_ARCHIVE1='setup_the_witcher_enhanced_edition_1.5_(a)_(10712).exe'
+GAME_ARCHIVE1_MD5='2440cfb5fb4890ff4b9bc4b88b434d38'
+GAME_ARCHIVE1_FILE2='setup_the_witcher_enhanced_edition_1.5_(a)_(10712)-1.bin'
+GAME_ARCHIVE1_FILE2_MD5='e530a1a2e86094740b45a14f63260804'
+GAME_ARCHIVE1_FILE3='setup_the_witcher_enhanced_edition_1.5_(a)_(10712)-2.bin'
+GAME_ARCHIVE1_FILE3_MD5='fb3a478bcb6e4702e1e8d392cb55391d'
+GAME_ARCHIVE1_FILE4='setup_the_witcher_enhanced_edition_1.5_(a)_(10712)-3.bin'
+GAME_ARCHIVE1_FILE4_MD5='2df8369af401815a736f5d88f85fbf8d'
 GAME_ARCHIVE_FULLSIZE='15000000'
-PKG_ORIGIN='gog'
-PKG_REVISION='2.0.0.12'
+PKG_VERSION='1.5.726-gog10712'
 
 GAME_CACHE_DIRS=''
 GAME_CACHE_FILES=''
@@ -84,20 +77,18 @@ APP1_NAME_FR="${GAME_NAME}"
 APP1_CAT='Game'
 
 PKG1_ID="${GAME_ID}"
-PKG1_VERSION='1.5.726'
 PKG1_ARCH='i386'
 PKG1_CONFLICTS=''
 PKG1_RECS=''
 PKG1_DESC="${GAME_NAME_LONG}"
 
 PKG2_ID="${GAME_ID}-data"
-PKG2_VERSION="${PKG1_VERSION}"
 PKG2_ARCH="${PKG1_ARCH}"
 PKG2_CONFLICTS=''
 PKG2_RECS=''
 PKG2_DESC="${GAME_NAME_LONG} (data)"
 
-PKG1_DEPS="${PKG2_ID} (= ${PKG2_VERSION}-${PKG_ORIGIN}${PKG_REVISION}), wine:amd64 | wine, wine32 | wine-bin | wine1.6-i386 | wine1.4-i386 | wine-staging-i386, winetricks"
+PKG1_DEPS="${PKG2_ID} (= ${PKG_VERSION}), wine:amd64 | wine, wine32 | wine-bin | wine1.6-i386 | wine1.4-i386 | wine-staging-i386, winetricks"
 PKG2_DEPS=''
 
 # Load common functions
@@ -132,8 +123,8 @@ WITH_MOVIES_DEFAULT=''
 
 printf '\n'
 game_mkdir 'PKG_TMPDIR' "$(mktemp -u ${GAME_ID_SHORT}.XXXXX)" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
-game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG1_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
-game_mkdir 'PKG2_DIR' "${PKG2_ID}_${PKG2_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG2_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
+game_mkdir 'PKG1_DIR' "${PKG1_ID}_${PKG_VERSION}_${PKG1_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
+game_mkdir 'PKG2_DIR' "${PKG2_ID}_${PKG_VERSION}_${PKG2_ARCH}" "$((${GAME_ARCHIVE_FULLSIZE}*2))"
 fetch_args "$@"
 check_deps 'fakeroot innoextract' 'icotool wrestool'
 printf '\n'
@@ -152,9 +143,6 @@ set_target '1' 'gog.com'
 set_target_extra 'GAME_ARCHIVE1_FILE2' '' "${GAME_ARCHIVE1_FILE2}"
 set_target_extra 'GAME_ARCHIVE1_FILE3' '' "${GAME_ARCHIVE1_FILE3}"
 set_target_extra 'GAME_ARCHIVE1_FILE4' '' "${GAME_ARCHIVE1_FILE4}"
-set_target_extra 'GAME_ARCHIVE1_FILE5' '' "${GAME_ARCHIVE1_FILE5}"
-set_target_extra 'GAME_ARCHIVE1_FILE6' '' "${GAME_ARCHIVE1_FILE6}"
-set_target_extra 'GAME_ARCHIVE1_FILE7' '' "${GAME_ARCHIVE1_FILE7}"
 printf '\n'
 
 # Check target file integrity
@@ -162,13 +150,10 @@ printf '\n'
 if [ "${GAME_ARCHIVE_CHECKSUM}" = 'md5sum' ]; then
 	printf '%s…\n' "$(l10n 'checksum_multiple')"
 	print wait
-	checksum "${GAME_ARCHIVE}" 'quiet' "${GAME_ARCHIVE1_MD5}" "${GAME_ARCHIVE2_MD5}"
+	checksum "${GAME_ARCHIVE}" 'quiet' "${GAME_ARCHIVE1_MD5}"
 	checksum "${GAME_ARCHIVE1_FILE2}" 'quiet' "${GAME_ARCHIVE1_FILE2_MD5}"
 	checksum "${GAME_ARCHIVE1_FILE3}" 'quiet' "${GAME_ARCHIVE1_FILE3_MD5}"
 	checksum "${GAME_ARCHIVE1_FILE4}" 'quiet' "${GAME_ARCHIVE1_FILE4_MD5}"
-	checksum "${GAME_ARCHIVE1_FILE5}" 'quiet' "${GAME_ARCHIVE1_FILE5_MD5}"
-	checksum "${GAME_ARCHIVE1_FILE6}" 'quiet' "${GAME_ARCHIVE1_FILE6_MD5}"
-	checksum "${GAME_ARCHIVE1_FILE7}" 'quiet' "${GAME_ARCHIVE1_FILE7_MD5}"
 	print done
 fi
 
@@ -185,13 +170,14 @@ done
 for file in 'meshes*' 'textures*' 'movies/'; do
 	mv "${PKG_TMPDIR}/app/data"/${file} "${PKG2_DIR}${PATH_GAME}/data"
 done
+mv "${PKG_TMPDIR}/app/__support/add" "${PKG1_DIR}${PATH_GAME}"
+rm -rf "${PKG_TMPDIR}/app/__support" "${PKG_TMPDIR}"/app/goggame-1207658924.* "${PKG_TMPDIR}/webcache.zip"
 mv "${PKG_TMPDIR}/app"/* "${PKG1_DIR}${PATH_GAME}"
-mv "${PKG_TMPDIR}/commondocs" "${PKG1_DIR}${PATH_GAME}"
 if [ "${NO_ICON}" = '0' ]; then
 	extract_icons "${APP1_ID}" "${APP1_ICON}" "${APP1_ICON_RES}" "${PKG_TMPDIR}"
 fi
 rm -rf "${PKG_TMPDIR}"
-cat > "${PKG1_DIR}${PATH_GAME}/witcher1.reg" << EOF
+cat > "${PKG1_DIR}${PATH_GAME}/witcher1.reg" << 'EOF'
 REGEDIT 4
 
 [HKEY_LOCAL_MACHINE\Software\CD Projekt Red\The Witcher]
@@ -199,13 +185,16 @@ REGEDIT 4
 "IsDjinniInstalled"=dword:00000001
 "Language"="3"
 "RegionVersion"="WE"
+
+[HKEY_CURRENT_USER\Software\Wine\Direct3D]
+"CheckFloatConstants"="enabled"
 EOF
 print done
 
 # Write launchers
 
 write_bin_wine_common "${PKG1_DIR}${PATH_BIN}/${APP_COMMON_ID}"
-sed -i 's#cp -surf "${GAME_PATH}"/\* "${WINE_GAME_PATH}"#&\n\tcp -surf "${GAME_PATH}"/commondocs/* "${WINEPREFIX}/drive_c/users/Public/Documents/"\n\tregedit "${WINE_GAME_PATH}/witcher1.reg" 2>/dev/null\n\trm -r "${WINE_GAME_PATH}/commondocs" "${WINE_GAME_PATH}/witcher1.reg"\n\twinetricks d3dx9_35\n\twinetricks d3dx9_36#' "${PKG1_DIR}${PATH_BIN}/${APP_COMMON_ID}"
+sed -i 's#cp -surf "${GAME_PATH}"/\* "${WINE_GAME_PATH}"#&\n\tcp -surf "${GAME_PATH}"/add/* "${WINEPREFIX}/drive_c/users/Public/Documents/"\n\tregedit "${WINE_GAME_PATH}/witcher1.reg" 2>/dev/null\n\trm -r "${WINE_GAME_PATH}/add" "${WINE_GAME_PATH}/witcher1.reg"\n\twinetricks d3dx9_35#' "${PKG1_DIR}${PATH_BIN}/${APP_COMMON_ID}"
 write_bin_wine_cfg "${PKG1_DIR}${PATH_BIN}/${GAME_ID_SHORT}-winecfg"
 write_bin_wine "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE}" '' '' "${APP1_NAME}"
 write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_NAME_FR}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop" "${APP1_CAT}" 'wine'
@@ -215,8 +204,8 @@ printf '\n'
 
 printf '%s…\n' "$(l10n 'build_pkgs')"
 print wait
-write_pkg_debian "${PKG1_DIR}" "${PKG1_ID}" "${PKG1_VERSION}-${PKG_ORIGIN}${PKG_REVISION}" "${PKG1_ARCH}" "${PKG1_CONFLICTS}" "${PKG1_DEPS}" "${PKG1_RECS}" "${PKG1_DESC}"
-write_pkg_debian "${PKG2_DIR}" "${PKG2_ID}" "${PKG2_VERSION}-${PKG_ORIGIN}${PKG_REVISION}" "${PKG2_ARCH}" "${PKG2_CONFLICTS}" "${PKG2_DEPS}" "${PKG2_RECS}" "${PKG2_DESC}"
+write_pkg_debian "${PKG1_DIR}" "${PKG1_ID}" "${PKG_VERSION}" "${PKG1_ARCH}" "${PKG1_CONFLICTS}" "${PKG1_DEPS}" "${PKG1_RECS}" "${PKG1_DESC}"
+write_pkg_debian "${PKG2_DIR}" "${PKG2_ID}" "${PKG_VERSION}" "${PKG2_ARCH}" "${PKG2_CONFLICTS}" "${PKG2_DEPS}" "${PKG2_RECS}" "${PKG2_DESC}"
 build_pkg "${PKG1_DIR}" "${PKG1_DESC}" "${PKG_COMPRESSION}" 'quiet'
 build_pkg "${PKG2_DIR}" "${PKG2_DESC}" "${PKG_COMPRESSION}" 'quiet'
 print done
