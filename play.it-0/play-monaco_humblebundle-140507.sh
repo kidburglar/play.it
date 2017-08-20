@@ -28,7 +28,7 @@
 ###
 
 ###
-# conversion script for the To The Moon installer sold on HumbleBundle.com
+# conversion script for the Monaco: What’s Yours is Mine installer sold on HumbleBundle.com
 # build a .deb package from the .sh installer
 # tested on Debian, should work on any .deb-based distribution
 #
@@ -39,39 +39,33 @@
 ###
 
 # Setting game-specific variables
-GAME_ID='to-the-moon'
-GAME_ARCHIVE1='ToTheMoon_linux_1389114090.sh'
-GAME_ARCHIVE1_MD5='706a5c9467328438d412370ffb1454de'
-GAME_FULL_SIZE='92232'
+GAME_ID='monaco'
+GAME_ARCHIVE1='Monaco-Linux-2014-05-07.sh'
+GAME_ARCHIVE1_MD5='0c9dd0ca759f302d55d690f6ce9b2c3a'
+GAME_FULL_SIZE='206836'
 APP1_ID="${GAME_ID}"
-APP1_EXE_ARCH1='./ToTheMoon.bin.x86'
-APP1_EXE_ARCH2='./ToTheMoon.bin.x86_64'
-APP1_ICON='./ToTheMoon.png'
-APP1_ICON_RES='32x32'
-APP1_NAME='To The Moon'
+APP1_EXE='./Monaco.bin.x86'
+APP1_ICON='./Monaco.png'
+APP1_ICON_RES='48x48'
+APP1_NAME='Monaco: What’s Yours is Mine'
 APP1_CAT='Game'
 PKG_ID="${GAME_ID}"
-PKG_VERSION='1.0'
-PKG_ORIGIN='humblebundle'
-PKG_REVISION='1389114090'
-PKG_DEPS='libasound2-plugins, libfreetype6, libgl1-mesa-glx | libgl1, libsdl2-2.0-0'
-PKG_DESC='To The Moon'
-PKG1_ARCH='i386'
-PKG2_ARCH='amd64'
-PKG1_CONFLICTS="${PKG_ID}:${PKG2_ARCH}"
-PKG2_CONFLICTS="${PKG_ID}:${PKG1_ARCH}"
+PKG_ARCH='i386'
+PKG_DEPS='libasound2-plugins, libgl1-mesa-glx | libgl1, libsdl2-2.0-0'
+PKG_DESC='Monaco: What’s Yours is Mine'
+PKG_ORIGIN='humble'
+PKG_REVISION='140507'
+PKG_VERSION='1.0build131029'
 
 # Setting extra variables
 PKG_PREFIX_DEFAULT='/usr/local'
 PKG_COMPRESSION_DEFAULT='none'
 GAME_ARCHIVE_CHECKSUM_DEFAULT='md5sum'
 if [ $(df --output=avail /tmp | tail -n1) -ge $((${GAME_FULL_SIZE}*2)) ]; then
-	PKG1_DIR="/tmp/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG1_ARCH}"
-	PKG2_DIR="/tmp/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG2_ARCH}"
+	PKG1_DIR="/tmp/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG_ARCH}"
 	PKG_TMPDIR="/tmp/${GAME_ID}.tmp-$(date +%s)"
 else
-	PKG1_DIR="${PWD}/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG1_ARCH}"
-	PKG2_DIR="${PWD}/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG2_ARCH}"
+	PKG1_DIR="${PWD}/${PKG_ID}_${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}_${PKG_ARCH}"
 	PKG_TMPDIR="${PWD}/${GAME_ID}.tmp-$(date +%s)"
 	export TMPDIR="${PKG_TMPDIR}"
 fi
@@ -81,9 +75,10 @@ build_package() {
 local dir="$1"
 local desc="$2"
 local compression="$3"
-local arch="$4"
-printf '%s %s (%s)…\n' "$(l10n 'Construction du paquet pour' 'Building package for')" "${desc}" "${arch}"
+printf '%s %s…\n' "$(l10n 'Construction du paquet pour' 'Building package for')" "${desc}"
+print_wait
 fakeroot -- dpkg-deb -Z"${compression}" -b "${dir}" "${PWD}/$(basename "${dir}").deb" 1>/dev/null
+print_done
 }
 
 checksum() {
@@ -165,9 +160,8 @@ write_desktop () {
 local id="$1"
 local name="$2"
 local cat="$3"
-local arch="$4"
-local target="$5"
-printf '%s %s (%s)…\n' "$(l10n 'Écriture de l’entrée de menu pour' 'Writing menu entry for')" "${name}" "${arch}"
+local target="$4"
+printf '%s %s…\n' "$(l10n 'Écriture de l’entrée de menu pour' 'Writing menu entry for')" "${name}"
 cat > "${target}" << EOF
 [Desktop Entry]
 Version=1.0
@@ -188,12 +182,11 @@ local id="$2"
 local version="$3"
 local arch="$4"
 local deps="$5"
-local conflicts="$6"
-local desc="$7"
+local desc="$6"
 local size="$(LC_ALL=C du -cks $(realpath ${dir}/* | grep -v DEBIAN$) | grep total | cut -f1)"
 local maint="$(whoami)@$(hostname)"
 local target="${dir}/DEBIAN/control"
-printf '%s %s (%s)…\n' "$(l10n 'Écriture des méta-données du paquet pour' 'Writing package meta-data for')" "${desc}" "${arch}"
+printf '%s %s…\n' "$(l10n 'Écriture des méta-données du paquet pour' 'Writing package meta-data for')" "${desc}"
 cat > "${target}" << EOF
 Package: ${id}
 Version: ${version}
@@ -201,7 +194,6 @@ Architecture: ${arch}
 Maintainer: ${maint}
 Installed-Size: ${size}
 Depends: ${deps}
-Conflicts: ${conflicts}
 Section: non-free/games
 Description: ${desc}
 EOF
@@ -320,7 +312,6 @@ printf '%s…\n' "$(l10n 'Construction de l’arborescence du paquet' 'Building 
 rm -rf "${PKG1_DIR}" "${PKG2_DIR}"
 for dir in "${PATH_GAME}" "${PATH_DOC}" "${PATH_BIN}" "${PATH_ICON}" "${PATH_DESK}" '/DEBIAN'; do
 	mkdir -p "${PKG1_DIR}${dir}"
-	mkdir -p "${PKG2_DIR}${dir}"
 done
 
 # Extracting game data
@@ -328,48 +319,29 @@ printf '\n'
 extract_gamedata "${GAME_ARCHIVE}" "${PKG_TMPDIR}"
 find "${PKG_TMPDIR}" -type d -exec chmod 755 '{}' +
 find "${PKG_TMPDIR}" -type f -exec chmod 644 '{}' +
-for file in './data/noarch/*.txt'; do
-	cp -l "${PKG_TMPDIR}"/${file} "${PKG1_DIR}${PATH_DOC}"
-	cp -l "${PKG_TMPDIR}"/${file} "${PKG2_DIR}${PATH_DOC}"
-	rm "${PKG_TMPDIR}"/${file}
-done
-cp -rl "${PKG_TMPDIR}"/data/noarch/* "${PKG1_DIR}${PATH_GAME}"
-cp -rl "${PKG_TMPDIR}"/data/noarch/* "${PKG2_DIR}${PATH_GAME}"
-mv "${PKG_TMPDIR}"/data/x86/* "${PKG1_DIR}${PATH_GAME}"
-mv "${PKG_TMPDIR}"/data/x86_64/* "${PKG2_DIR}${PATH_GAME}"
-chmod 755 "${PKG1_DIR}${PATH_GAME}/${APP1_EXE_ARCH1}"
-chmod 755 "${PKG2_DIR}${PATH_GAME}/${APP1_EXE_ARCH2}"
+mv "${PKG_TMPDIR}/data/noarch/README.linux" "${PKG1_DIR}${PATH_DOC}"
+mv "${PKG_TMPDIR}"/data/*/* "${PKG1_DIR}${PATH_GAME}"
+chmod 755 "${PKG1_DIR}${PATH_GAME}/${APP1_EXE}"
 mv "${PKG1_DIR}${PATH_GAME}/${APP1_ICON}" "${PKG1_DIR}${PATH_ICON}/${APP1_ID}.png"
-mv "${PKG2_DIR}${PATH_GAME}/${APP1_ICON}" "${PKG2_DIR}${PATH_ICON}/${APP1_ID}.png"
 
 # Writing scripts (game launcher)
-write_bin "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE_ARCH1}"
-write_bin "${PKG2_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE_ARCH2}"
+write_bin "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE}"
 
 # Writing menu entries
 printf '\n'
-write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_CAT}" "${PKG1_ARCH}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop"
-write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_CAT}" "${PKG2_ARCH}" "${PKG2_DIR}${PATH_DESK}/${APP1_ID}.desktop"
+write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_CAT}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop"
 
 # Writing package meta-data
 printf '\n'
-write_pkg_debian "${PKG1_DIR}" "${PKG_ID}" "${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}" "${PKG1_ARCH}" "${PKG_DEPS}" "${PKG1_CONFLICTS}" "${PKG_DESC}"
-write_pkg_debian "${PKG2_DIR}" "${PKG_ID}" "${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}" "${PKG2_ARCH}" "${PKG_DEPS}" "${PKG2_CONFLICTS}" "${PKG_DESC}"
+write_pkg_debian "${PKG1_DIR}" "${PKG_ID}" "${PKG_VERSION}-${PKG_ORIGIN}${PKG_REVISION}" "${PKG_ARCH}" "${PKG_DEPS}" "${PKG_DESC}"
 
 # Building package
-printf '\n%s…\n' "$(l10n 'Construction des paquets' 'Building packages')"
-print_wait
 rm -rf "${PKG_TMPDIR}"
 mkdir "${PKG_TMPDIR}"
-build_package "${PKG1_DIR}" "${PKG_DESC}" "${PKG_COMPRESSION}" "${PKG1_ARCH}"
-rm -rf "${PKG1_DIR}"
-build_package "${PKG2_DIR}" "${PKG_DESC}" "${PKG_COMPRESSION}" "${PKG2_ARCH}"
-rm -rf "${PKG2_DIR}" "${PKG_TMPDIR}"
-print_done
-printf '%s %s (%s) %s:\n' "$(l10n 'Installez' 'Install')" "${PKG_DESC}" "${PKG1_ARCH}" "$(l10n 'en lançant la série de commandes suivante en root ' 'by running the following commands as root')"
+build_package "${PKG1_DIR}" "${PKG_DESC}" "${PKG_COMPRESSION}"
+rm -rf "${PKG1_DIR}" "${PKG_TMPDIR}"
+printf '%s %s %s:\n' "$(l10n 'Installez' 'Install')" "${PKG_DESC}" "$(l10n 'en lançant la série de commandes suivante en root ' 'by running the following commands as root')"
 printf 'dpkg -i %s\napt-get install -f\n' "${PWD}/$(basename ${PKG1_DIR}).deb"
-printf '\n%s %s (%s) %s:\n' "$(l10n 'Installez' 'Install')" "${PKG_DESC}" "${PKG2_ARCH}" "$(l10n 'en lançant la série de commandes suivante en root ' 'by running the following commands as root')"
-printf 'dpkg -i %s\napt-get install -f\n' "${PWD}/$(basename ${PKG2_DIR}).deb"
 printf '\n%s ;)\n\n' "$(l10n 'Bon jeu' 'Have fun')"
 
 exit 0
