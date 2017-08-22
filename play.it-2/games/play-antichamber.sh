@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170803.1
+script_version=20170822.1
 
 # Set game-specific variables
 
@@ -69,7 +69,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa | libgl1, libvorbisfile3, libsdl2-mixer-2.0-0, libsdl2-2.0-0, libogg0, libasound2-plugins"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libvorbisfile3, libsdl2-mixer-2.0-0, libsdl2-2.0-0, libogg0, libasound2-plugins"
 PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-libgl lib32-libvorbis lib32-gcc-libs lib32-sdl2_mixer lib32-libogg lib32-sdl2 lib32-alsa-plugins"
 
 # Load common functions

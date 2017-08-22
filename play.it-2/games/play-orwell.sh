@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170716.1
+script_version=20170822.1
 
 # Set game-specific variables
 
@@ -77,7 +77,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libgl1-mesa | libgl1, libxrandr2"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libxcursor1, libgl1-mesa-glx | libgl1, libxrandr2"
 PKG_BIN_DEPS_ARCH="$PKG_DATA_ID glibc libxcursor libgl gcc-libs libxrandr"
 
 # Load common functions
