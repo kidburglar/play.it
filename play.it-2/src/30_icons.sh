@@ -121,14 +121,14 @@ postinst_icons_linking() {
 			local icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
 			PATH_ICON="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 
-			cat > "$postinst" <<- EOF
+			cat >> "$postinst" <<- EOF
 			if [ ! -e "$PATH_ICON/$app_id.png" ]; then
 			  mkdir --parents "$PATH_ICON"
 			  ln --symbolic "$PATH_GAME"/$icon_file "$PATH_ICON/$app_id.png"
 			fi
 			EOF
 
-			cat > "$prerm" <<- EOF
+			cat >> "$prerm" <<- EOF
 			if [ -e "$PATH_ICON/$app_id.png" ]; then
 			  rm "$PATH_ICON/$app_id.png"
 			  rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
