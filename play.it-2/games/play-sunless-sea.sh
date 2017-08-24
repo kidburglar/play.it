@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170611.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -93,6 +93,7 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='./Sunless Sea.x86'
 APP_MAIN_EXE_BIN64='./Sunless Sea.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON1 APP_MAIN_ICON2'
 APP_MAIN_ICON1='Sunless Sea_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON1_RES='128'
 APP_MAIN_ICON2='./Icon.png'
@@ -113,12 +114,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu libxcursor"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -162,25 +163,7 @@ done
 
 # Build package
 
-res1="$APP_MAIN_ICON1_RES"
-res2="$APP_MAIN_ICON2_RES"
-PATH_ICON1="$PATH_ICON_BASE/${res1}x${res1}/apps"
-PATH_ICON2="$PATH_ICON_BASE/${res2}x${res2}/apps"
-
-cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON1"
-mkdir --parents "$PATH_ICON2"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON1" "$PATH_ICON1/$GAME_ID.png"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON2" "$PATH_ICON2/$GAME_ID.png"
-EOF
-
-cat > "$prerm" << EOF
-rm "$PATH_ICON1/$GAME_ID.png"
-rm "$PATH_ICON2/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON1"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON2"
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN32' 'PKG_BIN64'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170710.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -60,8 +60,12 @@ ARCHIVE_GAME_DATA_FILES='./bin/*.xml ./bin/*.swf ./bin/data'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='bin/adl'
 APP_MAIN_OPTIONS='bin/BotaniculaLinux-app.xml -nodebug'
-APP_MAIN_ICON_PATH='bin/data/icons'
-APP_MAIN_ICON_RES='16 32 36 48 57 72 114 128 256 512'
+unset APP_MAIN_ICONS_LIST
+for res in 16 32 36 48 57 72 114 128 256 512; do
+	APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_${res}"
+	export APP_MAIN_ICON_${res}="bin/data/icons/b${res}.png"
+	export APP_MAIN_ICON_${res}_RES="$res"
+done
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
@@ -74,12 +78,12 @@ PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-nss lib32-gtk2 lib32-libxml2 lib32-alsa-pl
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -110,26 +114,7 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-cat > "$postinst" << EOF
-for res in $APP_MAIN_ICON_RES; do
-	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	if ! [ -e "\$PATH_ICON/$GAME_ID.png" ]; then
-		mkdir --parents "\$PATH_ICON"
-		ln --symbolic "$PATH_GAME/$APP_MAIN_ICON_PATH/b\${res}.png" "\$PATH_ICON/$GAME_ID.png"
-	fi
-done
-EOF
-
-cat > "$prerm" << EOF
-for res in $APP_ICON_RES; do
-	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	if [ -e "\$PATH_ICON/$GAME_ID.png" ]; then
-		rm "\$PATH_ICON/$GAME_ID.png"
-		rmdir --parents --ignore-fail-on-non-empty "\$PATH_ICON"
-	fi
-done
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170630.3
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -59,7 +59,12 @@ ARCHIVE_GAME_FILES='./icon128x128.png ./icon32x32.png ./icon48x48.png ./icon48x4
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='Nihilumbra'
-APP_MAIN_ICON_RES='32 48 64 128'
+unset APP_MAIN_ICONS_LIST
+for res in 32 48 64 128; do
+	APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_${res}"
+	export APP_MAIN_ICON_${res}="icon${res}x${res}.png"
+	export APP_MAIN_ICON_${res}_RES="$res"
+done
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -71,12 +76,12 @@ PKG_MAIN_DEPS_ARCH_HUMBLE_64='libxcursor libxrandr glu'
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -102,36 +107,20 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
+PATH_ICON="$PATH_ICON_BASE/48x48/apps"
 cat > "$postinst" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	if [ ! -e "\${PATH_ICON}/${GAME_ID}.png" ]; then
-		mkdir --parents "\${PATH_ICON}"
-		ln --symbolic "${PATH_GAME}/icon\${res}x\${res}.png" "\${PATH_ICON}/${GAME_ID}.png"
-	fi
-done
-PATH_ICON="${PATH_ICON_BASE}/48x48/apps"
-if [ ! -e "\${PATH_ICON}/${GAME_ID}.svg" ]; then
-	mkdir --parents "\${PATH_ICON}"
-	ln --symbolic "${PATH_GAME}/icon48x48.xpm" "\${PATH_ICON}/${GAME_ID}.xpm"
+if [ ! -e "$PATH_ICON/${GAME_ID}.xpm" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME/icon48x48.xpm" "$PATH_ICON/${GAME_ID}.xpm"
 fi
 EOF
-
 cat > "$prerm" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	if [ -e "\${PATH_ICON}/${GAME_ID}.png" ]; then
-		rm "\${PATH_ICON}/${GAME_ID}.png"
-		rmdir --ignore-fail-on-non-empty "\${PATH_ICON}"
-	fi
-done
-PATH_ICON="${PATH_ICON_BASE}/48x48/apps"
-if [ -e "\${PATH_ICON}/${GAME_ID}.xpm" ]; then
-	rm --force "\${PATH_ICON}/${GAME_ID}.xpm"
-	rmdir --ignore-fail-on-non-empty "\${PATH_ICON}"
+if [ -e "$PATH_ICON/${GAME_ID}.xpm" ]; then
+	rm --force "$PATH_ICON/${GAME_ID}.xpm"
+	rmdir --ignore-fail-on-non-empty "$PATH_ICON"
 fi
 EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata
 build_pkg
 

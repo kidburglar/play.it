@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -70,6 +70,7 @@ CONFIG_FILES='./*.xml ./config/*'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='aquaria'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='aquaria.png'
 APP_MAIN_ICON_RES='128'
 
@@ -84,12 +85,12 @@ PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-libstdc++5 lib32-libgl lib32-sdl lib32-ope
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -121,19 +122,7 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-
-cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON/$GAME_ID.png"
-EOF
-
-cat > "$prerm" << EOF
-rm "$PATH_ICON/$GAME_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN'

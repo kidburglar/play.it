@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170717.2
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -67,8 +67,12 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Osmos.bin32'
 APP_MAIN_EXE_BIN64='Osmos.bin64'
 APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
-APP_MAIN_ICON_PATH='Icons'
-APP_MAIN_ICON_RES='16 22 32 36 48 64 72 96 128 192 256'
+unset APP_MAIN_ICONS_LIST
+for res in 16 22 32 36 48 64 72 96 128 192 256; do
+	APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_${res}"
+	export APP_MAIN_ICON_${res}="Icons/${res}x${res}.png"
+	export APP_MAIN_ICON_${res}_RES="$res"
+done
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -85,12 +89,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID openal glu libvorbis"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -129,22 +133,7 @@ sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN64_PATH}${PAT
 
 # Build package
 
-cat > "$postinst" << EOF
-for res in $APP_MAIN_ICON_RES; do
-	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	mkdir --parents "\$PATH_ICON"
-	ln --symbolic "$PATH_GAME/$APP_MAIN_ICON_PATH/\${res}x\${res}.png" "\$PATH_ICON/$GAME_ID.png"
-done
-EOF
-
-cat > "$prerm" << EOF
-for res in $APP_MAIN_ICON_RES; do
-	PATH_ICON=$PATH_ICON_BASE/\${res}x\${res}/apps
-	rm "\$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "\$PATH_ICON"
-done
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
