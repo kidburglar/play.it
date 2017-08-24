@@ -34,33 +34,38 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.3
+script_version=20170902.1
 
 # Set game-specific variables
 
 GAME_ID='crypt-of-the-necrodancer'
 GAME_NAME='Crypt Of The NecroDancer'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='gog_crypt_of_the_necrodancer_2.3.0.6.sh'
-ARCHIVE_GOG_MD5='bece155772937aa32d2b4eba3aac0dd0'
-ARCHIVE_GOG_SIZE='1500000'
-ARCHIVE_GOG_VERSION='1.27-gog2.3.0.6'
+ARCHIVE_GOG='gog_crypt_of_the_necrodancer_2.4.0.7.sh'
+ARCHIVE_GOG_MD5='a8c21ce12e7e4c769aaddd76321672e4'
+ARCHIVE_GOG_SIZE='1700000'
+ARCHIVE_GOG_VERSION='1.28-gog2.4.0.7'
 
-ARCHIVE_GOG_OLD='gog_crypt_of_the_necrodancer_2.3.0.5.sh'
-ARCHIVE_GOG_OLD_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
+ARCHIVE_GOG_OLD='gog_crypt_of_the_necrodancer_2.3.0.6.sh'
+ARCHIVE_GOG_OLD_MD5='bece155772937aa32d2b4eba3aac0dd0'
 ARCHIVE_GOG_OLD_SIZE='1500000'
-ARCHIVE_GOG_OLD_VERSION='1.27-gog2.3.0.5'
+ARCHIVE_GOG_OLD_VERSION='1.27-gog2.3.0.6'
+
+ARCHIVE_GOG_OLDER='gog_crypt_of_the_necrodancer_2.3.0.5.sh'
+ARCHIVE_GOG_OLDER_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
+ARCHIVE_GOG_OLDER_SIZE='1500000'
+ARCHIVE_GOG_OLDER_VERSION='1.27-gog2.3.0.5'
 
 ARCHIVE_ICONS='crypt-of-the-necrodancer_icons.tar.gz'
 ARCHIVE_ICONS_MD5='04d2bb19adc13dbadce6161bd92bf59a'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC1_DATA_FILES='./*'
 
-ARCHIVE_DOC2_PATH='data/noarch/game/'
-ARCHIVE_DOC2_FILES='./license.txt'
+ARCHIVE_DOC2_DATA_PATH='data/noarch/game/'
+ARCHIVE_DOC2_DATA_FILES='./license.txt'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./*.so.* ./fmod ./NecroDancer ./essentia*'
@@ -99,16 +104,16 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
 PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
-PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
+PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -135,21 +140,14 @@ if [ "$ICONS_PACK" ]; then
 	)
 fi
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_MUSIC'
-organize_data 'GAME_MUSIC' "$PATH_GAME"
-
-PKG='PKG_VIDEO'
-organize_data 'GAME_VIDEO' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 if [ "$ICONS_PACK" ]; then
+	PKG='PKG_DATA'
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	res="$APP_MAIN_ICON_GOG_RES"
