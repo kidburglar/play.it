@@ -1,7 +1,10 @@
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: PLAYIT_WORKDIR PKG PKG_PATH
+# NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) PKG_PATH
 organize_data() {
+	if [ -z "$PKG" ]; then
+		organize_data_error_missing_pkg
+	fi
 	local archive_path
 	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
 		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
@@ -33,5 +36,22 @@ organize_data() {
 			done
 		)
 	fi
+}
+
+# display an error when calling organize_data() with $PKG unset or empty
+# USAGE: organize_data_error_missing_pkg
+# NEEDED VARS: (LANG)
+organize_data_error_missing_pkg() {
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='organize_data ne peut pas être appelé si $PKG n’est pas défini.\n'
+		;;
+		('en'|*)
+			string='organize_data can not be called if $PKG is not set.\n'
+		;;
+	esac
+	printf "$string"
+	return 1
 }
 
