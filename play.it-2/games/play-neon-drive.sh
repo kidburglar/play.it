@@ -34,20 +34,25 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20170902.1
 
 # Set game-specific variables
 
 GAME_ID='neon-drive'
 GAME_NAME='Neon Drive'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
-ARCHIVE_HUMBLE='NeonDrive_V1.4__Linux.rar'
-ARCHIVE_HUMBLE_MD5='86627f5639234614b036666de4223a15'
-ARCHIVE_HUMBLE_SIZE='490000'
-ARCHIVE_HUMBLE_VERSION='1.4-humble1'
-ARCHIVE_HUMBLE_TYPE='rar'
+ARCHIVE_HUMBLE='NeonDrive_V1.5_Linux.zip'
+ARCHIVE_HUMBLE_MD5='1fcbd5dc69cc08899b792b9f4c0d7075'
+ARCHIVE_HUMBLE_SIZE='500000'
+ARCHIVE_HUMBLE_VERSION='1.5-humble170831'
+
+ARCHIVE_HUMBLE_OLD='NeonDrive_V1.4__Linux.rar'
+ARCHIVE_HUMBLE_OLD_MD5='86627f5639234614b036666de4223a15'
+ARCHIVE_HUMBLE_OLD_SIZE='490000'
+ARCHIVE_HUMBLE_OLD_VERSION='1.4-humble1'
+ARCHIVE_HUMBLE_OLD_TYPE='rar'
 
 ARCHIVE_GAME_BIN32_PATH='.'
 ARCHIVE_GAME_BIN32_FILES='./Neon?Drive.x86 ./Neon?Drive_Data/*/x86'
@@ -103,14 +108,9 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
