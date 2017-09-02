@@ -1,3 +1,7 @@
+2.2.0
+
+  * Automatically detect archive type for *.rar files
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
