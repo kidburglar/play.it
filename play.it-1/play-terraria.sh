@@ -34,7 +34,7 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170708.1
+script_version=20170902.1
 
 # Set game-specific variables
 
@@ -44,10 +44,10 @@ GAME_ID='terraria'
 GAME_ID_SHORT='terraria'
 GAME_NAME='Terraria'
 
-GAME_ARCHIVE1='gog_terraria_2.17.0.21.sh'
-GAME_ARCHIVE1_MD5='90ec196ec38a7f7a5002f5a8109493cc'
+GAME_ARCHIVE1='terraria_en_1_3_5_3_14602.sh'
+GAME_ARCHIVE1_MD5='c99fdc0ae15dbff1e8147b550db4e31a'
 GAME_ARCHIVE_FULLSIZE='490000'
-PKG_REVISION='gog2.17.0.21'
+PKG_REVISION='gog14602'
 
 INSTALLER_PATH='data/noarch/game'
 INSTALLER_DOC='../docs/* changelog.txt'
