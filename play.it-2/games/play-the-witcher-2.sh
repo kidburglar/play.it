@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -72,6 +72,7 @@ ARCHIVE_GAME_DATA_FILES='./CookedPC ./fontconfig ./icudt52l.dat ./linux ./SDLGam
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='./witcher2'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='linux/icons/witcher2-icon.png'
 APP_MAIN_ICON_RES='256'
 
@@ -79,6 +80,7 @@ APP_CONFIG_ID="${GAME_ID}_config"
 APP_CONFIG_TYPE='native'
 APP_CONFIG_EXE='./configurator'
 APP_CONFIG_NAME="$GAME_NAME - configuration"
+APP_CONFIG_ICONS_LIST='APP_CONFIG_ICON'
 APP_CONFIG_ICON='linux/icons/witcher2-configurator.png'
 APP_CONFIG_ICON_RES='256'
 APP_CONFIG_CAT='Settings'
@@ -103,12 +105,12 @@ PKG_BIN_DEPS_ARCH="$PKG_PACK1_ID $PKG_PACK2_ID $PKG_MOVIES_ID $PKG_DATA_ID lib32
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -149,29 +151,15 @@ write_launcher 'APP_MAIN' 'APP_CONFIG'
 
 # Build package
 
-res_main="$APP_MAIN_ICON_RES"
-res_config="$APP_CONFIG_ICON_RES"
-PATH_ICON_MAIN="$PATH_ICON_BASE/${res_main}x${res_main}/apps"
-PATH_ICON_CONFIG="$PATH_ICON_BASE/${res_config}x${res_config}/apps"
-
 cat > "$postinst" << EOF
-mkdir --parents "$PATH_ICON_MAIN"
-mkdir --parents "$PATH_ICON_CONFIG"
-ln --symbolic "$PATH_GAME/$APP_MAIN_ICON" "$PATH_ICON_MAIN/$GAME_ID.png"
-ln --symbolic "$PATH_GAME/$APP_CONFIG_ICON" "$PATH_ICON_CONFIG/$APP_CONFIG_ID.png"
 printf 'Building pack0.dzip, this might take a while…\n'
 cat "$PATH_GAME/CookedPC/pack0.dzip.split"* > "$PATH_GAME/CookedPC/pack0.dzip"
 rm "$PATH_GAME/CookedPC/pack0.dzip.split"*
 EOF
-
 cat > "$prerm" << EOF
-rm "$PATH_ICON_MAIN/$GAME_ID.png"
-rm "$PATH_ICON_CONFIG/$APP_CONFIG_ID.png"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON_MAIN"
-rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON_CONFIG"
 rm "$PATH_GAME/CookedPC/pack0.dzip"
 EOF
-
+postinst_icons_linking 'APP_MAIN' 'APP_CONFIG'
 write_metadata 'PKG_BIN'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_PACK1' 'PKG_PACK2' 'PKG_MOVIES' 'PKG_DATA'

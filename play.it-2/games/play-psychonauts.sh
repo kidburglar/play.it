@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -70,6 +70,7 @@ CONFIG_FILES='./DisplaySettings.ini ./psychonauts.ini'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='Psychonauts'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON1'
 APP_MAIN_ICON1='psychonauts.png'
 APP_MAIN_ICON1_RES='512'
 APP_MAIN_ICON2='icon.bmp'
@@ -89,12 +90,12 @@ PKG_BIN_DEPS_ARCH="$PKG_SOUNDS_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -120,6 +121,12 @@ organize_data 'DOC1'      "$PATH_DOC"
 organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
+res="$APP_MAIN_ICON2_RES"
+PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON2"
+mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON2%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -129,34 +136,7 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-res="$APP_MAIN_ICON1_RES"
-PATH_ICON1="$PATH_ICON_BASE/${res}x${res}/apps"
-
-res="$APP_MAIN_ICON2_RES"
-PATH_ICON2="$PATH_ICON_BASE/${res}x${res}/apps"
-
-cat > "$postinst" << EOF
-if ! [ -e "$PATH_ICON1/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON1"
-	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON1 "$PATH_ICON1/$GAME_ID.png"
-fi
-if ! [ -e "$PATH_ICON2/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON2"
-	ln --symbolic "$PATH_GAME"/$APP_MAIN_ICON1 "$PATH_ICON2/$GAME_ID.png"
-fi
-EOF
-
-cat > "$prerm" << EOF
-if ! [ -e "$PATH_ICON1/$GAME_ID.png" ]; then
-	rm "$PATH_ICON1/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON1"
-fi
-if ! [ -e "$PATH_ICON2/$GAME_ID.png" ]; then
-	rm "$PATH_ICON2/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON2"
-fi
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata
 build_pkg
 

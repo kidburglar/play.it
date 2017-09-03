@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170610.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -68,7 +68,12 @@ ARCHIVE_GAME_DATA_FILES='./icons ./properties ./res'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='WorldOfGoo.bin32'
 APP_MAIN_EXE_BIN64='WorldOfGoo.bin64'
-APP_MAIN_ICON_RES='16 22 32 48 64 128'
+unset APP_MAIN_ICONS_LIST
+for res in 16 22 32 48 64 128; do
+	APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_${res}"
+	export APP_MAIN_ICON_${res}="icons/${res}x${res}.png"
+	export APP_MAIN_ICON_${res}_RES="$res"
+done
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -85,12 +90,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu libogg sdl sdl_mixer"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -140,28 +145,16 @@ done
 
 # Build package
 
+PATH_ICON="$PATH_ICON_BASE/scalable/apps"
 cat > "$postinst" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	mkdir -p "\${PATH_ICON}"
-	ln -s "${PATH_GAME}/icons/\${res}x\${res}.png" "\${PATH_ICON}/${GAME_ID}.png"
-done
-PATH_ICON="${PATH_ICON_BASE}/scalable/apps"
-mkdir -p "\${PATH_ICON}"
-ln -s "${PATH_GAME}/icons/scalable.svg" "\${PATH_ICON}/${GAME_ID}.svg"
+mkdir -p "$PATH_ICON"
+ln -s "$PATH_GAME/icons/scalable.svg" "$PATH_ICON/${GAME_ID}.svg"
 EOF
-
 cat > "$prerm" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="${PATH_ICON_BASE}/\${res}x\${res}/apps"
-	rm "\${PATH_ICON}/${GAME_ID}.png"
-	rmdir -p --ignore-fail-on-non-empty "\${PATH_ICON}"
-done
-PATH_ICON="${PATH_ICON_BASE}/scalable/apps"
-rm "\${PATH_ICON}/${GAME_ID}.svg"
-rmdir -p --ignore-fail-on-non-empty "\${PATH_ICON}"
+rm "$PATH_ICON/${GAME_ID}.svg"
+rmdir -p --ignore-fail-on-non-empty "$PATH_ICON"
 EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN32' 'PKG_BIN64'

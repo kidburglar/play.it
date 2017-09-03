@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170814.1
+script_version=20170824.1
 
 # Set game-specific variables
 
@@ -107,6 +107,7 @@ APP_MAIN_EXE_BIN64='140Linux.x86_64'
 APP_MAIN_EXE_BIN32_OLD='140.x86'
 APP_MAIN_EXE_BIN64_OLD='140.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
@@ -125,12 +126,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs glu alsa-lib libxcursor pulseau
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -171,23 +172,7 @@ done
 
 # Build package
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-
-cat > "$postinst" << EOF
-if [ ! -e "$PATH_ICON/$GAME_ID.png" ]; then
-	mkdir --parents "$PATH_ICON"
-	ln --force --symbolic "$PATH_GAME"/$APP_MAIN_ICON "$PATH_ICON/$GAME_ID.png"
-fi
-EOF
-
-cat > "$prerm" << EOF
-if [ -e "$PATH_ICON/$GAME_ID.png" ]; then
-	rm --force "$PATH_ICON/$GAME_ID.png"
-	rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
-fi
-EOF
-
+postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
