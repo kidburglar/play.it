@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# Neon Drive
+# Tropico
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -38,53 +38,61 @@ script_version=20170902.1
 
 # Set game-specific variables
 
-GAME_ID='neon-drive'
-GAME_NAME='Neon Drive'
+GAME_ID='tropico'
+GAME_NAME='Tropico'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
-ARCHIVE_HUMBLE='NeonDrive_V1.5_Linux.zip'
-ARCHIVE_HUMBLE_MD5='1fcbd5dc69cc08899b792b9f4c0d7075'
-ARCHIVE_HUMBLE_SIZE='500000'
-ARCHIVE_HUMBLE_VERSION='1.5-humble170831'
+ARCHIVE_GOG_EN='setup_tropico_2.1.0.14.exe'
+ARCHIVE_GOG_EN_MD5='1bd761bc4a40a42a9caeb41c70d46465'
+ARCHIVE_GOG_EN_VERSION='1.5.3-gog2.1.0.14'
+ARCHIVE_GOG_EN_SIZE='1400000'
 
-ARCHIVE_HUMBLE_OLD='NeonDrive_V1.4__Linux.rar'
-ARCHIVE_HUMBLE_OLD_MD5='86627f5639234614b036666de4223a15'
-ARCHIVE_HUMBLE_OLD_SIZE='490000'
-ARCHIVE_HUMBLE_OLD_VERSION='1.4-humble1'
-ARCHIVE_HUMBLE_OLD_TYPE='rar'
+ARCHIVE_GOG_FR='setup_tropico_french_2.1.0.14.exe'
+ARCHIVE_GOG_FR_MD5='aad4ea5a6fe2b2c2f347cfa7aae058b3'
+ARCHIVE_GOG_FR_VERSION='1.5.3-gog2.1.0.14'
+ARCHIVE_GOG_FR_SIZE='1400000'
 
-ARCHIVE_GAME_BIN32_PATH='.'
-ARCHIVE_GAME_BIN32_FILES='./Neon?Drive.x86 ./Neon?Drive_Data/*/x86'
+ARCHIVE_DOC_DATA_PATH='tmp'
+ARCHIVE_DOC_DATA_FILES='./*eula.txt'
 
-ARCHIVE_GAME_BIN64_PATH='.'
-ARCHIVE_GAME_BIN64_FILES='./Neon?Drive.x86_64 ./Neon?Drive_Data/*/x86_64'
+ARCHIVE_DOC_L10N_PATH='app'
+ARCHIVE_DOC_L10N_FILES='./*.txt ./*.pdf'
 
-ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='./Neon?Drive_Data'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./*.exe ./binkw32.dll ./mss32.dll'
 
-DATA_DIRS='./logs'
+ARCHIVE_GAME_L10N_PATH='app'
+ARCHIVE_GAME_L10N_FILES='./maps ./data2/*.cfg ./data2/*.lng ./data2/*.txt ./data2/x1.dap ./data2/x2.dap ./movies/*.txt ./movies/s_f2o.bik ./movies/s_m2o.bik ./movies/s_s2o.bik'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Neon Drive.x86'
-APP_MAIN_EXE_BIN64='./Neon Drive.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./data ./data2 ./movies ./voices'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+CONFIG_FILES='./data2/*.cfg'
+DATA_DIRS='./games ./maps'
+DATA_FILES='./data2/*.dat'
+
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='tropico.exe'
+APP_MAIN_ICON='tropico.exe'
+APP_MAIN_ICON_RES='32'
+
+PACKAGES_LIST='PKG_L10N PKG_DATA PKG_BIN'
+
+PKG_L10N_ID="${GAME_ID}-l10n"
+PKG_L10N_ID_GOG_EN="${PKG_L10N_ID}-en"
+PKG_L10N_ID_GOG_FR="${PKG_L10N_ID}-fr"
+PKG_L10N_PROVIDE="$PKG_L10N_ID"
+PKG_L10N_DESCRIPTION_GOG_EN='English localization'
+PKG_L10N_DESCRIPTION_GOG_FR='French localization'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa-glx | libgl1, libxcursor1, libxrandr2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libgl lib32-libxcursor lib32-libxrandr"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libgl libxcursor libxrandr"
+PKG_BIN_ID="$GAME_ID"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -109,35 +117,38 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
+
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
+
+# Disable censorship in French version
+
+if [ "$ARCHIVE" = 'ARCHIVE_GOG_FR' ]; then
+	LANG=C sed --in-place 's/^\( \+406 .\+militaire\) \(.\+\)/\1  \2/' "${PKG_L10N_PATH}${PATH_GAME}/data2/tropico.lng"
+fi
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

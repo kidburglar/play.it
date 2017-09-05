@@ -29,82 +29,59 @@ set -o errexit
 ###
 
 ###
-# Crypt Of The Necrodancer
+# A Story About My Uncle
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170902.1
+script_version=20170829.1
 
 # Set game-specific variables
 
-GAME_ID='crypt-of-the-necrodancer'
-GAME_NAME='Crypt Of The NecroDancer'
+GAME_ID='a-story-about-my-uncle'
+GAME_NAME='A Story About My Uncle'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_crypt_of_the_necrodancer_2.4.0.7.sh'
-ARCHIVE_GOG_MD5='a8c21ce12e7e4c769aaddd76321672e4'
-ARCHIVE_GOG_SIZE='1700000'
-ARCHIVE_GOG_VERSION='1.28-gog2.4.0.7'
+ARCHIVE_HUMBLE='Linux-NoDRM-ASAMU_5188.zip'
+ARCHIVE_HUMBLE_MD5='71f9f3add29a733c4a1a7d18d738d3d6'
+ARCHIVE_HUMBLE_SIZE='1300000'
+ARCHIVE_HUMBLE_VERSION='5188-humble170516'
 
-ARCHIVE_GOG_OLD='gog_crypt_of_the_necrodancer_2.3.0.6.sh'
-ARCHIVE_GOG_OLD_MD5='bece155772937aa32d2b4eba3aac0dd0'
-ARCHIVE_GOG_OLD_SIZE='1500000'
-ARCHIVE_GOG_OLD_VERSION='1.27-gog2.3.0.6'
+ARCHIVE_ICONS='a-story-about-my-uncle_icons.tar.gz'
+ARCHIVE_ICONS_MD5='db4eb7ab666e61ea5fc983102099ab31'
 
-ARCHIVE_GOG_OLDER='gog_crypt_of_the_necrodancer_2.3.0.5.sh'
-ARCHIVE_GOG_OLDER_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
-ARCHIVE_GOG_OLDER_SIZE='1500000'
-ARCHIVE_GOG_OLDER_VERSION='1.27-gog2.3.0.5'
+ARCHIVE_GAME_BIN32_PATH='.'
+ARCHIVE_GAME_BIN32_FILES='Binaries/linux-x86 Binaries/SDL2/lib/linux-x86'
 
-ARCHIVE_ICONS='crypt-of-the-necrodancer_icons.tar.gz'
-ARCHIVE_ICONS_MD5='04d2bb19adc13dbadce6161bd92bf59a'
+ARCHIVE_GAME_BIN64_PATH='.'
+ARCHIVE_GAME_BIN64_FILES='Binaries/linux-amd64 Binaries/SDL2/lib/linux-amd64'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC1_DATA_FILES='./*'
-
-ARCHIVE_DOC2_DATA_PATH='data/noarch/game/'
-ARCHIVE_DOC2_DATA_FILES='./license.txt'
-
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.so.* ./fmod ./NecroDancer ./essentia*'
-
-ARCHIVE_GAME_MUSIC_PATH='data/noarch/game'
-ARCHIVE_GAME_MUSIC_FILES='./data/music'
-
-ARCHIVE_GAME_VIDEO_PATH='data/noarch/game'
-ARCHIVE_GAME_VIDEO_FILES='./data/video'
-
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./data'
+ARCHIVE_GAME_DATA_PATH='.'
+ARCHIVE_GAME_DATA_FILES='./ASAMU ./Engine'
 
 ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./128x128 ./256x256'
+ARCHIVE_ICONS_FILES='32x32'
 
-DATA_DIRS='./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
-DATA_FILES='./data/save_data.xml ./data/played.dat'
+CONFIG_DIRS='./ASAMU/Cloud ./ASAMU/Config'
+DATA_DIRS='./ASAMU/Saves'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_LIBS='.'
-APP_MAIN_EXE='NecroDancer'
-APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
-APP_MAIN_ICON_GOG_RES='256'
+APP_MAIN_EXE_BIN32='Binaries/linux-x86/ASAMU'
+APP_MAIN_EXE_BIN64='Binaries/linux-amd64/ASAMU'
 
-PACKAGES_LIST='PKG_MUSIC PKG_VIDEO PKG_DATA PKG_BIN'
-
-PKG_MUSIC_ID="${GAME_ID}-music"
-PKG_MUSIC_DESCRIPTION='music'
-
-PKG_VIDEO_ID="${GAME_ID}-video"
-PKG_VIDEO_DESCRIPTION='video'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
-PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libsdl2-2.0-0, libopenal1, libgl1-mesa-glx | libgl1"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-libopenal lib32-libgl"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 openal libgl"
 
 # Load common functions
 
@@ -133,6 +110,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 if [ "$ICONS_PACK" ]; then
 	(
 		ARCHIVE='ICONS_PACK'
@@ -141,27 +119,21 @@ if [ "$ICONS_PACK" ]; then
 fi
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
 if [ "$ICONS_PACK" ]; then
 	PKG='PKG_DATA'
 	organize_data 'ICONS' "$PATH_ICON_BASE"
-else
-	res="$APP_MAIN_ICON_GOG_RES"
-	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-	mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
@@ -174,6 +146,10 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0

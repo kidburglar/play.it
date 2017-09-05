@@ -29,82 +29,66 @@ set -o errexit
 ###
 
 ###
-# Crypt Of The Necrodancer
+# Invisible Inc.
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170902.1
+script_version=20170830.1
 
 # Set game-specific variables
 
-GAME_ID='crypt-of-the-necrodancer'
-GAME_NAME='Crypt Of The NecroDancer'
+GAME_ID='invisible-inc'
+GAME_NAME='Invisible Inc.'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_crypt_of_the_necrodancer_2.4.0.7.sh'
-ARCHIVE_GOG_MD5='a8c21ce12e7e4c769aaddd76321672e4'
-ARCHIVE_GOG_SIZE='1700000'
-ARCHIVE_GOG_VERSION='1.28-gog2.4.0.7'
+ARCHIVE_GOG='gog_invisible_inc_2.6.0.11.sh'
+ARCHIVE_GOG_MD5='97e6efdc9237ec17deb02b5cf5185cf5'
+ARCHIVE_GOG_SIZE='1200000'
+ARCHIVE_GOG_VERSION='2016.04.13-gog2.6.0.11'
 
-ARCHIVE_GOG_OLD='gog_crypt_of_the_necrodancer_2.3.0.6.sh'
-ARCHIVE_GOG_OLD_MD5='bece155772937aa32d2b4eba3aac0dd0'
-ARCHIVE_GOG_OLD_SIZE='1500000'
-ARCHIVE_GOG_OLD_VERSION='1.27-gog2.3.0.6'
-
-ARCHIVE_GOG_OLDER='gog_crypt_of_the_necrodancer_2.3.0.5.sh'
-ARCHIVE_GOG_OLDER_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
-ARCHIVE_GOG_OLDER_SIZE='1500000'
-ARCHIVE_GOG_OLDER_VERSION='1.27-gog2.3.0.5'
-
-ARCHIVE_ICONS='crypt-of-the-necrodancer_icons.tar.gz'
-ARCHIVE_ICONS_MD5='04d2bb19adc13dbadce6161bd92bf59a'
+ARCHIVE_ICONS='invisible-inc_icons.tar.gz'
+ARCHIVE_ICONS_MD5='37a62fed1dc4185e95db3e82e6695c1d'
 
 ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC1_DATA_FILES='./*'
 
-ARCHIVE_DOC2_DATA_PATH='data/noarch/game/'
-ARCHIVE_DOC2_DATA_FILES='./license.txt'
+ARCHIVE_DOC2_DATA_PATH='data/noarch/games'
+ARCHIVE_DOC2_DATA_FILES='./LICENSE'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./*.so.* ./fmod ./NecroDancer ./essentia*'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./InvisibleInc32 ./lib32'
 
-ARCHIVE_GAME_MUSIC_PATH='data/noarch/game'
-ARCHIVE_GAME_MUSIC_FILES='./data/music'
-
-ARCHIVE_GAME_VIDEO_PATH='data/noarch/game'
-ARCHIVE_GAME_VIDEO_FILES='./data/video'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./InvisibleInc64 ./lib64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./data'
+ARCHIVE_GAME_DATA_FILES='./anims.kwad ./characters.kwad ./errata.kwad ./gui.kwad ./hashes.dat ./images.kwad ./main.lua ./moai.lua ./movies.kwad ./scripts.zip ./sound.kwad'
 
 ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./128x128 ./256x256'
-
-DATA_DIRS='./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
-DATA_FILES='./data/save_data.xml ./data/played.dat'
+ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./64x64 ./128x128 ./256x256'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_LIBS='.'
-APP_MAIN_EXE='NecroDancer'
+APP_MAIN_LIBS_BIN32='lib32'
+APP_MAIN_LIBS_BIN64='lib64'
+APP_MAIN_EXE_BIN32='InvisibleInc32'
+APP_MAIN_EXE_BIN64='InvisibleInc64'
 APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
 APP_MAIN_ICON_GOG_RES='256'
 
-PACKAGES_LIST='PKG_MUSIC PKG_VIDEO PKG_DATA PKG_BIN'
-
-PKG_MUSIC_ID="${GAME_ID}-music"
-PKG_MUSIC_DESCRIPTION='music'
-
-PKG_VIDEO_ID="${GAME_ID}-video"
-PKG_VIDEO_DESCRIPTION='video'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
-PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libsdl2-2.0-0, libgl1-mesa-glx | libgl1"
+PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-libgl"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
+PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 libgl"
 
 # Load common functions
 
@@ -133,7 +117,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ICONS_PACK" ]; then  
 	(
 		ARCHIVE='ICONS_PACK'
 		extract_data_from "$ICONS_PACK"
@@ -147,12 +131,11 @@ for PKG in $PACKAGES_LIST; do
 done
 
 if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	res="$APP_MAIN_ICON_GOG_RES"
 	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-	mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
 	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
 fi
 
@@ -160,8 +143,9 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
@@ -174,6 +158,10 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0
