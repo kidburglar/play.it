@@ -1,6 +1,6 @@
 # extract .png or .ico files from given file
 # USAGE: extract_icon_from $file[…]
-# NEEDED VARS: PLAYIT_WORKDIR
+# NEEDED VARS: PLAYIT_WORKDIR (WRESTOOL_NAME)
 # CALLS: liberror
 extract_icon_from() {
 	for file in "$@"; do
@@ -9,9 +9,10 @@ extract_icon_from() {
 		case "${file##*.}" in
 			('exe')
 				if [ "$WRESTOOL_NAME" ]; then
-					WRESTOOL_OPTIONS="--name=$WRESTOOL_NAME"
+					local wrestool_options="--name=$WRESTOOL_NAME"
 				fi
-				wrestool --extract --type=14 $WRESTOOL_OPTIONS --output="$destination" "$file"
+				wrestool --extract --type=14 $wrestool_options --output="$destination" "$file"
+				unset wrestool_options
 			;;
 			('ico')
 				icotool --extract --output="$destination" "$file" 2>/dev/null
