@@ -12,6 +12,8 @@
 
   * Add $APP_POSTRUN support to WINE launchers
 
+  * Skip building already existing packages
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
