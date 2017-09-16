@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170916.1
+script_version=20170916.2
 
 # Set game-specific variables
 
@@ -79,16 +79,13 @@ ARCHIVE_GAME_BIN_FILES='./*.so.* ./fmod ./NecroDancer ./essentia*'
 ARCHIVE_GAME_MUSIC_PATH='data/noarch/game'
 ARCHIVE_GAME_MUSIC_FILES='./data/music'
 
-ARCHIVE_GAME_VIDEO_PATH='data/noarch/game'
-ARCHIVE_GAME_VIDEO_FILES='./data/video'
-
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./data'
+ARCHIVE_GAME_DATA_FILES='./data/*.png ./data/*.xml ./data/bestiary ./data/entities ./data/essentia ./data/gui ./data/items ./data/languages ./data/level ./data/lua ./data/mainmenu ./data/mentor ./data/particles ./data/sounds* ./data/spells ./data/swipes ./data/text ./data/traps ./data/video'
 
 ARCHIVE_ICONS_PATH='.'
 ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./128x128 ./256x256'
 
-DATA_DIRS='./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
+DATA_DIRS='./data/custom_music ./downloaded_dungeons ./downloaded_mods ./logs ./mods ./replays'
 DATA_FILES='./data/save_data.xml ./data/played.dat'
 
 APP_MAIN_TYPE='native'
@@ -97,20 +94,18 @@ APP_MAIN_EXE='NecroDancer'
 APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
 APP_MAIN_ICON_GOG_RES='256'
 
-PACKAGES_LIST='PKG_MUSIC PKG_VIDEO PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_MUSIC PKG_DATA PKG_BIN'
 
 PKG_MUSIC_ID="${GAME_ID}-music"
 PKG_MUSIC_DESCRIPTION='music'
 
-PKG_VIDEO_ID="${GAME_ID}-video"
-PKG_VIDEO_DESCRIPTION='video'
-
 PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_PROVIDE="${GAME_ID}-video"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_VIDEO_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
-PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_VIDEO_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
+PKG_BIN_DEPS_DEB="$PKG_MUSIC_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxrandr2, libopenal1, libvorbis0a"
+PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-libgl lib32-libxrandr lib32-openal lib32-libogg lib32-libvorbis"
 
 # Load common functions
 
