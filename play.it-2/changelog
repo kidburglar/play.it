@@ -1,3 +1,13 @@
+2.1.1
+
+  * Fails gracefully if organize_data() is called before setting $PKG
+
+  * Fix a bug where postinst_icons_linking() would erase the prerm/postinst
+    prior content instead of appending to it
+
+  * Fix a bug with wrestool, where calling it once with the --name option
+    would have this option been carried out to all subsequent invocations
+
 2.1.0
 
   * First fully installable version of ./play.it
