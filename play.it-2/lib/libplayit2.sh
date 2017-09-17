@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.1.0
-library_revision=20170820.1
+library_version=2.1.1
+library_revision=20170917.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -914,8 +914,11 @@ extract_data_from_print() {
 
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: PLAYIT_WORKDIR PKG PKG_PATH
+# NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) PKG_PATH
 organize_data() {
+	if [ -z "$PKG" ]; then
+		organize_data_error_missing_pkg
+	fi
 	local archive_path
 	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
 		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
@@ -949,9 +952,26 @@ organize_data() {
 	fi
 }
 
+# display an error when calling organize_data() with $PKG unset or empty
+# USAGE: organize_data_error_missing_pkg
+# NEEDED VARS: (LANG)
+organize_data_error_missing_pkg() {
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='organize_data ne peut pas être appelé si $PKG n’est pas défini.\n'
+		;;
+		('en'|*)
+			string='organize_data can not be called if $PKG is not set.\n'
+		;;
+	esac
+	printf "$string"
+	return 1
+}
+
 # extract .png or .ico files from given file
 # USAGE: extract_icon_from $file[…]
-# NEEDED VARS: PLAYIT_WORKDIR
+# NEEDED VARS: PLAYIT_WORKDIR (WRESTOOL_NAME)
 # CALLS: liberror
 extract_icon_from() {
 	for file in "$@"; do
@@ -960,9 +980,10 @@ extract_icon_from() {
 		case "${file##*.}" in
 			('exe')
 				if [ "$WRESTOOL_NAME" ]; then
-					WRESTOOL_OPTIONS="--name=$WRESTOOL_NAME"
+					local wrestool_options="--name=$WRESTOOL_NAME"
 				fi
-				wrestool --extract --type=14 $WRESTOOL_OPTIONS --output="$destination" "$file"
+				wrestool --extract --type=14 $wrestool_options --output="$destination" "$file"
+				unset wrestool_options
 			;;
 			('ico')
 				icotool --extract --output="$destination" "$file" 2>/dev/null
@@ -1072,14 +1093,14 @@ postinst_icons_linking() {
 			local icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
 			PATH_ICON="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 
-			cat > "$postinst" <<- EOF
+			cat >> "$postinst" <<- EOF
 			if [ ! -e "$PATH_ICON/$app_id.png" ]; then
 			  mkdir --parents "$PATH_ICON"
 			  ln --symbolic "$PATH_GAME"/$icon_file "$PATH_ICON/$app_id.png"
 			fi
 			EOF
 
-			cat > "$prerm" <<- EOF
+			cat >> "$prerm" <<- EOF
 			if [ -e "$PATH_ICON/$app_id.png" ]; then
 			  rm "$PATH_ICON/$app_id.png"
 			  rmdir --parents --ignore-fail-on-non-empty "$PATH_ICON"
