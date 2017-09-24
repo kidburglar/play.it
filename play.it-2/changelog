@@ -7,6 +7,9 @@
   * Make /tmp/play.it world-writable to allow using ./play.it more easily on
     shared systems
 
+  * Allow to set package-specific values for $APP_OPTIONS, $APP_PRERUN and
+    $APP_POSTRUN
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
