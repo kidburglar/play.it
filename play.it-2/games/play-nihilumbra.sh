@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20170924.1
 
 # Set game-specific variables
 
@@ -70,7 +70,7 @@ PACKAGES_LIST='PKG_MAIN'
 
 PKG_MAIN_ARCH_HUMBLE_32='32'
 PKG_MAIN_ARCH_HUMBLE_64='64'
-PKG_MAIN_DEPS_DEB='libc6, libstdc++6, libxcursor1, libxrandr2, libglu1-mesa-glx | libglu1'
+PKG_MAIN_DEPS_DEB='libc6, libstdc++6, libxcursor1, libxrandr2, libglu1-mesa | libglu1'
 PKG_MAIN_DEPS_ARCH_HUMBLE_32='lib32-libxcursor lib32-libxrandr lib32-glu'
 PKG_MAIN_DEPS_ARCH_HUMBLE_64='libxcursor libxrandr glu'
 
