@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170908.1
+script_version=20170925.1
 
 # Set game-specific variables
 
@@ -78,6 +78,8 @@ CONFIG_FILES='./*.ini'
 DATA_DIRS='./characters ./mpsave ./override ./portraits ./save ./scripts'
 DATA_FILES='./*.tlk ./chitin.key'
 
+APP_WINETRICKS='vd=800x600'
+
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='bgmain2.exe'
 APP_MAIN_ICON='baldur.exe'
@@ -104,8 +106,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine"
+PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine, winetricks"
+PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
