@@ -29,6 +29,10 @@ set_temp_directories() {
 		export PLAYIT_WORKDIR="$XDG_RUNTIME_DIR/$name"
 	elif [ -w '/tmp' ] && [ $free_space_tmp -ge $needed_space ]; then
 		export PLAYIT_WORKDIR="/tmp/$name"
+		if [ ! -e "${PLAYIT_WORKDIR%/*}" ]; then
+			mkdir --parents "${PLAYIT_WORKDIR%/*}"
+			chmod 777 "${PLAYIT_WORKDIR%/*}"
+		fi
 	elif [ -w "$XDG_CACHE_HOME" ] && [ $free_space_cache -ge $needed_space ]; then
 		export PLAYIT_WORKDIR="$XDG_CACHE_HOME/$name"
 	elif [ -w "$PWD" ] && [ $free_space_pwd -ge $needed_space ]; then
