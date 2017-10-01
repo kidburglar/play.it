@@ -34,14 +34,14 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20170925.1
 
 # Set game-specific variables
 
 GAME_ID='windward'
 GAME_NAME='Windward'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
 ARCHIVE_GOG='gog_windward_2.36.0.40.sh'
 ARCHIVE_GOG_MD5='6afbdcfda32a6315139080822c30396a'
@@ -58,21 +58,34 @@ ARCHIVE_GOG_OLDER_MD5='f5ce09719bf355e48d2eac59b84592d1'
 ARCHIVE_GOG_OLDER_SIZE='120000'
 ARCHIVE_GOG_OLDER_VERSION='20160707-gog2.35.0.38'
 
-ARCHIVE_HUMBLE='WindwardLinux_HB.zip'
-ARCHIVE_HUMBLE_MD5='f2d1a9a91055ecb6c5ce1bd7e3ddd803'
+ARCHIVE_HUMBLE='WindwardLinux_HB_1505248588.zip'
+ARCHIVE_HUMBLE_MD5='9ea99157d13ae53905757f2fb3ab5b54'
 ARCHIVE_HUMBLE_SIZE='130000'
-ARCHIVE_HUMBLE_VERSION='20160707-humble1'
+ARCHIVE_HUMBLE_VERSION='20160707.0-humble170912'
 
-ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_HUMBLE_OLD='WindwardLinux_HB.zip'
+ARCHIVE_HUMBLE_OLD_MD5='f2d1a9a91055ecb6c5ce1bd7e3ddd803'
+ARCHIVE_HUMBLE_OLD_SIZE='130000'
+ARCHIVE_HUMBLE_OLD_VERSION='20160707-humble1'
+
+ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC_DATA_PATH_GOG_OLD='data/noarch/docs'
+ARCHIVE_DOC_DATA_PATH_GOG_OLDER='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN_PATH_HUMBLE='.'
+ARCHIVE_GAME_BIN_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_GOG_OLDER='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_HUMBLE='Windward'
+ARCHIVE_GAME_BIN_PATH_HUMBLE_OLD='.'
 ARCHIVE_GAME_BIN_FILES='./Windward.x86 ./Windward_Data/Plugins ./Windward_Data/Mono'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='.'
-ARCHIVE_GAME_DATA_FILES='./Windward_Data'
+ARCHIVE_GAME_DATA_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG_OLDER='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='Windward'
+ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD='.'
+ARCHIVE_GAME_DATA_FILES='./Windward_Data/level* ./Windward_Data/mainData /Windward_Data/PlayerConnectionConfigFile ./Windward_Data/*.assets ./Windward_Data/*.resS ./Windward_Data/Managed ./Windward_Data/Resources'
 
 DATA_DIRS='./logs'
 
@@ -90,7 +103,7 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
 PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor lsb-release"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-libxcursor lsb-release"
 
 # Load common functions
 
@@ -114,12 +127,10 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_GAME"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 

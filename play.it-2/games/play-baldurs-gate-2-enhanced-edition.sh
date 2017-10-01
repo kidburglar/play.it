@@ -34,11 +34,11 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170610.1
+script_version=20171001.2
 
 # Set game-specific variables
 
-GAME_ID='baldurs-gate-2-ee'
+GAME_ID='baldurs-gate-2-enhanced-edition'
 GAME_NAME='Baldur’s Gate 2 - Enhanced Edition'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
@@ -51,8 +51,8 @@ ARCHIVE_GOG_VERSION='2.3.67.3-gog2.6.0.11'
 ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./BaldursGateII ./engine.lua'
@@ -60,37 +60,25 @@ ARCHIVE_GAME_BIN_FILES='./BaldursGateII ./engine.lua'
 ARCHIVE_GAME_AREAS_PATH='data/noarch/game'
 ARCHIVE_GAME_AREAS_FILES='./data/AREA*.bif ./data/Areas.bif ./data/25Areas.bif ./data/ARMisc.bif ./data/25ArMisc.bif'
 
-ARCHIVE_GAME_MOVIES_PATH='data/noarch/game'
-ARCHIVE_GAME_MOVIES_FILES='./movies'
-
-ARCHIVE_GAME_MUSIC_PATH='data/noarch/game'
-ARCHIVE_GAME_MUSIC_FILES='./music'
-
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*'
+ARCHIVE_GAME_DATA_FILES='./chitin.key ./lang ./Manuals ./movies ./music ./scripts ./data/*Anim.bif ./data/*Items.bif ./data/*Sound.bif ./data/*Cre* ./data/25AmbSnd.bif ./data/25Deflt.bif ./data/25Dialog.bif ./data/25Effect.bif ./data/25Gui* ./data/25MiscAn.bif ./data/25NpcSo.bif ./data/25Portrt.bif ./data/25Projct.bif ./data/25Scripts.bif ./data/25SndFX.bif ./data/25SpelAn.bif ./data/25Spells.bif ./data/25Store.bif ./data/bgee* ./data/BlackPits.bif ./data/characters.bif ./data/CREAnim1.bif ./data/Default.bif ./data/DIALOG.BIF ./data/Dorn.bif ./data/ee* ./data/Effects.bif ./data/fonts.bif ./data/GUI* ./data/Hd0* ./data/Hexxat.bif ./data/Neera.bif ./data/NPC* ./data/orphan.bif ./data/PaperDol.bif ./data/patch13.bif ./data/Patch2.bif ./data/Portrait.bif ./data/Project.bif ./data/Rasaad.bif ./data/Scripts.bif ./data/Shaders.bif ./data/Spells.bif ./data/STORES.BIF'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='BaldursGateII'
 APP_MAIN_ICON='data/noarch/support/icon.png'
 APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_AREAS PKG_MOVIES PKG_MUSIC PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_AREAS PKG_DATA PKG_BIN'
 
 PKG_AREAS_ID="${GAME_ID}-areas"
 PKG_AREAS_DESCRIPTION='areas'
-
-PKG_MOVIES_ID="${GAME_ID}-movies"
-PKG_MOVIES_DESCRIPTION='movies'
-
-PKG_MUSIC_ID="${GAME_ID}-music"
-PKG_MUSIC_DESCRIPTION='music'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_AREAS_ID, $PKG_MOVIES_ID, $PKG_MUSIC_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libjson0, libopenal1"
-PKG_BIN_DEPS_ARCH="$PKG_AREAS_ID $PKG_MOVIES_ID $PKG_MUSIC_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-json-c"
+PKG_BIN_DEPS_DEB="$PKG_AREAS_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libjson0, libopenal1"
+PKG_BIN_DEPS_ARCH="$PKG_AREAS_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-json-c"
 
 # Load common functions
 
@@ -119,21 +107,10 @@ ARCHIVE='ARCHIVE_GOG'
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_AREAS'
-organize_data 'GAME_AREAS' "$PATH_GAME"
-
-PKG='PKG_MOVIES'
-organize_data 'GAME_MOVIES' "$PATH_GAME"
-
-PKG='PKG_MUSIC'
-organize_data 'GAME_MUSIC' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
@@ -169,7 +146,7 @@ EOF
 
 write_metadata 'PKG_BIN'
 rm "$postinst"
-write_metadata 'PKG_AREAS' 'PKG_MOVIES' 'PKG_MUSIC' 'PKG_DATA'
+write_metadata 'PKG_AREAS' 'PKG_DATA'
 build_pkg
 
 # Clean up

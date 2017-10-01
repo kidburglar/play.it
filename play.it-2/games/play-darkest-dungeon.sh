@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170715.2
+script_version=20170930.1
 
 # Set game-specific variables
 
@@ -43,33 +43,35 @@ GAME_NAME='Darkest Dungeon'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='gog_darkest_dungeon_2.15.0.15.sh'
-ARCHIVE_GOG_MD5='aa129363a693458d421df1b203960f8c'
+ARCHIVE_GOG='darkest_dungeon_en_20645_15279.sh'
+ARCHIVE_GOG_MD5='78bfc79c2b0e7e8016d611746499fa22'
 ARCHIVE_GOG_SIZE='2100000'
-ARCHIVE_GOG_VERSION='20326-gog2.15.0.15'
+ARCHIVE_GOG_VERSION='20645-gog15279'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_darkest_dungeon_2.14.0.14.sh'
-ARCHIVE_GOG_OLD_MD5='68c3728388a44a9f7f859351748d2463'
+ARCHIVE_GOG_OLD='darkest_dungeon_en_20578_15132.sh'
+ARCHIVE_GOG_OLD_MD5='12b51408bdedb012ee38e2321910cfca'
 ARCHIVE_GOG_OLD_SIZE='2100000'
-ARCHIVE_GOG_OLD_VERSION='20326-gog2.14.0.14'
+ARCHIVE_GOG_OLD_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='gog_darkest_dungeon_2.13.0.13.sh'
-ARCHIVE_GOG_OLDER_MD5='bea41d27a9b050872ebaa9c93cf0df12'
+ARCHIVE_GOG_OLDER='gog_darkest_dungeon_2.15.0.15.sh'
+ARCHIVE_GOG_OLDER_MD5='aa129363a693458d421df1b203960f8c'
 ARCHIVE_GOG_OLDER_SIZE='2100000'
-ARCHIVE_GOG_OLDER_VERSION='20235-gog2.13.0.13'
+ARCHIVE_GOG_OLDER_VERSION='20326-gog2.15.0.15'
 
-ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_2.12.0.12.sh'
-ARCHIVE_GOG_OLDEST_MD5='0d809acc7b82fe7b280026e04f95f669'
+ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_2.14.0.14.sh'
+ARCHIVE_GOG_OLDEST_MD5='68c3728388a44a9f7f859351748d2463'
 ARCHIVE_GOG_OLDEST_SIZE='2100000'
-ARCHIVE_GOG_OLDEST_VERSION='20108-gog2.12.0.12'
+ARCHIVE_GOG_OLDEST_VERSION='20326-gog2.14.0.14'
 
 DATA_DIRS='./logs'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC1_DATA_FILES='./*'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./README.linux'
+ARCHIVE_DOC2_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC2_DATA_FILES='./README.linux'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./lib ./darkest.bin.x86'
@@ -84,7 +86,7 @@ ARCHIVE_GAME_VIDEO_PATH='data/noarch/game'
 ARCHIVE_GAME_VIDEO_FILES='./video'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*'
+ARCHIVE_GAME_DATA_FILES='./Icon.bmp ./pin ./svn_revision.txt ./activity_log ./campaign ./colours ./curios ./cursors ./dungeons ./effects ./fe_flow ./fonts ./fx ./game_over ./heroes ./inventory ./loading_screen ./loot ./maps ./modes ./mods ./monsters ./overlays ./panels ./props ./raid ./raid_results ./scripts ./scrolls ./shaders ./shared ./trinkets ./upgrades ./user_information ./localization/*.bat ./localization/*.csv ./localization/*.loc ./localization/*.txt ./localization/*.xml ./localization/pc'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='darkest.bin.x86'
@@ -114,12 +116,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_AUDIO_ID $PKG_VIDEO_ID $PKG_DATA_ID glibs gcc-libs sdl
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -134,28 +136,11 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-for dir in 'localization/ps4' 'localization/psv'\
-           'shaders_ps4'      'shaders_psv'\
-           'video_ps4'        'video_psv'; do
-	rm --force --recursive "$PLAYIT_WORKDIR/gamedata/data/noarch/game/$dir"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
-
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_AUDIO'
-organize_data 'GAME_AUDIO' "$PATH_GAME"
-
-PKG='PKG_VIDEO'
-organize_data 'GAME_VIDEO' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
 
 res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"

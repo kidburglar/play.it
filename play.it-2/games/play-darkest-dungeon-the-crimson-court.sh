@@ -29,12 +29,12 @@ set -o errexit
 ###
 
 ###
-# Darkest Dungeon
+# Darkest Dungeon: The Crimson Court
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170715.1
+script_version=20170930.1
 
 # Set game-specific variables
 
@@ -44,25 +44,27 @@ GAME_NAME='Darkest Dungeon: The Crimson Court'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='gog_darkest_dungeon_the_crimson_court_dlc_2.4.0.5.sh'
-ARCHIVE_GOG_MD5='18acadcb1c9a2d4dc83198aaab44c1ca'
+ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
+ARCHIVE_GOG_MD5='523c66d4575095c66a03d3859e4f83b8'
 ARCHIVE_GOG_SIZE='360000'
-ARCHIVE_GOG_VERSION='20326-gog2.4.0.5'
+ARCHIVE_GOG_VERSION='20645-gog15279'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_darkest_dungeon_the_crimson_court_dlc_2.3.0.4.sh'
-ARCHIVE_GOG_OLD_MD5='99eecd10296c6f60830f2b086981cb97'
+ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
+ARCHIVE_GOG_OLD_MD5='96ac3ed631dd2509ffbf88f88823e019'
 ARCHIVE_GOG_OLD_SIZE='360000'
-ARCHIVE_GOG_OLD_VERSION='20326-gog2.3.0.4'
+ARCHIVE_GOG_OLD_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='gog_darkest_dungeon_the_crimson_court_dlc_2.2.0.3.sh'
-ARCHIVE_GOG_OLDER_MD5='492d4d231d9286587a065fb0bd30cd09'
+ARCHIVE_GOG_OLDER='gog_darkest_dungeon_the_crimson_court_dlc_2.4.0.5.sh'
+ARCHIVE_GOG_OLDER_MD5='18acadcb1c9a2d4dc83198aaab44c1ca'
 ARCHIVE_GOG_OLDER_SIZE='360000'
-ARCHIVE_GOG_OLDER_VERSION='20235-gog2.2.0.3'
+ARCHIVE_GOG_OLDER_VERSION='20326-gog2.4.0.5'
 
-ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_the_crimson_court_dlc_2.1.0.2.sh'
-ARCHIVE_GOG_OLDEST_MD5='a5f5b9011ed0b3fbf6c6b37a19cb2ce8'
+ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_the_crimson_court_dlc_2.3.0.4.sh'
+ARCHIVE_GOG_OLDEST_MD5='99eecd10296c6f60830f2b086981cb97'
 ARCHIVE_GOG_OLDEST_SIZE='360000'
-ARCHIVE_GOG_OLDEST_VERSION='20108-gog2.1.0.2'
+ARCHIVE_GOG_OLDEST_VERSION='20326-gog2.3.0.4'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -78,12 +80,12 @@ PKG_MAIN_DEPS_ARCH="$GAME_ID"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.1'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else

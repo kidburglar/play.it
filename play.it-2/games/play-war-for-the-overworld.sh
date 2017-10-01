@@ -34,53 +34,67 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20170930.1
 
 # Set game-specific variables
 
 GAME_ID='war-for-the-overworld'
 GAME_NAME='War for the Overworld'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_war_for_the_overworld_2.5.0.6.sh'
-ARCHIVE_GOG_MD5='f003d58cea1b2c5416a4af059768d77b'
+ARCHIVE_GOG='war_for_the_overworld_en_1_6_3f1_14896.sh'
+ARCHIVE_GOG_MD5='c49bb5d5f937bf7231527b9d945fb613'
 ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.6.3-gog2.5.0.6'
+ARCHIVE_GOG_VERSION='1.6.3f1-gog14896'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.2.0.3.sh'
-ARCHIVE_GOG_OLD_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.5.0.6.sh'
+ARCHIVE_GOG_OLD_MD5='f003d58cea1b2c5416a4af059768d77b'
 ARCHIVE_GOG_OLD_SIZE='2500000'
-ARCHIVE_GOG_OLD_VERSION='1.6.2f3-gog2.2.0.3'
+ARCHIVE_GOG_OLD_VERSION='1.6.3-gog2.5.0.6'
+
+ARCHIVE_GOG_OLDER='gog_war_for_the_overworld_2.2.0.3.sh'
+ARCHIVE_GOG_OLDER_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG_OLDER_SIZE='2500000'
+ARCHIVE_GOG_OLDER_VERSION='1.6.2f3-gog2.2.0.3'
 
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
 ARCHIVE_HUMBLE_SIZE='2500000'
 ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
 
-ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC_DATA_PATH_GOG_OLD='data/noarch/docs'
+ARCHIVE_DOC_DATA_PATH_GOG_OLDER='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_BIN_FILES='./WFTO*.x86_64 ./WFTO*_Data/Plugins ./WFTO*_Data/Mono ./WFTO*_Data/CoherentUI_Host'
+ARCHIVE_GAME_BIN_FILES='./*.x86_64 ./*_Data/Plugins ./*_Data/Mono ./*_Data/CoherentUI_Host'
 
 ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_ASSETS_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_ASSETS_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_ASSETS_FILES='./WFTO*_Data/*.assets*'
+ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets*'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG_OLD='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG_OLDER='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_DATA_FILES='./WFTO*_Data'
+ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources'
 
-DATA_DIRS='./logs ./WFTO*_Data/GameData'
+DATA_DIRS='./logs ./*_Data/GameData'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_GOG='WFTOGame.x86_64'
 APP_MAIN_EXE_HUMBLE='WFTO.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='WFTO*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN'
@@ -117,21 +131,16 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/WFTO*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
-
-PKG='PKG_ASSETS'
-organize_data 'GAME_ASSETS' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host
+chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
 
 (
-	cd "${PKG_DATA_PATH}${PATH_GAME}"/WFTO*_Data/uiresources/maps
+	cd "${PKG_DATA_PATH}${PATH_GAME}"/*_Data/uiresources/maps
 	mv 'Stonegate.unity.png' 'stonegate.unity.png'
 )
 
@@ -140,7 +149,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 # Write launchers
 
 case "$ARCHIVE" in
-	('ARCHIVE_GOG')
+	('ARCHIVE_GOG'|'ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER')
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
 	;;
 	('ARCHIVE_HUMBLE')
