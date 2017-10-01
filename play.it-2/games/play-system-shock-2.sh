@@ -29,42 +29,45 @@ set -o errexit
 ###
 
 ###
-# Fran Bow
+# System Shock 2
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170924.1
+script_version=20171001.2
 
 # Set game-specific variables
 
-GAME_ID='fran-bow'
-GAME_NAME='Fran Bow'
+GAME_ID='system-shock-2'
+GAME_NAME='System Shock 2'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_fran_bow_2.3.0.5.sh'
-ARCHIVE_GOG_MD5='6e3013e9c8be4d25e1815f00bc177941'
-ARCHIVE_GOG_SIZE='530000'
-ARCHIVE_GOG_VERSION='160315-gog2.3.0.5'
+ARCHIVE_GOG='setup_system_shock_2_2.46_nd_(11004).exe'
+ARCHIVE_GOG_MD5='98c3d01d53bb2b0dc25d7ed7093a67d3'
+ARCHIVE_GOG_SIZE='680000'
+ARCHIVE_GOG_VERSION='2.46-gog11004'
 
-ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
-ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./*.pdf ./*.txt ./*.wri ./doc ./editor/*.txt'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GAME1_BIN_PATH='app'
+ARCHIVE_GAME1_BIN_FILES='./*.ax ./*.bnd ./*.cfg ./*.exe ./*.osm ./7z.dll ./d3dx9_43.dll ./ffmpeg.dll ./fmsel.dll ./ir41_32.dll ./ir50_32.dll ./lgvid.dll ./msvcrt40.dll ./editor/*.cfg ./editor/*.dll ./editor/*.exe ./microsoft.vc90.crt'
 
-ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./runner'
+ARCHIVE_GAME2_BIN_PATH='app/__support/app'
+ARCHIVE_GAME2_BIN_FILES='./*.cfg ./*.ini'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./assets'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./*.bin ./*.dif ./*.dml ./ilist.* ./patch* ./binds ./data ./sq_scripts'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE='runner'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='assets/icon.png'
-APP_MAIN_ICON_RES='64'
+CONFIG_FILES='./*.bnd ./*.cfg ./*.ini'
+DATA_DIRS='./current ./save_0 ./save_1 ./save_2 ./save_3 ./save_4 ./save_5 ./save_6 ./save_7 ./save_8 ./save_9 ./save_10 ./save_11 ./save_12 ./save_13 ./save_14'
+DATA_FILES='./*.log'
+
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='shock2.exe'
+APP_MAIN_ICON='shock2.exe'
+APP_MAIN_ICON_RES='16 32 48 64'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
@@ -72,8 +75,8 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libglu1-mesa | libglu1, libopenal1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-openal lib32-libxrandr"
+PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -93,35 +96,22 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Use libSSL 1.0.0 32-bit archive
-
-set_archive 'LIBSSL' 'ARCHIVE_LIBSSL'
-ARCHIVE='ARCHIVE_GOG'
-
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"   "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}"  "$PATH_GAME"
+	organize_data "GAME1_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "GAME2_${PKG#PKG_}" "$PATH_GAME"
+done
 
-PKG='PKG_DATA'
-organize_data 'DOC'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
-
-# Include libSSL into the game directory
-
-if [ "$LIBSSL" ]; then
-	dir='libs'
-	ARCHIVE='LIBSSL'
-	extract_data_from "$LIBSSL"
-	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
-	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}/$dir"
-	APP_MAIN_LIBS="$dir"
-	rm --recursive "$PLAYIT_WORKDIR/gamedata"
-fi
 
 # Write launchers
 
@@ -130,10 +120,7 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
