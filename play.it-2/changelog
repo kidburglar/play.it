@@ -14,6 +14,8 @@
 
   * Skip building already existing packages
 
+  * New distro-agnostic method to declare dependencies
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
