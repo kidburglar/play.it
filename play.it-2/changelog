@@ -2,6 +2,8 @@
 
   * Automatically detect archive type for *.rar files
 
+  * Allow to use multiple fallback values for $ARCHIVE_PATH and $ARCHIVE_FILES
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
