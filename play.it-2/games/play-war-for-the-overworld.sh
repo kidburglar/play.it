@@ -34,30 +34,37 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170930.1
+script_version=20171014.1
 
 # Set game-specific variables
 
 GAME_ID='war-for-the-overworld'
 GAME_NAME='War for the Overworld'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='war_for_the_overworld_en_1_6_3f1_14896.sh'
-ARCHIVE_GOG_MD5='c49bb5d5f937bf7231527b9d945fb613'
-ARCHIVE_GOG_SIZE='2500000'
-ARCHIVE_GOG_VERSION='1.6.3f1-gog14896'
+ARCHIVE_GOG='war_for_the_overworld_en_1_6_4_15562.sh'
+ARCHIVE_GOG_MD5='45847e6faf4114e266d0fef99cae42b6'
+ARCHIVE_GOG_SIZE='2800000'
+ARCHIVE_GOG_VERSION='1.6.4-gog15562'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_war_for_the_overworld_2.5.0.6.sh'
-ARCHIVE_GOG_OLD_MD5='f003d58cea1b2c5416a4af059768d77b'
-ARCHIVE_GOG_OLD_SIZE='2500000'
-ARCHIVE_GOG_OLD_VERSION='1.6.3-gog2.5.0.6'
+ARCHIVE_GOG_OLD='war_for_the_overworld_en_1_6_4_15447.sh'
+ARCHIVE_GOG_OLD_MD5='09335b964b387ce911942f6c72ab3fb0'
+ARCHIVE_GOG_OLD_SIZE='2800000'
+ARCHIVE_GOG_OLD_VERSION='1.6.4-gog15447'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='gog_war_for_the_overworld_2.2.0.3.sh'
-ARCHIVE_GOG_OLDER_MD5='45522631c0feef1e115d01a638156171'
+ARCHIVE_GOG_OLDER='war_for_the_overworld_en_1_6_3f1_14896.sh'
+ARCHIVE_GOG_OLDER_MD5='c49bb5d5f937bf7231527b9d945fb613'
 ARCHIVE_GOG_OLDER_SIZE='2500000'
-ARCHIVE_GOG_OLDER_VERSION='1.6.2f3-gog2.2.0.3'
+ARCHIVE_GOG_OLDER_VERSION='1.6.3f1-gog14896'
+ARCHIVE_GOG_OLDER_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLDEST='gog_war_for_the_overworld_2.5.0.6.sh'
+ARCHIVE_GOG_OLDEST_MD5='f003d58cea1b2c5416a4af059768d77b'
+ARCHIVE_GOG_OLDEST_SIZE='2500000'
+ARCHIVE_GOG_OLDEST_VERSION='1.6.3-gog2.5.0.6'
 
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
@@ -67,23 +74,27 @@ ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
 ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/docs'
 ARCHIVE_DOC_DATA_PATH_GOG_OLD='data/noarch/docs'
 ARCHIVE_DOC_DATA_PATH_GOG_OLDER='data/noarch/docs'
+ARCHIVE_DOC_DATA_PATH_GOG_OLDEST='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_GOG_OLD='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_GOG_OLDER='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_GOG_OLDEST='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_BIN_FILES='./*.x86_64 ./*_Data/Plugins ./*_Data/Mono ./*_Data/CoherentUI_Host'
 
 ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_ASSETS_PATH_GOG_OLD='data/noarch/game'
 ARCHIVE_GAME_ASSETS_PATH_GOG_OLDER='data/noarch/game'
+ARCHIVE_GAME_ASSETS_PATH_GOG_OLDEST='data/noarch/game'
 ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets*'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_GOG_OLD='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_GOG_OLDER='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_GOG_OLDEST='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources'
 
@@ -149,7 +160,7 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 # Write launchers
 
 case "$ARCHIVE" in
-	('ARCHIVE_GOG'|'ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER')
+	('ARCHIVE_GOG'|'ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER'|'ARCHIVE_GOG_OLDEST')
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
 	;;
 	('ARCHIVE_HUMBLE')
