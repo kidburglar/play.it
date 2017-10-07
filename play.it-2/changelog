@@ -10,6 +10,8 @@
   * Allow to set package-specific values for $APP_OPTIONS, $APP_PRERUN and
     $APP_POSTRUN
 
+  * Add $APP_POSTRUN support to WINE launchers
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG
