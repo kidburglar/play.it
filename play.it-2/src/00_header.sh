@@ -32,6 +32,6 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.1.1
-library_revision=20170917.1
+library_version=2.2.0
+library_revision=20171014.1
 

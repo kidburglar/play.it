@@ -67,14 +67,10 @@ write_bin_run_wine() {
 	cd "$PATH_PREFIX"
 	EOF
 
-	if [ "$app_prerun" ]; then
-		cat >> "$file" <<- EOF
-		$app_prerun
-		EOF
-	fi
-
-	cat >> "$file" <<- 'EOF'
-	wine "$APP_EXE" $APP_OPTIONS $@
+	cat >> "$file" <<- EOF
+	$app_prerun
+	wine "\$APP_EXE" \$APP_OPTIONS \$@
+	$app_postrun
 
 	EOF
 }

@@ -1,3 +1,21 @@
+2.2.0
+
+  * Automatically detect archive type for *.rar files
+
+  * Allow to use multiple fallback values for $ARCHIVE_PATH and $ARCHIVE_FILES
+
+  * Make /tmp/play.it world-writable to allow using ./play.it more easily on
+    shared systems
+
+  * Allow to set package-specific values for $APP_OPTIONS, $APP_PRERUN and
+    $APP_POSTRUN
+
+  * Add $APP_POSTRUN support to WINE launchers
+
+  * Skip building already existing packages
+
+  * New distro-agnostic method to declare dependencies
+
 2.1.1
 
   * Fails gracefully if organize_data() is called before setting $PKG

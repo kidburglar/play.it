@@ -4,10 +4,13 @@
 # CALLED BY: write_metadata
 pkg_write_arch() {
 	local pkg_deps
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
+		pkg_set_deps_arch $(eval printf -- '%b' \"\$${pkg}_DEPS\")
+	fi
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	else
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
+		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
+	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
+		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
 	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
 	local target="$pkg_path/.PKGINFO"
@@ -73,6 +76,193 @@ pkg_write_arch() {
 	fi
 }
 
+# set list or Arch Linux dependencies from generic names
+# USAGE: pkg_set_deps_arch $dep[…]
+# CALLS: pkg_set_deps_arch32 pkg_set_deps_arch64
+# CALLED BY: pkg_write_arch
+pkg_set_deps_arch() {
+	local architecture
+	if [ "$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
+		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")"
+	else
+		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+	fi
+	case $architecture in
+		('32')
+			pkg_set_deps_arch32 $@
+		;;
+		('64')
+			pkg_set_deps_arch64 $@
+		;;
+	esac
+}
+
+# set list or Arch Linux 32-bit dependencies from generic names
+# USAGE: pkg_set_deps_arch32 $dep[…]
+# CALLED BY: pkg_set_deps_arch
+pkg_set_deps_arch32() {
+	for dep in $@; do
+		case $dep in
+			('alsa')
+				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
+			;;
+			('dosbox')
+				pkg_dep='dosbox'
+			;;
+			('freetype')
+				pkg_dep='lib32-freetype2'
+			;;
+			('gcc32')
+				pkg_dep='gcc-multilib'
+			;;
+			('glibc')
+				pkg_dep='lib32-glibc'
+			;;
+			('glu')
+				pkg_dep='lib32-glu'
+			;;
+			('glx')
+				pkg_dep='lib32-libgl'
+			;;
+			('gtk2')
+				pkg_dep='lib32-gtk2'
+			;;
+			('json')
+				pkg_dep='lib32-json-c'
+			;;
+			('libcurl-gnutls')
+				pkg_dep='lib32-libcurl-gnutls'
+			;;
+			('libstdc++')
+				pkg_dep='lib32-gcc-libs'
+			;;
+			('libxrandr')
+				pkg_dep='lib32-libxrandr'
+			;;
+			('nss')
+				pkg_dep='lib32-nss'
+			;;
+			('openal')
+				pkg_dep='lib32-openal'
+			;;
+			('pulseaudio')
+				pkg_dep='pulseaudio'
+			;;
+			('sdl1.2')
+				pkg_dep='lib32-sdl'
+			;;
+			('sdl2')
+				pkg_dep='lib32-sdl2'
+			;;
+			('sdl2_image')
+				pkg_dep='lib32-sdl2_image'
+			;;
+			('sdl2_mixer')
+				pkg_dep='lib32-sdl2_mixer'
+			;;
+			('vorbis')
+				pkg_dep='lib32-libvorbis'
+			;;
+			('wine')
+				pkg_dep='wine'
+			;;
+			('winetricks')
+				pkg_dep='winetricks'
+			;;
+			('xcursor')
+				pkg_dep='lib32-libxcursor'
+			;;
+			(*)
+				pkg_deps="$dep"
+			;;
+		esac
+		pkg_deps="$pkg_deps $pkg_dep"
+	done
+}
+
+# set list or Arch Linux 64-bit dependencies from generic names
+# USAGE: pkg_set_deps_arch64 $dep[…]
+# CALLED BY: pkg_set_deps_arch
+pkg_set_deps_arch64() {
+	for dep in $@; do
+		case $dep in
+			('alsa')
+				pkg_dep='alsa-lib alsa-plugins'
+			;;
+			('dosbox')
+				pkg_dep='dosbox'
+			;;
+			('freetype')
+				pkg_dep='freetype2'
+			;;
+			('gcc32')
+				pkg_dep='gcc-multilib'
+			;;
+			('glibc')
+				pkg_dep='glibc'
+			;;
+			('glu')
+				pkg_dep='glu'
+			;;
+			('glx')
+				pkg_dep='libgl'
+			;;
+			('gtk2')
+				pkg_dep='gtk2'
+			;;
+			('json')
+				pkg_dep='json-c'
+			;;
+			('libcurl-gnutls')
+				pkg_dep='libcurl-gnutls'
+			;;
+			('libstdc++')
+				pkg_dep='gcc-libs'
+			;;
+			('libxrandr')
+				pkg_dep='libxrandr'
+			;;
+			('nss')
+				pkg_dep='nss'
+			;;
+			('openal')
+				pkg_dep='openal'
+			;;
+			('pulseaudio')
+				pkg_dep='pulseaudio'
+			;;
+			('sdl1.2')
+				pkg_dep='sdl'
+			;;
+			('sdl2')
+				pkg_dep='sdl2'
+			;;
+			('sdl2_image')
+				pkg_dep='sdl2_image'
+			;;
+			('sdl2_mixer')
+				pkg_dep='sdl2_mixer'
+			;;
+			('vorbis')
+				pkg_dep='libvorbis'
+			;;
+			('wine')
+				pkg_dep='wine'
+			;;
+			('winetricks')
+				pkg_dep='winetricks'
+			;;
+			('xcursor')
+				pkg_dep='libxcursor'
+			;;
+			(*)
+				pkg_dep="$dep"
+			;;
+		esac
+		pkg_deps="$pkg_deps $pkg_dep"
+	done
+}
+
 # build .pkg.tar package
 # USAGE: pkg_build_arch $pkg_path
 # NEEDED VARS: (OPTION_COMPRESSION) (LANG) PLAYIT_WORKDIR
@@ -80,6 +270,13 @@ pkg_write_arch() {
 # CALLED BY: build_pkg
 pkg_build_arch() {
 	local pkg_filename="$PWD/${1##*/}.pkg.tar"
+
+	if [ -e "$pkg_filename" ]; then
+		pkg_build_print_already_exists "${pkg_filename##*/}"
+		export ${pkg}_PKG="$pkg_filename"
+		return 0
+	fi
+
 	local tar_options='--create --group=root --owner=root'
 
 	case $OPTION_COMPRESSION in
@@ -109,5 +306,7 @@ pkg_build_arch() {
 	)
 
 	export ${pkg}_PKG="$pkg_filename"
+
+	print_ok
 }
 
