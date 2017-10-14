@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.1.1
-library_revision=20170917.1
+library_version=2.2.0
+library_revision=20171014.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -311,6 +311,9 @@ archive_guess_type() {
 		;;
 		(gog_*.sh)
 			export ${ARCHIVE}_TYPE='mojosetup'
+		;;
+		(*.rar)
+			export ${ARCHIVE}_TYPE='rar'
 		;;
 		(*.tar)
 			export ${ARCHIVE}_TYPE='tar'
@@ -724,6 +727,10 @@ set_temp_directories() {
 		export PLAYIT_WORKDIR="$XDG_RUNTIME_DIR/$name"
 	elif [ -w '/tmp' ] && [ $free_space_tmp -ge $needed_space ]; then
 		export PLAYIT_WORKDIR="/tmp/$name"
+		if [ ! -e "${PLAYIT_WORKDIR%/*}" ]; then
+			mkdir --parents "${PLAYIT_WORKDIR%/*}"
+			chmod 777 "${PLAYIT_WORKDIR%/*}"
+		fi
 	elif [ -w "$XDG_CACHE_HOME" ] && [ $free_space_cache -ge $needed_space ]; then
 		export PLAYIT_WORKDIR="$XDG_CACHE_HOME/$name"
 	elif [ -w "$PWD" ] && [ $free_space_pwd -ge $needed_space ]; then
@@ -920,22 +927,24 @@ organize_data() {
 		organize_data_error_missing_pkg
 	fi
 	local archive_path
-	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}\")"
-	elif [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")" ]; then
-		archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
-	else
-		unset archive_path
-	fi
+	local guessed_path="ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}"
+	while [ "${guessed_path#ARCHIVE_*_PATH}" != "$guessed_path" ]; do
+		if [ -n "$(eval printf -- '%b' \"\$${guessed_path}\")" ]; then
+			archive_path="$(eval printf -- '%b' \"\$${guessed_path}\")"
+			break
+		fi
+		guessed_path="${guessed_path%_*}"
+	done
 
 	local archive_files
-	if [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}\")" ]; then
-		archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}\")"
-	elif [ -n "$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")" ]; then
-		archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
-	else
-		unset archive_files
-	fi
+	local guessed_files="ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}"
+	while [ "${guessed_files#ARCHIVE_*_FILES}" != "$guessed_files" ]; do
+		if [ -n "$(eval printf -- '%b' \"\$${guessed_files}\")" ]; then
+			archive_files="$(eval printf -- '%b' \"\$${guessed_files}\")"
+			break
+		fi
+		guessed_files="${guessed_files%_*}"
+	done
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")${2}"
@@ -1247,9 +1256,26 @@ write_bin() {
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
-			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
-			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			local app_options
+			if [ -n "$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")" ]; then
+				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")"
+			else
+				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			fi
+
+			local app_prerun
+			if [ -n "$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")" ]; then
+				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")"
+			else
+				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
+			fi
+
+			local app_postrun
+			if [ -n "$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")" ]; then
+				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")"
+			else
+				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			fi
 
 			local app_exe
 			if [ -n "$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")" ]; then
@@ -1780,14 +1806,10 @@ write_bin_run_wine() {
 	cd "$PATH_PREFIX"
 	EOF
 
-	if [ "$app_prerun" ]; then
-		cat >> "$file" <<- EOF
-		$app_prerun
-		EOF
-	fi
-
-	cat >> "$file" <<- 'EOF'
-	wine "$APP_EXE" $APP_OPTIONS $@
+	cat >> "$file" <<- EOF
+	$app_prerun
+	wine "\$APP_EXE" \$APP_OPTIONS \$@
+	$app_postrun
 
 	EOF
 }
@@ -1875,8 +1897,6 @@ build_pkg() {
 				liberror 'OPTION_PACKAGE' 'build_pkg'
 			;;
 		esac
-
-		print_ok
 	done
 }
 
@@ -1897,16 +1917,36 @@ pkg_print() {
 	printf "$string" "$1"
 }
 
+# print package building message
+# USAGE: pkg_build_print_already_exists $file
+# NEEDED VARS: (LANG)
+# CALLED BY: pkg_build_arch pkg_build_deb
+pkg_build_print_already_exists() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='%s existe déjà.\n'
+		;;
+		('en'|*)
+			string='%s already exists.\n'
+		;;
+	esac
+	printf "$string" "$1"
+}
+
 # write .pkg.tar package meta-data
 # USAGE: pkg_write_arch
 # NEEDED VARS: GAME_NAME PKG_DEPS_ARCH
 # CALLED BY: write_metadata
 pkg_write_arch() {
 	local pkg_deps
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
+		pkg_set_deps_arch $(eval printf -- '%b' \"\$${pkg}_DEPS\")
+	fi
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	else
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
+		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
+	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
+		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
 	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
 	local target="$pkg_path/.PKGINFO"
@@ -1972,6 +2012,193 @@ pkg_write_arch() {
 	fi
 }
 
+# set list or Arch Linux dependencies from generic names
+# USAGE: pkg_set_deps_arch $dep[…]
+# CALLS: pkg_set_deps_arch32 pkg_set_deps_arch64
+# CALLED BY: pkg_write_arch
+pkg_set_deps_arch() {
+	local architecture
+	if [ "$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
+		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")"
+	else
+		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+	fi
+	case $architecture in
+		('32')
+			pkg_set_deps_arch32 $@
+		;;
+		('64')
+			pkg_set_deps_arch64 $@
+		;;
+	esac
+}
+
+# set list or Arch Linux 32-bit dependencies from generic names
+# USAGE: pkg_set_deps_arch32 $dep[…]
+# CALLED BY: pkg_set_deps_arch
+pkg_set_deps_arch32() {
+	for dep in $@; do
+		case $dep in
+			('alsa')
+				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
+			;;
+			('dosbox')
+				pkg_dep='dosbox'
+			;;
+			('freetype')
+				pkg_dep='lib32-freetype2'
+			;;
+			('gcc32')
+				pkg_dep='gcc-multilib'
+			;;
+			('glibc')
+				pkg_dep='lib32-glibc'
+			;;
+			('glu')
+				pkg_dep='lib32-glu'
+			;;
+			('glx')
+				pkg_dep='lib32-libgl'
+			;;
+			('gtk2')
+				pkg_dep='lib32-gtk2'
+			;;
+			('json')
+				pkg_dep='lib32-json-c'
+			;;
+			('libcurl-gnutls')
+				pkg_dep='lib32-libcurl-gnutls'
+			;;
+			('libstdc++')
+				pkg_dep='lib32-gcc-libs'
+			;;
+			('libxrandr')
+				pkg_dep='lib32-libxrandr'
+			;;
+			('nss')
+				pkg_dep='lib32-nss'
+			;;
+			('openal')
+				pkg_dep='lib32-openal'
+			;;
+			('pulseaudio')
+				pkg_dep='pulseaudio'
+			;;
+			('sdl1.2')
+				pkg_dep='lib32-sdl'
+			;;
+			('sdl2')
+				pkg_dep='lib32-sdl2'
+			;;
+			('sdl2_image')
+				pkg_dep='lib32-sdl2_image'
+			;;
+			('sdl2_mixer')
+				pkg_dep='lib32-sdl2_mixer'
+			;;
+			('vorbis')
+				pkg_dep='lib32-libvorbis'
+			;;
+			('wine')
+				pkg_dep='wine'
+			;;
+			('winetricks')
+				pkg_dep='winetricks'
+			;;
+			('xcursor')
+				pkg_dep='lib32-libxcursor'
+			;;
+			(*)
+				pkg_deps="$dep"
+			;;
+		esac
+		pkg_deps="$pkg_deps $pkg_dep"
+	done
+}
+
+# set list or Arch Linux 64-bit dependencies from generic names
+# USAGE: pkg_set_deps_arch64 $dep[…]
+# CALLED BY: pkg_set_deps_arch
+pkg_set_deps_arch64() {
+	for dep in $@; do
+		case $dep in
+			('alsa')
+				pkg_dep='alsa-lib alsa-plugins'
+			;;
+			('dosbox')
+				pkg_dep='dosbox'
+			;;
+			('freetype')
+				pkg_dep='freetype2'
+			;;
+			('gcc32')
+				pkg_dep='gcc-multilib'
+			;;
+			('glibc')
+				pkg_dep='glibc'
+			;;
+			('glu')
+				pkg_dep='glu'
+			;;
+			('glx')
+				pkg_dep='libgl'
+			;;
+			('gtk2')
+				pkg_dep='gtk2'
+			;;
+			('json')
+				pkg_dep='json-c'
+			;;
+			('libcurl-gnutls')
+				pkg_dep='libcurl-gnutls'
+			;;
+			('libstdc++')
+				pkg_dep='gcc-libs'
+			;;
+			('libxrandr')
+				pkg_dep='libxrandr'
+			;;
+			('nss')
+				pkg_dep='nss'
+			;;
+			('openal')
+				pkg_dep='openal'
+			;;
+			('pulseaudio')
+				pkg_dep='pulseaudio'
+			;;
+			('sdl1.2')
+				pkg_dep='sdl'
+			;;
+			('sdl2')
+				pkg_dep='sdl2'
+			;;
+			('sdl2_image')
+				pkg_dep='sdl2_image'
+			;;
+			('sdl2_mixer')
+				pkg_dep='sdl2_mixer'
+			;;
+			('vorbis')
+				pkg_dep='libvorbis'
+			;;
+			('wine')
+				pkg_dep='wine'
+			;;
+			('winetricks')
+				pkg_dep='winetricks'
+			;;
+			('xcursor')
+				pkg_dep='libxcursor'
+			;;
+			(*)
+				pkg_dep="$dep"
+			;;
+		esac
+		pkg_deps="$pkg_deps $pkg_dep"
+	done
+}
+
 # build .pkg.tar package
 # USAGE: pkg_build_arch $pkg_path
 # NEEDED VARS: (OPTION_COMPRESSION) (LANG) PLAYIT_WORKDIR
@@ -1979,6 +2206,13 @@ pkg_write_arch() {
 # CALLED BY: build_pkg
 pkg_build_arch() {
 	local pkg_filename="$PWD/${1##*/}.pkg.tar"
+
+	if [ -e "$pkg_filename" ]; then
+		pkg_build_print_already_exists "${pkg_filename##*/}"
+		export ${pkg}_PKG="$pkg_filename"
+		return 0
+	fi
+
 	local tar_options='--create --group=root --owner=root'
 
 	case $OPTION_COMPRESSION in
@@ -2008,6 +2242,8 @@ pkg_build_arch() {
 	)
 
 	export ${pkg}_PKG="$pkg_filename"
+
+	print_ok
 }
 
 # write .deb package meta-data
@@ -2016,10 +2252,21 @@ pkg_build_arch() {
 # CALLED BY: write_metadata
 pkg_write_deb() {
 	local pkg_deps
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
+		pkg_set_deps_deb $(eval printf -- '%b' \"\$${pkg}_DEPS\")
+	fi
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-	else
-		pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
+		if [ -n "$pkg_deps" ]; then
+			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
+		else
+			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
+		fi
+	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
+		if [ -n "$pkg_deps" ]; then
+			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
+		else
+			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
+		fi
 	fi
 	local pkg_size=$(du --total --block-size=1K --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
 	local target="$pkg_path/DEBIAN/control"
@@ -2090,6 +2337,93 @@ pkg_write_deb() {
 	fi
 }
 
+# set list of Debian dependencies from generic names
+# USAGE: pkg_set_deps_deb $dep[…]
+# CALLED BY: pkg_write_deb
+pkg_set_deps_deb() {
+	for dep in $@; do
+		case $dep in
+			('alsa')
+				pkg_dep='libasound2-plugins'
+			;;
+			('dosbox')
+				pkg_dep='dosbox'
+			;;
+			('freetype')
+				pkg_dep='libfreetype6'
+			;;
+			('gcc32')
+				pkg_dep='gcc-multilib:amd64 | gcc'
+			;;
+			('glibc')
+				pkg_dep='libc6'
+			;;
+			('glu')
+				pkg_dep='libglu1-mesa | libglu1'
+			;;
+			('glx')
+				pkg_dep='libgl1-mesa-glx | libgl1'
+			;;
+			('gtk2')
+				pkg_dep='libgtk2.0-0'
+			;;
+			('json')
+				pkg_dep='libjson-c3 | libjson-c2 | libjson0'
+			;;
+			('libcurl-gnutls')
+				pkg_dep='libcurl3-gnutls'
+			;;
+			('libstdc++')
+				pkg_dep='libstdc++6'
+			;;
+			('libxrandr')
+				pkg_dep='libxrandr2'
+			;;
+			('nss')
+				pkg_dep='libnss3'
+			;;
+			('openal')
+				pkg_dep='libopenal1'
+			;;
+			('pulseaudio')
+				pkg_dep='pulseaudio:amd64 | pulseaudio'
+			;;
+			('sdl1.2')
+				pkg_dep='libsdl1.2debian'
+			;;
+			('sdl2')
+				pkg_dep='libsdl2-2.0-0'
+			;;
+			('sdl2_image')
+				pkg_dep='libsdl2-image-2.0-0'
+			;;
+			('sdl2_mixer')
+				pkg_dep='libsdl2-mixer-2.0-0'
+			;;
+			('vorbis')
+				pkg_dep='libvorbisfile3'
+			;;
+			('wine')
+				pkg_dep='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
+			;;
+			('winetricks')
+				pkg_dep='winetricks'
+			;;
+			('xcursor')
+				pkg_dep='libxcursor1'
+			;;
+			(*)
+				pkg_dep="$dep"
+			;;
+		esac
+		if [ -n "$pkg_deps" ]; then
+			pkg_deps="$pkg_deps, $pkg_dep"
+		else
+			pkg_deps="$pkg_dep"
+		fi
+	done
+}
+
 # build .deb package
 # USAGE: pkg_build_deb $pkg_path
 # NEEDED VARS: (OPTION_COMPRESSION) (LANG) PLAYIT_WORKDIR
@@ -2097,6 +2431,11 @@ pkg_write_deb() {
 # CALLED BY: build_pkg
 pkg_build_deb() {
 	local pkg_filename="$PWD/${1##*/}.deb"
+	if [ -e "$pkg_filename" ]; then
+		pkg_build_print_already_exists "${pkg_filename##*/}"
+		export ${pkg}_PKG="$pkg_filename"
+		return 0
+	fi
 
 	local dpkg_options
 	case $OPTION_COMPRESSION in
@@ -2111,6 +2450,8 @@ pkg_build_deb() {
 	pkg_print "${pkg_filename##*/}"
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
 	export ${pkg}_PKG="$pkg_filename"
+
+	print_ok
 }
 
 if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
