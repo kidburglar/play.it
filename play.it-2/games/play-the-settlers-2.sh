@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20171022.1
 
 # Set game-specific variables
 
@@ -54,27 +54,24 @@ ARCHIVE_GOG_FR_VERSION='1.51-gog2.1.0.16'
 ARCHIVE_GOG_FR_SIZE='410000'
 
 ARCHIVE_GOG_DE='setup_settlers2_gold_german_2.1.0.17.exe'
-ARCHIVE_GOG_DE_MD5='2a0b5292c82b0d4c8f2cafe53a20ba5e'
+ARCHIVE_GOG_DE_MD5='f87a8fded6de455af4e6a284b3c4ed5e'
 ARCHIVE_GOG_DE_VERSION='1.51-gog2.1.0.17'
 ARCHIVE_GOG_DE_SIZE='370000'
 
-ARCHIVE_DOC1_PATH='tmp'
-ARCHIVE_DOC1_FILES='./*eula.txt'
-
-ARCHIVE_DOC2_PATH='app'
-ARCHIVE_DOC2_FILES='./eula ./*.txt'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./eula ./*.txt'
 
 ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./dos4gw.exe ./s2edit.exe ./s2.exe ./setup.exe ./setup.ini video/smackply.exe'
+ARCHIVE_GAME_BIN_FILES='./dos4gw.exe ./s2edit.exe ./s2.exe ./setup.exe ./setup.ini video/smackply.exe ./drivers'
 
-ARCHIVE_GAME_IMAGE_PATH='app'
-ARCHIVE_GAME_IMAGE_FILES='./settlers2.gog ./settlers2.inst'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./settlers2.gog ./settlers2.inst ./settler2.vmc ./data/animdat ./data/bobs ./data/*.lst ./data/cbob ./data/*.dat ./data/*.idx ./data/io/*.dat ./data/io/*.fnt ./data/masks ./data/mbob ./data/missions/mis_00*.rtx ./data/missions/mis_10*.rtx ./data/sounddat ./data/textures ./gfx/palette ./gfx/pics2 ./gfx/pics/install.lbm ./gfx/pics/mission ./gfx/pics/setup013.lbm ./gfx/pics/setup015.lbm ./gfx/pics/setup666.lbm ./gfx/pics/setup667.lbm ./gfx/pics/setup801.lbm ./gfx/pics/setup802.lbm ./gfx/pics/setup803.lbm ./gfx/pics/setup804.lbm ./gfx/pics/setup805.lbm ./gfx/pics/setup806.lbm ./gfx/pics/setup810.lbm ./gfx/pics/setup811.lbm ./gfx/pics/setup895.lbm ./gfx/pics/setup896.lbm ./gfx/pics/setup899.lbm ./gfx/pics/setup990.lbm ./gfx/pics/world.lbm ./gfx/pics/worldmsk.lbm ./gfx/textures ./gfw_high.ico ./goggame-1207658786.ico'
 
-ARCHIVE_GAME_DATA1_PATH='app'
-ARCHIVE_GAME_DATA1_FILES='./data ./drivers ./gfx ./video ./gfw_high.ico ./goggame-1207658786.ico ./install.scr ./settler2.vmc save/mission.dat'
+ARCHIVE_GAME1_L10N_PATH='app'
+ARCHIVE_GAME1_L10N_FILES='./install.scr ./video/intro.smk ./save/mission.dat ./gfx/pics/setup000.lbm ./gfx/pics/setup010.lbm ./gfx/pics/setup011.lbm ./gfx/pics/setup012.lbm ./gfx/pics/setup014.lbm ./gfx/pics/setup897.lbm ./gfx/pics/setup898.lbm ./gfx/pics/setup900.lbm ./gfx/pics/setup901.lbm ./gfx/pics/setup996.lbm ./gfx/pics/setup997.lbm ./gfx/pics/setup998.lbm ./data/resource.idx ./data/missions/mis_0100.rtx ./data/txt* ./data/online ./data/maps* ./data/io/editio.idx ./data/io/io.idx'
 
-ARCHIVE_GAME_DATA2_PATH='app/__support/save'
-ARCHIVE_GAME_DATA2_FILES='save/mission.dat'
+ARCHIVE_GAME2_L10N_PATH='app/__support/save'
+ARCHIVE_GAME2_L10N_FILES='save/mission.dat'
 
 CONFIG_FILES='./setup.ini'
 DATA_DIRS='./data ./gfx ./save ./worlds'
@@ -101,26 +98,39 @@ APP_SETUP_EXE='setup.exe'
 APP_SETUP_NAME="$GAME_NAME - Setup"
 APP_SETUP_CAT='Settings'
 
-PACKAGES_LIST='PKG_DATA PKG_IMAGE PKG_BIN'
+PACKAGES_LIST='PKG_DATA PKG_L10N PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_IMAGE_ID="${GAME_ID}-image"
-PKG_IMAGE_DESCRIPTION='disk image'
+PKG_L10N_ID="${GAME_ID}-l10n"
+PKG_L10N_ID_GOG_EN="${PKG_L10N_ID}-en"
+PKG_L10N_ID_GOG_FR="${PKG_L10N_ID}-fr"
+PKG_L10N_ID_GOG_DE="${PKG_L10N_ID}-de"
+PKG_L10N_PROVIDE="$PKG_L10N_ID"
+PKG_L10N_DESCRIPTION_GOG_EN='English localization'
+PKG_L10N_DESCRIPTION_GOG_FR='French localization'
+PKG_L10N_DESCRIPTION_GOG_DE='German localization'
 
+PKG_BIN_ID="$GAME_ID"
+PKG_BIN_ID_GOG_EN="${GAME_ID}-en"
+PKG_BIN_ID_GOG_FR="${GAME_ID}-fr"
+PKG_BIN_ID_GOG_DE="${GAME_ID}-de"
+PKG_BIN_PROVIDE="$PKG_BIN_ID"
+PKG_BIN_DESCRIPTION_GOG_EN='English version'
+PKG_BIN_DESCRIPTION_GOG_FR='French version'
+PKG_BIN_DESCRIPTION_GOG_DE='German version'
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, $PKG_IMAGE_ID, dosbox"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID $PKG_IMAGE_ID dosbox"
+PKG_BIN_DEPS="$PKG_DATA_ID $PKG_L10N_ID dosbox"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.2'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -135,20 +145,16 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"   "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}"  "$PATH_GAME"
+	organize_data "GAME1_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "GAME2_${PKG#PKG_}" "$PATH_GAME"
+done
 
-PKG='PKG_IMAGE'
-organize_data 'GAME_IMAGE' "$PATH_GAME"
+sed --in-place 's/SETTLERS2.gog/settlers2.gog/' "${PKG_DATA_PATH}${PATH_GAME}/$GAME_IMAGE"
 
 PKG='PKG_DATA'
-organize_data 'DOC1'       "$PATH_DOC"
-organize_data 'DOC2'       "$PATH_DOC"
-organize_data 'GAME_DATA1' "$PATH_GAME"
-organize_data 'GAME_DATA2' "$PATH_GAME"
-
-sed --in-place 's/SETTLERS2.gog/settlers2.gog/' "${PKG_IMAGE_PATH}${PATH_GAME}/$GAME_IMAGE"
-
 extract_and_sort_icons_from 'APP_MAIN'
 rm "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
 
@@ -179,7 +185,7 @@ EOF
 
 write_metadata 'PKG_DATA'
 rm "$postinst" "$prerm"
-write_metadata 'PKG_BIN' 'PKG_IMAGE'
+write_metadata 'PKG_BIN' 'PKG_L10N'
 build_pkg
 
 # Clean up
