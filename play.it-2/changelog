@@ -5,6 +5,8 @@
 
   * Improve handling of user directories
 
+  * Add new packages to the list of generic dependencies
+
 2.2.0
 
   * Automatically detect archive type for *.rar files
