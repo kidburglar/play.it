@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170930.1
+script_version=20171028.1
 
 # Set game-specific variables
 
@@ -44,27 +44,28 @@ GAME_NAME='Darkest Dungeon: The Crimson Court'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
-ARCHIVE_GOG_MD5='523c66d4575095c66a03d3859e4f83b8'
-ARCHIVE_GOG_SIZE='360000'
-ARCHIVE_GOG_VERSION='20645-gog15279'
+ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
+ARCHIVE_GOG_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
+ARCHIVE_GOG_SIZE='350000'
+ARCHIVE_GOG_VERSION='21071-gog15970'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
-ARCHIVE_GOG_OLD_MD5='96ac3ed631dd2509ffbf88f88823e019'
+ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
+ARCHIVE_GOG_OLD_MD5='523c66d4575095c66a03d3859e4f83b8'
 ARCHIVE_GOG_OLD_SIZE='360000'
-ARCHIVE_GOG_OLD_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLD_VERSION='20645-gog15279'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='gog_darkest_dungeon_the_crimson_court_dlc_2.4.0.5.sh'
-ARCHIVE_GOG_OLDER_MD5='18acadcb1c9a2d4dc83198aaab44c1ca'
+ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
+ARCHIVE_GOG_OLDER_MD5='96ac3ed631dd2509ffbf88f88823e019'
 ARCHIVE_GOG_OLDER_SIZE='360000'
-ARCHIVE_GOG_OLDER_VERSION='20326-gog2.4.0.5'
+ARCHIVE_GOG_OLDER_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_the_crimson_court_dlc_2.3.0.4.sh'
-ARCHIVE_GOG_OLDEST_MD5='99eecd10296c6f60830f2b086981cb97'
+ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_the_crimson_court_dlc_2.4.0.5.sh'
+ARCHIVE_GOG_OLDEST_MD5='18acadcb1c9a2d4dc83198aaab44c1ca'
 ARCHIVE_GOG_OLDEST_SIZE='360000'
-ARCHIVE_GOG_OLDEST_VERSION='20326-gog2.3.0.4'
+ARCHIVE_GOG_OLDEST_VERSION='20326-gog2.4.0.5'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -75,12 +76,11 @@ ARCHIVE_GAME_FILES='./dlc'
 PACKAGES_LIST='PKG_MAIN'
 
 PKG_MAIN_ID="${GAME_ID}-the-crimson-court"
-PKG_MAIN_DEPS_DEB="$GAME_ID"
-PKG_MAIN_DEPS_ARCH="$GAME_ID"
+PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.2'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

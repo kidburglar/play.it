@@ -34,19 +34,25 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170924.1
+script_version=20171025.1
 
 # Set game-specific variables
 
 GAME_ID='invisible-inc'
 GAME_NAME='Invisible Inc.'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_invisible_inc_2.6.0.11.sh'
-ARCHIVE_GOG_MD5='97e6efdc9237ec17deb02b5cf5185cf5'
+ARCHIVE_GOG='invisible_inc_en_8_07_2017_15873.sh'
+ARCHIVE_GOG_MD5='b3acb8f72cf01f71b0ddcb4355543a16'
 ARCHIVE_GOG_SIZE='1200000'
-ARCHIVE_GOG_VERSION='2016.04.13-gog2.6.0.11'
+ARCHIVE_GOG_VERSION='2017.07.08-gog15873'
+ARCHIVE_GOG_TYPE='mojosetup_unzip'
+
+ARCHIVE_GOG_OLD='gog_invisible_inc_2.6.0.11.sh'
+ARCHIVE_GOG_OLD_MD5='97e6efdc9237ec17deb02b5cf5185cf5'
+ARCHIVE_GOG_OLD_SIZE='1200000'
+ARCHIVE_GOG_OLD_VERSION='2016.04.13-gog2.6.0.11'
 
 ARCHIVE_ICONS='invisible-inc_icons.tar.gz'
 ARCHIVE_ICONS_MD5='37a62fed1dc4185e95db3e82e6695c1d'
@@ -83,16 +89,14 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libsdl2-2.0-0, libgl1-mesa-glx | libgl1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-libgl"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 glx"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 libgl"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.2'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

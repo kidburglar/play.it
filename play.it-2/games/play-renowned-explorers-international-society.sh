@@ -29,25 +29,31 @@ set -o errexit
 ###
 
 ###
-# Renowned Explorers International Society
+# Renowned Explorers: International Society
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171014.1
+script_version=20171021.1
 
 # Set game-specific variables
 
 GAME_ID='renowned-explorers-international-society'
 GAME_NAME='Renowned Explorers: International Society'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='renowned_explorers_international_society_en_459_14894.sh'
-ARCHIVE_GOG_MD5='ff6b368b3919002d2db750213d33fcef'
+ARCHIVE_GOG='renowned_explorers_international_society_en_466_15616.sh'
+ARCHIVE_GOG_MD5='fbad4b4d361a0e7d29b9781e3c5a5e85'
 ARCHIVE_GOG_SIZE='1100000'
-ARCHIVE_GOG_VERSION='459-gog14894'
+ARCHIVE_GOG_VERSION='466-gog15616'
 ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='renowned_explorers_international_society_en_459_14894.sh'
+ARCHIVE_GOG_OLD_MD5='ff6b368b3919002d2db750213d33fcef'
+ARCHIVE_GOG_OLD_SIZE='1100000'
+ARCHIVE_GOG_OLD_VERSION='459-gog14894'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
@@ -73,16 +79,14 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libsdl2-2.0-0, libglu1-mesa | libglu1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-sdl2 lib32-libxcursor lib32-libxrandr lib32-glu"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 glu"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 libxcursor libxrandr glu"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.2'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -103,7 +107,7 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
