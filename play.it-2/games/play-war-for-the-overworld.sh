@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171025.1
+script_version=20171028.1
 
 # Set game-specific variables
 
@@ -67,6 +67,7 @@ ARCHIVE_GOG_OLDEST_SIZE='2500000'
 ARCHIVE_GOG_OLDEST_VERSION='1.6.3f1-gog14896'
 ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
 
+ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
 ARCHIVE_HUMBLE_SIZE='2500000'
 ARCHIVE_HUMBLE_VERSION='1.5.2-humble170202'
