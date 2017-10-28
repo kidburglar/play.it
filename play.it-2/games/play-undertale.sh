@@ -34,19 +34,25 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20171028.1
 
 # Set game-specific variables
 
 GAME_ID='undertale'
 GAME_NAME='Undertale'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_undertale_2.0.0.1.sh'
-ARCHIVE_GOG_MD5='e740df4e15974ad8c21f45ebe8426fb0'
+ARCHIVE_GOG='undertale_en_1_06_15928.sh'
+ARCHIVE_GOG_MD5='54f9275d3def027e9f3f65a61094a662'
 ARCHIVE_GOG_SIZE='160000'
-ARCHIVE_GOG_VERSION='1.001-gog2.0.0.1'
+ARCHIVE_GOG_VERSION='1.06-gog15928'
+ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='gog_undertale_2.0.0.1.sh'
+ARCHIVE_GOG_OLD_MD5='e740df4e15974ad8c21f45ebe8426fb0'
+ARCHIVE_GOG_OLD_SIZE='160000'
+ARCHIVE_GOG_OLD_VERSION='1.001-gog2.0.0.1'
 
 ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
@@ -55,13 +61,14 @@ ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN_FILES='./UNDERTALE'
+ARCHIVE_GAME_BIN_FILES='./runner ./UNDERTALE'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./assets'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='UNDERTALE'
+APP_MAIN_EXE_GOG='runner'
+APP_MAIN_EXE_GOG_OLD='UNDERTALE'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='assets/icon.png'
 APP_MAIN_ICON_RES='64'
@@ -72,12 +79,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libopenal1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-openal lib32-libxrandr"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu openal libxrandr"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.2'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -95,28 +101,29 @@ fi
 
 # Use libSSL 1.0.0 32-bit archive
 
+ARCHIVE_MAIN="$ARCHIVE"
 set_archive 'LIBSSL' 'ARCHIVE_LIBSSL'
-ARCHIVE='ARCHIVE_GOG'
+ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libSSL into the game directory
 
 if [ "$LIBSSL" ]; then
+	(
+		ARCHIVE='LIBSSL'
+		extract_data_from "$LIBSSL"
+	)
 	dir='libs'
-	ARCHIVE='LIBSSL'
-	extract_data_from "$LIBSSL"
 	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
 	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}/$dir"
 	APP_MAIN_LIBS="$dir"
@@ -126,6 +133,14 @@ fi
 # Write launchers
 
 PKG='PKG_BIN'
+case "$ARCHIVE" in
+	('ARCHIVE_GOG')
+		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
+	;;
+	('ARCHIVE_GOG_OLD')
+		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_OLD"
+	;;
+esac
 write_launcher 'APP_MAIN'
 
 # Build package
