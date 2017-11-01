@@ -29,55 +29,36 @@ set -o errexit
 ###
 
 ###
-# Darkest Dungeon: The Crimson Court
+# Teenagent
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.1
+script_version=20171021.1
 
 # Set game-specific variables
 
-# copy GAME_ID from play-darkest-dungeon.sh
-GAME_ID='darkest-dungeon'
-GAME_NAME='Darkest Dungeon: The Crimson Court'
+GAME_ID='teenagent'
+GAME_NAME='Teenagent'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21096_16065.sh'
-ARCHIVE_GOG_MD5='d4beaeb7effff0cbd2e292abf0ef5332'
-ARCHIVE_GOG_SIZE='350000'
-ARCHIVE_GOG_VERSION='21096-gog16066'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='setup_teenagent_1.0_(15595).exe'
+ARCHIVE_GOG_MD5='95126a8eba61b60e12535ebaa020c01b'
+ARCHIVE_GOG_SIZE='32000'
+ARCHIVE_GOG_VERSION='1.0-gog15595'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
-ARCHIVE_GOG_OLD_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
-ARCHIVE_GOG_OLD_SIZE='350000'
-ARCHIVE_GOG_OLD_VERSION='21071-gog15970'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_GAME_MAIN_PATH='app'
+ARCHIVE_GAME_MAIN_FILES='./*.res ./goggame-1207658753.ico'
 
-ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
-ARCHIVE_GOG_OLDER_MD5='523c66d4575095c66a03d3859e4f83b8'
-ARCHIVE_GOG_OLDER_SIZE='360000'
-ARCHIVE_GOG_OLDER_VERSION='20645-gog15279'
-ARCHIVE_GOG_OLDER_TYPE='mojosetup'
-
-ARCHIVE_GOG_OLDEST='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
-ARCHIVE_GOG_OLDEST_MD5='96ac3ed631dd2509ffbf88f88823e019'
-ARCHIVE_GOG_OLDEST_SIZE='360000'
-ARCHIVE_GOG_OLDEST_VERSION='20578-gog15132'
-ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
-
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
-
-ARCHIVE_GAME_PATH='data/noarch/game'
-ARCHIVE_GAME_FILES='./dlc'
+APP_MAIN_TYPE='scummvm'
+APP_MAIN_SCUMMID='teenagent'
+APP_MAIN_ICON='goggame-1207658753.ico'
+APP_MAIN_ICON_RES='16 32 48 256'
 
 PACKAGES_LIST='PKG_MAIN'
 
-PKG_MAIN_ID="${GAME_ID}-the-crimson-court"
-PKG_MAIN_DEPS="$GAME_ID"
+PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
@@ -97,14 +78,22 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Extract game data
+
+# Extract data from game
 
 extract_data_from "$SOURCE_ARCHIVE"
+tolower "$PLAYIT_WORKDIR/gamedata"
 
-organize_data 'DOC'  "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
+organize_data 'GAME_MAIN' "$PATH_GAME"
+
+extract_and_sort_icons_from 'APP_MAIN'
+rm "$PKG_MAIN_PATH/$PATH_GAME/$APP_MAIN_ICON"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Write launchers
+
+write_launcher 'APP_MAIN'
 
 # Build package
 

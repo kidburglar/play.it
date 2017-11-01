@@ -29,84 +29,82 @@ set -o errexit
 ###
 
 ###
-# Darkest Dungeon
+# Torchlight II
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.1
+script_version=20171030.1
 
 # Set game-specific variables
 
-GAME_ID='darkest-dungeon'
-GAME_NAME='Darkest Dungeon'
+GAME_ID='torchlight-2'
+GAME_NAME='Torchlight II'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='darkest_dungeon_en_21096_16066.sh'
-ARCHIVE_GOG_MD5='435905fe6edd911a8645d4feaf94ec34'
-ARCHIVE_GOG_SIZE='2200000'
-ARCHIVE_GOG_VERSION='21096-gog16066'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='gog_torchlight_2_2.0.0.2.sh'
+ARCHIVE_GOG_MD5='e107f6d4c6d4cecea37ade420a8d4892'
+ARCHIVE_GOG_SIZE='1700000'
+ARCHIVE_GOG_VERSION='1.25.9.7-gog2.0.0.2'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_en_21071_15970.sh'
-ARCHIVE_GOG_OLD_MD5='e4880968101835fcd27f63a48e208ed8'
-ARCHIVE_GOG_OLD_SIZE='2200000'
-ARCHIVE_GOG_OLD_VERSION='21071-gog15970'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_HUMBLE='Torchlight2-linux-2015-04-01.sh'
+ARCHIVE_HUMBLE_MD5='730a5d08c8f1cd4a65afbc0ca631d85c'
+ARCHIVE_HUMBLE_SIZE='1700000'
+ARCHIVE_HUMBLE_VERSION='1.25.2.4-humble150402'
+ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='darkest_dungeon_en_20645_15279.sh'
-ARCHIVE_GOG_OLDER_MD5='78bfc79c2b0e7e8016d611746499fa22'
-ARCHIVE_GOG_OLDER_SIZE='2100000'
-ARCHIVE_GOG_OLDER_VERSION='20645-gog15279'
-ARCHIVE_GOG_OLDER_TYPE='mojosetup'
-
-ARCHIVE_GOG_OLDEST='darkest_dungeon_en_20578_15132.sh'
-ARCHIVE_GOG_OLDEsT_MD5='12b51408bdedb012ee38e2321910cfca'
-ARCHIVE_GOG_OLDEST_SIZE='2100000'
-ARCHIVE_GOG_OLDEST_VERSION='20578-gog15132'
-ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
-
-DATA_DIRS='./logs'
-
-ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC1_DATA_PATH_GOG='data/noarch/docs'
 ARCHIVE_DOC1_DATA_FILES='./*'
 
-ARCHIVE_DOC2_DATA_PATH='data/noarch/game'
-ARCHIVE_DOC2_DATA_FILES='./README.linux'
+ARCHIVE_DOC2_DATA_PATH_HUMBLE='data'
+ARCHIVE_DOC2_DATA_FILES='./EULA'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./lib ./darkest.bin.x86'
+ARCHIVE_DOC3_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_DOC3_DATA_PATH_HUMBLE='data/noarch'
+ARCHIVE_DOC3_DATA_FILES='./licenses'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./lib64 ./darkest.bin.x86_64'
+ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN32_PATH_HUMBLE='data/x86'
+ARCHIVE_GAME_BIN32_FILES='./lib ./*.bin.x86'
 
-ARCHIVE_GAME_MEDIA_PATH='data/noarch/game'
-ARCHIVE_GAME_MEDIA_FILES='./audio ./video'
+ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN64_PATH_HUMBLE='data/x86_64'
+ARCHIVE_GAME_BIN64_FILES='./lib64 ./*.bin.x86_64'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Icon.bmp ./pin ./svn_revision.txt ./activity_log ./campaign ./colours ./curios ./cursors ./dungeons ./effects ./fe_flow ./fonts ./fx ./game_over ./heroes ./inventory ./loading_screen ./loot ./maps ./modes ./mods ./monsters ./overlays ./panels ./props ./raid ./raid_results ./scripts ./scrolls ./shaders ./shared ./trinkets ./upgrades ./user_information ./localization/*.bat ./localization/*.csv ./localization/*.loc ./localization/*.txt ./localization/*.xml ./localization/pc'
+ARCHIVE_GAME_MEDIA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_MEDIA_PATH_HUMBLE='data/noarch'
+ARCHIVE_GAME_MEDIA_FILES='./movies ./music'
+
+ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='data/noarch'
+ARCHIVE_GAME_DATA_FILES='./*.bmp ./*.cfg ./*.png ./icons ./PAKS ./porting ./programs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='darkest.bin.x86'
-APP_MAIN_EXE_BIN64='darkest.bin.x86_64'
-APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
-APP_MAIN_ICON='Icon.bmp'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE_BIN32='Torchlight2.bin.x86'
+APP_MAIN_EXE_BIN64='Torchlight2.bin.x86_64'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='Delvers.png'
+APP_MAIN_ICON_RES='256'
 
 PACKAGES_LIST='PKG_MEDIA PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_MEDIA_ID="${GAME_ID}-media"
-PKG_MEDIA_DESCRIPTION='audio & video'
+PKG_MEDIA_DESCRIPTION='movies & music'
 
+PKG_BIN32_ARCH='32'
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_MEDIA_ID $PKG_DATA_ID glibc libstdc++6 sdl2"
+PKG_BIN32_DEPS="$PKG_MEDIA_ID $PKG_DATA_ID glibc libstdc++ sdl2 freetype glx"
+PKG_BIN32_DEPS_ARCH='lib32-bzip2 lib32-libxft'
+PKG_BIN32_DEPS_DEB='libbz2-1.0, libxft2'
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_ARCH='bzip2 libxft'
+PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
 
 # Load common functions
 
@@ -129,18 +127,17 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC3_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+chmod +x "${PKG_BIN32_PATH}${PATH_GAME}"/*.bin.x86
+chmod +x "${PKG_BIN64_PATH}${PATH_GAME}"/*.bin.x86_64
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -150,15 +147,12 @@ for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
 
-
-# Allow persistent logging via output redirection to work
-
-sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
-
 # Build package
 
-write_metadata
+postinst_icons_linking 'APP_MAIN'
+write_metadata 'PKG_DATA'
+rm "$postinst" "$prerm"
+write_metadata 'PKG_MEDIA' 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
