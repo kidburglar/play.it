@@ -165,15 +165,24 @@ write_bin() {
 			  (
 			    cd "$1"
 			    for dir in $2; do
+			      if [ ! -e "$dir" ]; then
+			        if [ -e "$PATH_PREFIX/$dir" ]; then
+			          (
+			            cd "$PATH_PREFIX"
+			            cp --dereference --parents --recursive "$dir" "$1"
+			          )
+			        elif [ -e "$PATH_GAME/$dir" ]; then
+			          (
+			            cd "$PATH_GAME"
+			            cp --parents --recursive "$dir" "$1"
+			          )
+			        else
+			          mkdir --parents "$dir"
+			        fi
+			      fi
 			      rm --force --recursive "$PATH_PREFIX/$dir"
 			      mkdir --parents "$PATH_PREFIX/${dir%/*}"
-			      if [ ! -e "$dir" ]; then
-			        (
-			          cd "$PATH_GAME"
-			          cp --parents --recursive "$dir" "$1"
-			        )
-			      fi
-			      ln --symbolic "$(readlink -e "$dir")" "$PATH_PREFIX/$dir"
+			      ln --symbolic "$(readlink --canonicalize-existing "$dir")" "$PATH_PREFIX/$dir"
 			    done
 			  )
 			}
@@ -188,19 +197,6 @@ write_bin() {
 			        rm --force "$PATH_PREFIX/$file"
 			        mkdir --parents "$PATH_PREFIX/${file%/*}"
 			        ln --symbolic "$file_real" "$PATH_PREFIX/$file"
-			      fi
-			    done
-			  )
-			}
-
-			init_userdir_dirs() {
-			  (
-			    cd "$PATH_GAME"
-			    for dir in $2; do
-			      if [ ! -e "$1/$dir" ] && [ -e "$dir" ]; then
-			        cp --parents --recursive "$dir" "$1"
-			      else
-			        mkdir --parents "$1/$dir"
 			      fi
 			    done
 			  )
@@ -225,19 +221,16 @@ write_bin() {
 
 			if [ ! -e "$PATH_CACHE" ]; then
 			  mkdir --parents "$PATH_CACHE"
-			  init_userdir_dirs "$PATH_CACHE" "$CACHE_DIRS"
 			  init_userdir_files "$PATH_CACHE" "$CACHE_FILES"
 			fi
 
 			if [ ! -e "$PATH_CONFIG" ]; then
 			  mkdir --parents "$PATH_CONFIG"
-			  init_userdir_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
 			  init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
 			fi
 
 			if [ ! -e "$PATH_DATA" ]; then
 			  mkdir --parents "$PATH_DATA"
-			  init_userdir_dirs "$PATH_DATA" "$DATA_DIRS"
 			  init_userdir_files "$PATH_DATA" "$DATA_FILES"
 			fi
 
