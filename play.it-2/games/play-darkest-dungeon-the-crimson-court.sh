@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171028.1
+script_version=20171101.1
 
 # Set game-specific variables
 
@@ -44,28 +44,29 @@ GAME_NAME='Darkest Dungeon: The Crimson Court'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
-ARCHIVE_GOG_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
+ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21096_16065.sh'
+ARCHIVE_GOG_MD5='d4beaeb7effff0cbd2e292abf0ef5332'
 ARCHIVE_GOG_SIZE='350000'
-ARCHIVE_GOG_VERSION='21071-gog15970'
+ARCHIVE_GOG_VERSION='21096-gog16066'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
-ARCHIVE_GOG_OLD_MD5='523c66d4575095c66a03d3859e4f83b8'
-ARCHIVE_GOG_OLD_SIZE='360000'
-ARCHIVE_GOG_OLD_VERSION='20645-gog15279'
+ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
+ARCHIVE_GOG_OLD_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
+ARCHIVE_GOG_OLD_SIZE='350000'
+ARCHIVE_GOG_OLD_VERSION='21071-gog15970'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
-ARCHIVE_GOG_OLDER_MD5='96ac3ed631dd2509ffbf88f88823e019'
+ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
+ARCHIVE_GOG_OLDER_MD5='523c66d4575095c66a03d3859e4f83b8'
 ARCHIVE_GOG_OLDER_SIZE='360000'
-ARCHIVE_GOG_OLDER_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLDER_VERSION='20645-gog15279'
 ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDEST='gog_darkest_dungeon_the_crimson_court_dlc_2.4.0.5.sh'
-ARCHIVE_GOG_OLDEST_MD5='18acadcb1c9a2d4dc83198aaab44c1ca'
+ARCHIVE_GOG_OLDEST='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
+ARCHIVE_GOG_OLDEST_MD5='96ac3ed631dd2509ffbf88f88823e019'
 ARCHIVE_GOG_OLDEST_SIZE='360000'
-ARCHIVE_GOG_OLDEST_VERSION='20326-gog2.4.0.5'
+ARCHIVE_GOG_OLDEST_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
