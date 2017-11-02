@@ -7,6 +7,8 @@
 
   * Add new packages to the list of generic dependencies
 
+  * Add a patch allowing to change the default package compression method
+
 2.2.0
 
   * Automatically detect archive type for *.rar files
