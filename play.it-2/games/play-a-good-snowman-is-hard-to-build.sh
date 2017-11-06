@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171014.1
+script_version=20171101.1
 
 # Set game-specific variables
 
@@ -48,6 +48,9 @@ ARCHIVE_HUMBLE_MD5='4461dfdcaba9e8793e3044b458b0e301'
 ARCHIVE_HUMBLE_SIZE='120000'
 ARCHIVE_HUMBLE_VERSION='1.0.8-humble160421'
 
+ARCHIVE_ICONS='a-good-snowman-is-hard-to-build_icons.tar.gz'
+ARCHIVE_ICONS_MD5='8d595a7758ae8cd6dbc441ab79579fb4'
+
 ARCHIVE_GAME_BIN32_PATH='snowman'
 ARCHIVE_GAME_BIN32_FILES='./bin32'
 
@@ -56,6 +59,9 @@ ARCHIVE_GAME_BIN64_FILES='./bin64'
 
 ARCHIVE_GAME_DATA_PATH='snowman'
 ARCHIVE_GAME_DATA_FILES='./atlases ./crashdumper ./fonts ./libraries ./manifest ./music ./resources ./sounds ./spritesheets ./strings'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./24x24 ./32x32 ./40x40 ./48x48 ./64x64 ./96x96 ./128x128 ./256x256 ./512x512 ./768x768'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_PRERUN_BIN32='ln --symbolic --force bin32/lime-legacy.ndll .'
@@ -96,13 +102,30 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+if [ "$ICONS_PACK" ]; then
+	(
+		ARCHIVE='ICONS_PACK'
+		extract_data_from "$ICONS_PACK"
+	)
+fi
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
+
+if [ "$ICONS_PACK" ]; then
+	PKG='PKG_DATA'
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
