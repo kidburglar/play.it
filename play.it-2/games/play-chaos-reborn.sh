@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20171106.1
 
 # Set game-specific variables
 
@@ -77,6 +77,15 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_PRERUN='file="$HOME/.config/unity3d/Snapshot Games Inc_/Chaos Reborn/prefs"
+mkdir --parents "${file%/*}"
+if [ ! -e "$file" ]; then
+	cat > "$file" <<- EOF
+		<unity_prefs version_major="1" version_minor="1">
+		<pref name="Screenmanager Is Fullscreen mode" type="int">0</pref>
+		</unity_prefs>
+	EOF
+fi'
 APP_MAIN_EXE_BIN32='ChaosRebornLinux.x86'
 APP_MAIN_EXE_BIN64='ChaosRebornLinux.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
