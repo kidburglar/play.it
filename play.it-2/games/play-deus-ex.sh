@@ -34,28 +34,33 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171007.1
+script_version=20171108.2
 
 # Set game-specific variables
 
 GAME_ID='deus-ex'
 GAME_NAME='Deus Ex'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.2.2)_(15442).exe'
-ARCHIVE_GOG_MD5='573582142424ba1b5aba1f6727276450'
-ARCHIVE_GOG_VERSION='1.112fm-gog15442'
+ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.3.0.1)_(16231).exe'
+ARCHIVE_GOG_MD5='eaaf7c7c3052fbf71f5226e2d4495268'
+ARCHIVE_GOG_VERSION='1.112fm-gog16231'
 ARCHIVE_GOG_SIZE='750000'
 
+ARCHIVE_GOG_OLD='setup_deus_ex_goty_1.112fm(revision_1.2.2)_(15442).exe'
+ARCHIVE_GOG_OLD_MD5='573582142424ba1b5aba1f6727276450'
+ARCHIVE_GOG_OLD_VERSION='1.112fm-gog15442'
+ARCHIVE_GOG_OLD_SIZE='750000'
+
 ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='./manual.pdf ./help ./system/*.txt'
+ARCHIVE_DOC_DATA_FILES='./manual.pdf ./system/*.txt'
 
 ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./system/*.exe ./system/*.ini ./system/*.int ./system/3dfxspl2.dll ./system/3dfxspl3.dll ./system/3dfxspl.dll ./system/consys.dll ./system/core.dll ./system/d3ddrv.dll ./system/deusex.dll ./system/deusextext.dll ./system/editor.dll ./system/engine.dll ./system/extension.dll ./system/fire.dll ./system/galaxy.dll ./system/glide2x.dll ./system/glide3x.dll ./system/glide.dll ./system/glidedrv.dll ./system/ipdrv.dll ./system/metaldrv.dll ./system/msvcrt.dll ./system/opengldrv.dll ./system/render.dll ./system/sgldrv.dll ./system/softdrv.dll ./system/window.dll ./system/windrv.dll'
 
 ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./system/*.u maps ./music ./sounds ./textures'
+ARCHIVE_GAME_DATA_FILES='./system/*.u ./help ./maps ./music ./sounds ./textures'
 
 CONFIG_FILES='./system/*.ini'
 DATA_DIRS='./save'
