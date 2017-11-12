@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171015.1
+script_version=20171112.1
 
 # Set game-specific variables
 
@@ -158,6 +158,12 @@ extract_and_sort_icons_from 'APP_MAIN' 'APP_CONFIG'
 move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Disable frame buffer effects on first launch
+
+file="${PKG_BIN_PATH}${PATH_GAME}/swkotor2.ini"
+regex='s/\[Graphics Options\]/&\nFrame Buffer=0/'
+sed --in-place "$regex" "$file"
 
 # Write launchers
 
