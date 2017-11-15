@@ -9,6 +9,8 @@
 
   * Add a patch allowing to change the default package compression method
 
+  * Remove the need to manually clean-up package scripts
+
 2.2.0
 
   * Automatically detect archive type for *.rar files

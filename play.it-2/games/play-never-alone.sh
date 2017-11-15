@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20171115.1
 
 # Set game-specific variables
 
@@ -80,7 +80,7 @@ PKG_BIN_DEPS_ARCH="$PKG_VIDEOS_ID $PKG_DATA_ID glu libxcursor"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -121,7 +121,6 @@ write_launcher 'APP_MAIN'
 
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
-rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN' 'PKG_VIDEOS'
 build_pkg
 

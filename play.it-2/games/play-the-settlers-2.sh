@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171022.1
+script_version=20171128.1
 
 # Set game-specific variables
 
@@ -125,7 +125,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID $PKG_L10N_ID dosbox"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
