@@ -28,7 +28,9 @@ extract_data_from() {
 				set_standard_permissions "$destination"
 			;;
 			('mojosetup_unzip')
-				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1 || true
+				set +e
+				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1
+				set -e
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')

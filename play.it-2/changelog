@@ -1,3 +1,8 @@
+2.3.0
+
+  * Improve handling of MojoSetup extraction with unzip ending with an error
+    code
+
 2.2.0
 
   * Automatically detect archive type for *.rar files
