@@ -95,7 +95,7 @@ move_icons_to() {
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	(
 		cd "$source_path"
-		cp --link --parents --recursive "./$PATH_ICON_BASE" "$destination_path"
+		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
 		rm --recursive "./$PATH_ICON_BASE"
 		rmdir --ignore-fail-on-non-empty --parents "./${PATH_ICON_BASE%/*}"
 	)

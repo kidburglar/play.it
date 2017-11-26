@@ -11,6 +11,8 @@
 
   * Remove the need to manually clean-up package scripts
 
+  * Preserve symbolic links when copying files
+
 2.2.0
 
   * Automatically detect archive type for *.rar files
