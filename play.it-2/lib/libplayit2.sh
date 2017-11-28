@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.2.0
-library_revision=20171014.1
+library_version=2.3.0
+library_revision=20171128.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -866,7 +866,9 @@ extract_data_from() {
 				set_standard_permissions "$destination"
 			;;
 			('mojosetup_unzip')
-				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1 || true
+				set +e
+				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1
+				set -e
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')
@@ -953,7 +955,7 @@ organize_data() {
 			cd "$PLAYIT_WORKDIR/gamedata/$archive_path"
 			for file in $archive_files; do
 				if [ -e "$file" ]; then
-					cp --recursive --force --link --parents "$file" "$pkg_path"
+					cp --recursive --force --link --parents --no-dereference --preserve=links "$file" "$pkg_path"
 					rm --recursive "$file"
 				fi
 			done
@@ -1075,7 +1077,7 @@ move_icons_to() {
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	(
 		cd "$source_path"
-		cp --link --parents --recursive "./$PATH_ICON_BASE" "$destination_path"
+		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
 		rm --recursive "./$PATH_ICON_BASE"
 		rmdir --ignore-fail-on-non-empty --parents "./${PATH_ICON_BASE%/*}"
 	)
@@ -1393,15 +1395,24 @@ write_bin() {
 			  (
 			    cd "$1"
 			    for dir in $2; do
+			      if [ ! -e "$dir" ]; then
+			        if [ -e "$PATH_PREFIX/$dir" ]; then
+			          (
+			            cd "$PATH_PREFIX"
+			            cp --dereference --parents --recursive "$dir" "$1"
+			          )
+			        elif [ -e "$PATH_GAME/$dir" ]; then
+			          (
+			            cd "$PATH_GAME"
+			            cp --parents --recursive "$dir" "$1"
+			          )
+			        else
+			          mkdir --parents "$dir"
+			        fi
+			      fi
 			      rm --force --recursive "$PATH_PREFIX/$dir"
 			      mkdir --parents "$PATH_PREFIX/${dir%/*}"
-			      if [ ! -e "$dir" ]; then
-			        (
-			          cd "$PATH_GAME"
-			          cp --parents --recursive "$dir" "$1"
-			        )
-			      fi
-			      ln --symbolic "$(readlink -e "$dir")" "$PATH_PREFIX/$dir"
+			      ln --symbolic "$(readlink --canonicalize-existing "$dir")" "$PATH_PREFIX/$dir"
 			    done
 			  )
 			}
@@ -1416,19 +1427,6 @@ write_bin() {
 			        rm --force "$PATH_PREFIX/$file"
 			        mkdir --parents "$PATH_PREFIX/${file%/*}"
 			        ln --symbolic "$file_real" "$PATH_PREFIX/$file"
-			      fi
-			    done
-			  )
-			}
-
-			init_userdir_dirs() {
-			  (
-			    cd "$PATH_GAME"
-			    for dir in $2; do
-			      if [ ! -e "$1/$dir" ] && [ -e "$dir" ]; then
-			        cp --parents --recursive "$dir" "$1"
-			      else
-			        mkdir --parents "$1/$dir"
 			      fi
 			    done
 			  )
@@ -1453,19 +1451,16 @@ write_bin() {
 
 			if [ ! -e "$PATH_CACHE" ]; then
 			  mkdir --parents "$PATH_CACHE"
-			  init_userdir_dirs "$PATH_CACHE" "$CACHE_DIRS"
 			  init_userdir_files "$PATH_CACHE" "$CACHE_FILES"
 			fi
 
 			if [ ! -e "$PATH_CONFIG" ]; then
 			  mkdir --parents "$PATH_CONFIG"
-			  init_userdir_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
 			  init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
 			fi
 
 			if [ ! -e "$PATH_DATA" ]; then
 			  mkdir --parents "$PATH_DATA"
-			  init_userdir_dirs "$PATH_DATA" "$DATA_DIRS"
 			  init_userdir_files "$PATH_DATA" "$DATA_FILES"
 			fi
 
@@ -1872,6 +1867,7 @@ write_metadata() {
 			;;
 		esac
 	done
+	rm  --force "$postinst" "$prerm"
 }
 
 # build .pkg.tar or .deb package
@@ -2042,6 +2038,9 @@ pkg_set_deps_arch32() {
 			('alsa')
 				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
 			;;
+			('bzip2')
+				pkg_dep='lib32-bzip2'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -2050,6 +2049,9 @@ pkg_set_deps_arch32() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib'
+			;;
+			('gconf')
+				pkg_dep='lib32-gconf'
 			;;
 			('glibc')
 				pkg_dep='lib32-glibc'
@@ -2108,6 +2110,9 @@ pkg_set_deps_arch32() {
 			('xcursor')
 				pkg_dep='lib32-libxcursor'
 			;;
+			('xft')
+				pkg_dep='lib32-libxft'
+			;;
 			(*)
 				pkg_deps="$dep"
 			;;
@@ -2125,6 +2130,9 @@ pkg_set_deps_arch64() {
 			('alsa')
 				pkg_dep='alsa-lib alsa-plugins'
 			;;
+			('bzip2')
+				pkg_dep='bzip2'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -2133,6 +2141,9 @@ pkg_set_deps_arch64() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib'
+			;;
+			('gconf')
+				pkg_dep='gconf'
 			;;
 			('glibc')
 				pkg_dep='glibc'
@@ -2190,6 +2201,9 @@ pkg_set_deps_arch64() {
 			;;
 			('xcursor')
 				pkg_dep='libxcursor'
+			;;
+			('xft')
+				pkg_dep='libxft'
 			;;
 			(*)
 				pkg_dep="$dep"
@@ -2346,6 +2360,9 @@ pkg_set_deps_deb() {
 			('alsa')
 				pkg_dep='libasound2-plugins'
 			;;
+			('bzip2')
+				pkg_dep='libbz2-1.0'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -2354,6 +2371,9 @@ pkg_set_deps_deb() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib:amd64 | gcc'
+			;;
+			('gconf')
+				pkg_dep='libgconf-2-4'
 			;;
 			('glibc')
 				pkg_dep='libc6'
@@ -2411,6 +2431,9 @@ pkg_set_deps_deb() {
 			;;
 			('xcursor')
 				pkg_dep='libxcursor1'
+			;;
+			('xft')
+				pkg_dep='libxft2'
 			;;
 			(*)
 				pkg_dep="$dep"
