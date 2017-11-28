@@ -1,3 +1,7 @@
+2.4.0
+
+  * Add option to load regedit files on WINE prefix initialization
+
 2.3.2
 
   * Fix launchers broken in 2.3.1
