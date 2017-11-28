@@ -98,6 +98,9 @@ pkg_set_deps_deb() {
 			('alsa')
 				pkg_dep='libasound2-plugins'
 			;;
+			('bzip2')
+				pkg_dep='libbz2-1.0'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -106,6 +109,9 @@ pkg_set_deps_deb() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib:amd64 | gcc'
+			;;
+			('gconf')
+				pkg_dep='libgconf-2-4'
 			;;
 			('glibc')
 				pkg_dep='libc6'
@@ -163,6 +169,9 @@ pkg_set_deps_deb() {
 			;;
 			('xcursor')
 				pkg_dep='libxcursor1'
+			;;
+			('xft')
+				pkg_dep='libxft2'
 			;;
 			(*)
 				pkg_dep="$dep"

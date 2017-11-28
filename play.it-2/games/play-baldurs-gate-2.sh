@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170925.1
+script_version=20171115.1
 
 # Set game-specific variables
 
@@ -112,7 +112,7 @@ PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -180,7 +180,6 @@ if [ -e "$PATH_GAME/data/data" ]; then
 fi
 EOF
 write_metadata 'PKG_L10N' 'PKG_DATA'
-rm "$postinst" "$prerm"
 write_metadata 'PKG_BIN'
 build_pkg
 

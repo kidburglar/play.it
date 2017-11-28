@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20171115.1
 
 # Set game-specific variables
 
@@ -105,7 +105,7 @@ PKG_BIN_DEPS_ARCH="$PKG_PACK1_ID $PKG_PACK2_ID $PKG_MOVIES_ID $PKG_DATA_ID lib32
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -161,7 +161,6 @@ rm "$PATH_GAME/CookedPC/pack0.dzip"
 EOF
 postinst_icons_linking 'APP_MAIN' 'APP_CONFIG'
 write_metadata 'PKG_BIN'
-rm "$postinst" "$prerm"
 write_metadata 'PKG_PACK1' 'PKG_PACK2' 'PKG_MOVIES' 'PKG_DATA'
 build_pkg
 

@@ -32,7 +32,7 @@ organize_data() {
 			cd "$PLAYIT_WORKDIR/gamedata/$archive_path"
 			for file in $archive_files; do
 				if [ -e "$file" ]; then
-					cp --recursive --force --link --parents "$file" "$pkg_path"
+					cp --recursive --force --link --parents --no-dereference --preserve=links "$file" "$pkg_path"
 					rm --recursive "$file"
 				fi
 			done

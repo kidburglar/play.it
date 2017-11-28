@@ -42,6 +42,7 @@ write_metadata() {
 			;;
 		esac
 	done
+	rm  --force "$postinst" "$prerm"
 }
 
 # build .pkg.tar or .deb package

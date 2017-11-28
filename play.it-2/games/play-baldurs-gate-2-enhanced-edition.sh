@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171001.2
+script_version=20171115.1
 
 # Set game-specific variables
 
@@ -82,7 +82,7 @@ PKG_BIN_DEPS_ARCH="$PKG_AREAS_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-jso
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -145,7 +145,6 @@ fi
 EOF
 
 write_metadata 'PKG_BIN'
-rm "$postinst"
 write_metadata 'PKG_AREAS' 'PKG_DATA'
 build_pkg
 

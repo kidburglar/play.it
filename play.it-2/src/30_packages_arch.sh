@@ -106,6 +106,9 @@ pkg_set_deps_arch32() {
 			('alsa')
 				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
 			;;
+			('bzip2')
+				pkg_dep='lib32-bzip2'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -114,6 +117,9 @@ pkg_set_deps_arch32() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib'
+			;;
+			('gconf')
+				pkg_dep='lib32-gconf'
 			;;
 			('glibc')
 				pkg_dep='lib32-glibc'
@@ -172,6 +178,9 @@ pkg_set_deps_arch32() {
 			('xcursor')
 				pkg_dep='lib32-libxcursor'
 			;;
+			('xft')
+				pkg_dep='lib32-libxft'
+			;;
 			(*)
 				pkg_deps="$dep"
 			;;
@@ -189,6 +198,9 @@ pkg_set_deps_arch64() {
 			('alsa')
 				pkg_dep='alsa-lib alsa-plugins'
 			;;
+			('bzip2')
+				pkg_dep='bzip2'
+			;;
 			('dosbox')
 				pkg_dep='dosbox'
 			;;
@@ -197,6 +209,9 @@ pkg_set_deps_arch64() {
 			;;
 			('gcc32')
 				pkg_dep='gcc-multilib'
+			;;
+			('gconf')
+				pkg_dep='gconf'
 			;;
 			('glibc')
 				pkg_dep='glibc'
@@ -254,6 +269,9 @@ pkg_set_deps_arch64() {
 			;;
 			('xcursor')
 				pkg_dep='libxcursor'
+			;;
+			('xft')
+				pkg_dep='libxft'
 			;;
 			(*)
 				pkg_dep="$dep"
