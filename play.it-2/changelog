@@ -1,3 +1,8 @@
+2.3.1
+
+  * Use full path to game binary in launchers, to avoid issues when using
+    non-default install path
+
 2.3.0
 
   * Improve handling of MojoSetup extraction with unzip ending with an error

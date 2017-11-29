@@ -336,7 +336,7 @@ write_desktop() {
 		Type=Application
 		Name=$app_name
 		Icon=$app_id
-		Exec=$app_id
+		Exec=${PATH_BIN}${app_id}
 		Categories=$app_cat
 		EOF
 	done
