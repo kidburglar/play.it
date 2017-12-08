@@ -29,47 +29,36 @@ set -o errexit
 ###
 
 ###
-# Anno 1503
+# Renowned Explorers: More To Explore
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.1
+script_version=20171207.2
 
 # Set game-specific variables
 
-GAME_ID='anno-1503'
-GAME_NAME='Anno 1503'
+GAME_ID='renowned-explorers-international-society'
+GAME_NAME='Renowned Explorers: More To Explore'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='setup_anno_1503_2.0.0.5.exe'
-ARCHIVE_GOG_MD5='a7b6aeb2c5f96e2fab12d1ef12f3b4af'
-ARCHIVE_GOG_VERSION='3.0.43-gog2.0.0.5'
-ARCHIVE_GOG_SIZE='1520000'
-ARCHIVE_GOG_TYPE='innosetup'
+ARCHIVE_GOG='renowned_explorers_more_to_explore_dlc_en_466_15616.sh'
+ARCHIVE_GOG_MD5='c99ca440cb312b90052939db49aeef03'
+ARCHIVE_GOG_SIZE='69000'
+ARCHIVE_GOG_VERSION='466-gog15616'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='./*.pdf'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./*.exe ./*.dll'
+ARCHIVE_GAME_PATH='data/noarch/game'
+ARCHIVE_GAME_FILES='./data'
 
-ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./*.dat ./data ./help ./music ./profiles ./samples ./scenes ./speech ./textures ./toolgfx ./videos'
+PACKAGES_LIST='PKG_MAIN'
 
-APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='1503startup.exe'
-APP_MAIN_ICON='1503startup.exe'
-APP_MAIN_ICON_RES='32'
-
-PACKAGES_LIST='PKG_DATA PKG_BIN'
-
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID wine"
+PKG_MAIN_ID='renowned-explorers-more-to-explore'
+PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
@@ -92,22 +81,11 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
-
-PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
+organize_data 'DOC'  "$PATH_DOC"
+organize_data 'GAME' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
-
-# Write launchers
-
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
 
 # Build package
 

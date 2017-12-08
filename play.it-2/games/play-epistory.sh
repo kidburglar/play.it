@@ -29,47 +29,57 @@ set -o errexit
 ###
 
 ###
-# Anno 1503
+# Epistory - Typing Chronicles
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.1
+script_version=20171207.1
 
 # Set game-specific variables
 
-GAME_ID='anno-1503'
-GAME_NAME='Anno 1503'
+GAME_ID='epistory-typing-chronicles'
+GAME_NAME='Epistory - Typing Chronicles'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='setup_anno_1503_2.0.0.5.exe'
-ARCHIVE_GOG_MD5='a7b6aeb2c5f96e2fab12d1ef12f3b4af'
-ARCHIVE_GOG_VERSION='3.0.43-gog2.0.0.5'
-ARCHIVE_GOG_SIZE='1520000'
-ARCHIVE_GOG_TYPE='innosetup'
+ARCHIVE_GOG='gog_epistory_typing_chronicles_2.2.0.3.sh'
+ARCHIVE_GOG_MD5='8db1f835a9189099e57c174ba2353f53'
+ARCHIVE_GOG_SIZE='1300000'
+ARCHIVE_GOG_VERSION='1.3.5-gog2.2.0.3'
 
-ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='./*.pdf'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./*.exe ./*.dll'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
 
-ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./*.dat ./data ./help ./music ./profiles ./samples ./scenes ./speech ./textures ./toolgfx ./videos'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 
-APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='1503startup.exe'
-APP_MAIN_ICON='1503startup.exe'
-APP_MAIN_ICON_RES='32'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+DATA_DIRS='./logs'
+
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE_BIN32='./Epistory.x86'
+APP_MAIN_EXE_BIN64='./Epistory.x86_64'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
+
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID wine"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor libxrandr"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -92,34 +102,37 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
-
-PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
-write_metadata
+postinst_icons_linking 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
 
-rm --recursive "$PLAYIT_WORKDIR"
+rm --recursive "${PLAYIT_WORKDIR}"
 
 # Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0
