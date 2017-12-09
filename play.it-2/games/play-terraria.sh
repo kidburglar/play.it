@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.4
+script_version=20171209.3
 
 # Set game-specific variables
 
@@ -80,7 +80,9 @@ APP_SERVER_NAME="$GAME_NAME Server"
 APP_SERVER_TYPE='native'
 APP_SERVER_EXE_BIN32='TerrariaServer.bin.x86'
 APP_SERVER_EXE_BIN64='TerrariaServer.bin.x86_64'
-
+APP_SERVER_ICONS_LIST='APP_MAIN_ICON'
+APP_SERVER_ICON='Terraria.png'
+APP_SERVER_ICON_RES='512'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -132,6 +134,7 @@ done
 # Build package
 
 postinst_icons_linking 'APP_MAIN'
+postinst_icons_linking 'APP_SERVER'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
