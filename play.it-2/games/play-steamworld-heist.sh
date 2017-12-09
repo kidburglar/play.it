@@ -29,65 +29,48 @@ set -o errexit
 ###
 
 ###
-# Brütal Legend
+# Steamworld Heist
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.2
+script_version=20171208.3
 
 # Set game-specific variables
 
-GAME_ID='brutal-legend'
-GAME_NAME='Brütal Legend'
+GAME_ID='steamworld-heist'
+GAME_NAME='Steamworld Heist'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_brutal_legend_2.0.0.3.sh'
-ARCHIVE_GOG_MD5='f5927fb8b3959c52e2117584475ffe49'
-ARCHIVE_GOG_SIZE='8800000'
-ARCHIVE_GOG_TYPE='mojosetup_unzip'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'
+ARCHIVE_HUMBLE='SteamWorldHeist.tar.gz'
+ARCHIVE_HUMBLE_MD5='79a499459c09d7881efeb95be7abc559'
+ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_SIZE='200000'
 
-ARCHIVE_HUMBLE='BrutalLegend-Linux-2013-06-15-setup.bin'
-ARCHIVE_HUMBLE_MD5='cbda6ae12aafe20a76f4d45367430d32'
-ARCHIVE_HUMBLE_SIZE='8800000'
-ARCHIVE_HUMBLE_TYPE='mojosetup_unzip'
-ARCHIVE_HUMBLE_VERSION='1.0-humble130616'
+ARCHIVE_DOC_PATH='SteamWorldHeist'
+ARCHIVE_DOC_FILES='./*.txt ./Licenses'
 
-ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='SteamWorldHeist'
+ARCHIVE_GAME_BIN_FILES='./Heist'
 
-ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN_PATH_HUMBLE='data'
-ARCHIVE_GAME_BIN_FILES='./Buddha.bin.x86 ./lib ./DFCONFIG'
-
-ARCHIVE_GAME_AUDIO_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_AUDIO_PATH_HUMBLE='data'
-ARCHIVE_GAME_AUDIO_FILES='./Win'
-
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='data'
-ARCHIVE_GAME_DATA_FILES='./Buddha.png ./Data ./Linux ./OGL'
-
-DATA_FILES='./DFCONFIG'
+ARCHIVE_GAME_DATA_PATH='SteamWorldHeist'
+ARCHIVE_GAME_DATA_FILES='./Bundle ./icon.png ./icon.bmp'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='Buddha.bin.x86'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Buddha.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_EXE='Heist'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON APP_MAIN_ICON_BMP'
+APP_MAIN_ICON='icon.png'
+APP_MAIN_ICON_BMP='icon.bmp'
+APP_MAIN_ICON_RES='48'
 
-PACKAGES_LIST='PKG_AUDIO PKG_DATA PKG_BIN'
-
-PKG_AUDIO_ID="${GAME_ID}-audio"
-PKG_AUDIO_DESCRIPTION='audio'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_AUDIO_ID $PKG_DATA_ID glibc libstdc++ glu sdl2"
+PKG_BIN_DEPS="$PKG_DATA_ID libstdc++ glx"
 
 # Load common functions
 
@@ -110,9 +93,10 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
@@ -126,15 +110,14 @@ write_launcher 'APP_MAIN'
 # Build package
 
 postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_AUDIO' 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
 
 rm --recursive "$PLAYIT_WORKDIR"
 
-#print instructions
+# Print instructions
 
 print_instructions
 

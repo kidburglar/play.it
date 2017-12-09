@@ -29,65 +29,69 @@ set -o errexit
 ###
 
 ###
-# Brütal Legend
+# Terraria
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.2
+script_version=20171208.4
 
 # Set game-specific variables
 
-GAME_ID='brutal-legend'
-GAME_NAME='Brütal Legend'
+GAME_ID='terraria'
+GAME_NAME='Terraria'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_brutal_legend_2.0.0.3.sh'
-ARCHIVE_GOG_MD5='f5927fb8b3959c52e2117584475ffe49'
-ARCHIVE_GOG_SIZE='8800000'
-ARCHIVE_GOG_TYPE='mojosetup_unzip'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'
+ARCHIVE_GOG='terraria_en_1_3_5_3_14602.sh'
+ARCHIVE_GOG_MD5='c99fdc0ae15dbff1e8147b550db4e31a'
+ARCHIVE_GOG_SIZE='490000'
+ARCHIVE_GOG_VERSION='1.3.5.3-gog14602'
 
-ARCHIVE_HUMBLE='BrutalLegend-Linux-2013-06-15-setup.bin'
-ARCHIVE_HUMBLE_MD5='cbda6ae12aafe20a76f4d45367430d32'
-ARCHIVE_HUMBLE_SIZE='8800000'
-ARCHIVE_HUMBLE_TYPE='mojosetup_unzip'
-ARCHIVE_HUMBLE_VERSION='1.0-humble130616'
+ARCHIVE_GOG_OLD='gog_terraria_2.17.0.21.sh'
+ARCHIVE_GOG_OLD_MD5='90ec196ec38a7f7a5002f5a8109493cc'
+ARCHIVE_GOG_OLD_SIZE='487864'
+ARCHIVE_GOG_OLD_VERSION='1.3.5.3-gog2.17.0.21'
 
-ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
+ARCHIVE_DOC1_PATH='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN_PATH_HUMBLE='data'
-ARCHIVE_GAME_BIN_FILES='./Buddha.bin.x86 ./lib ./DFCONFIG'
+ARCHIVE_DOC2_PATH='data/noarch/game'
+ARCHIVE_DOC2_FILES='./changelog.txt'
 
-ARCHIVE_GAME_AUDIO_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_AUDIO_PATH_HUMBLE='data'
-ARCHIVE_GAME_AUDIO_FILES='./Win'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./Terraria.bin.x86 ./TerrariaServer.bin.x86 ./lib'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='data'
-ARCHIVE_GAME_DATA_FILES='./Buddha.png ./Data ./Linux ./OGL'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./Terraria.bin.x86_64 ./TerrariaServer.bin.x86_64 ./lib64'
 
-DATA_FILES='./DFCONFIG'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./Content ./*.dll ./System.Windows.Forms.dll.config ./FNA.dll.config ./Terraria ./Terraria.png ./TerrariaServer ./*.exe ./monoconfig ./monomachineconfig ./open-folder'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='Buddha.bin.x86'
+APP_MAIN_EXE_BIN32='Terraria.bin.x86'
+APP_MAIN_EXE_BIN64='Terraria.bin.x86_64'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Buddha.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_ICON='Terraria.png'
+APP_MAIN_ICON_RES='512'
 
-PACKAGES_LIST='PKG_AUDIO PKG_DATA PKG_BIN'
+APP_SERVER_ID="$GAME_ID-server"
+APP_SERVER_NAME="$GAME_NAME Server"
+APP_SERVER_TYPE='native'
+APP_SERVER_EXE_BIN32='TerrariaServer.bin.x86'
+APP_SERVER_EXE_BIN64='TerrariaServer.bin.x86_64'
 
-PKG_AUDIO_ID="${GAME_ID}-audio"
-PKG_AUDIO_DESCRIPTION='audio'
+
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_AUDIO_ID $PKG_DATA_ID glibc libstdc++ glu sdl2"
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID glu xcursor libxrandr"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -95,8 +99,8 @@ target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -112,7 +116,8 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
@@ -120,14 +125,15 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN' 'APP_SERVER'
+done
 
 # Build package
 
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_AUDIO' 'PKG_BIN'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
@@ -136,6 +142,10 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 #print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0
