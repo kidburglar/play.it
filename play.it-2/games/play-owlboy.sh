@@ -34,9 +34,11 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171209.3
+script_version=20171209.4
 
 # Set game-specific variables
+
+SCRIPT_DEPS='find dos2unix'
 
 GAME_ID='owlboy'
 GAME_NAME='Owlboy'
@@ -120,6 +122,10 @@ mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
 mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Convert .ini files to Unix-style line separators
+
+find "${PKG_DATA_PATH}${PATH_GAME}" -type f -name '*.ini' -exec dos2unix '{}' + > /dev/null 2>&1
 
 # Write launchers
 
