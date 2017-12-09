@@ -29,17 +29,17 @@ set -o errexit
 ###
 
 ###
-# The Last Tinker
+# The Last Tinker: City of Colors
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171206.1
+script_version=20171208.1
 
 # Set game-specific variables
 
 GAME_ID='the-last-tinker'
-GAME_NAME='The Last Tinker'
+GAME_NAME='The Last Tinker: City of Colors'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
