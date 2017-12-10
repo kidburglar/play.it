@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20171210.1
 
 # Set game-specific variables
 
@@ -74,7 +74,6 @@ ARCHIVE_GAME2_DATA_PATH_GOG_EN="data/noarch/prefix/drive_c/gog games/baldur's ga
 ARCHIVE_GAME2_DATA_PATH_GOG_FR="data/noarch/prefix/drive_c/gog games/baldur's gate 2 (french)/data"
 ARCHIVE_GAME2_DATA_FILES='./data'
 
-CACHE_DIRS='./cache ./temp'
 CONFIG_FILES='./*.ini'
 DATA_DIRS='./characters ./mpsave ./override ./portraits ./save ./scripts'
 DATA_FILES='./*.err ./*.log ./*.tlk ./chitin.key'

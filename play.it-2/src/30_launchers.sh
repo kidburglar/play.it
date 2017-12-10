@@ -1,6 +1,6 @@
 # alias calling write_bin() and write_desktop()
 # USAGE: write_launcher $app[…]
-# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CACHE_DIRS CACHE_FILES CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG PKG_PATH
+# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG PKG_PATH
 # CALLS: write_bin write_dekstop
 write_launcher() {
 	write_bin $@
@@ -9,7 +9,7 @@ write_launcher() {
 
 # write launcher script
 # USAGE: write_bin $app[…]
-# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CACHE_DIRS CACHE_FILES CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
 # CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
@@ -110,9 +110,6 @@ write_bin() {
 			GAME_ID='$GAME_ID'
 			PATH_GAME='$PATH_GAME'
 
-			CACHE_DIRS='$CACHE_DIRS'
-			CACHE_FILES='$CACHE_FILES'
-
 			CONFIG_DIRS='$CONFIG_DIRS'
 			CONFIG_FILES='$CONFIG_FILES'
 
@@ -129,11 +126,9 @@ write_bin() {
 
 			# Set prefix-specific variables
 
-			[ "$XDG_CACHE_HOME" ] || XDG_CACHE_HOME="$HOME/.cache"
 			[ "$XDG_CONFIG_HOME" ] || XDG_CONFIG_HOME="$HOME/.config"
 			[ "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
 
-			PATH_CACHE="$XDG_CACHE_HOME/$PREFIX_ID"
 			PATH_CONFIG="$XDG_CONFIG_HOME/$PREFIX_ID"
 			PATH_DATA="$XDG_DATA_HOME/games/$PREFIX_ID"
 			EOF
@@ -219,11 +214,6 @@ write_bin() {
 
 			# Build user-writable directories
 
-			if [ ! -e "$PATH_CACHE" ]; then
-			  mkdir --parents "$PATH_CACHE"
-			  init_userdir_files "$PATH_CACHE" "$CACHE_FILES"
-			fi
-
 			if [ ! -e "$PATH_CONFIG" ]; then
 			  mkdir --parents "$PATH_CONFIG"
 			  init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
@@ -247,10 +237,8 @@ write_bin() {
 			  mkdir --parents "$PATH_PREFIX"
 			  cp --force --recursive --symbolic-link --update "$PATH_GAME"/* "$PATH_PREFIX"
 			fi
-			init_prefix_files "$PATH_CACHE"
 			init_prefix_files "$PATH_CONFIG"
 			init_prefix_files "$PATH_DATA"
-			init_prefix_dirs "$PATH_CACHE" "$CACHE_DIRS"
 			init_prefix_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
 			init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"
 
@@ -277,7 +265,6 @@ write_bin() {
 
 		if [ $app_type != 'scummvm' ] && [ $app_type != 'native_no-prefix' ]; then
 			cat >> "$file" <<- 'EOF'
-			clean_userdir "$PATH_CACHE" "$CACHE_FILES"
 			clean_userdir "$PATH_CONFIG" "$CONFIG_FILES"
 			clean_userdir "$PATH_DATA" "$DATA_FILES"
 

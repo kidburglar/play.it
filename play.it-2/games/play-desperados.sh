@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.2
+script_version=20171210.1
 
 # Set game-specific variables
 
@@ -60,7 +60,6 @@ ARCHIVE_GAME_BIN_FILES='./*.dll ./*.exe'
 ARCHIVE_GAME_DATA_PATH='app/game'
 ARCHIVE_GAME_DATA_FILES='./data'
 
-CACHE_FILES='./*.tmp'
 CONFIG_DIRS='./data/configuration'
 DATA_DIRS='./data/savegame ./data/levels/briefing/Restart'
 

@@ -3,6 +3,8 @@
   * Use full path to game binary in launchers, to avoid issues when using
     non-default install path
 
+  * Do not store temporary files outside of prefix
+
 2.3.0
 
   * Improve handling of MojoSetup extraction with unzip ending with an error
