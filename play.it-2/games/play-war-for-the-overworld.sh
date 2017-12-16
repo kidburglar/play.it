@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171216.1
+script_version=20171216.3
 
 # Set game-specific variables
 
@@ -67,6 +67,10 @@ ARCHIVE_GOG_OLDEST_SIZE='2800000'
 ARCHIVE_GOG_OLDEST_VERSION='1.6.4-gog15447'
 ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
 
+ARCHIVE_GOG_UNDERLORD='gog_war_for_the_overworld_underlord_edition_upgrade_dlc_2.0.0.1.sh'
+ARCHIVE_GOG_UNDERLORD_MD5='635912eed200d45d8907ab1fb4cc53a4'
+ARCHIVE_GOG_UNDERLORD_TYPE='mojosetup'
+
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
 ARCHIVE_HUMBLE_SIZE='2500000'
@@ -85,7 +89,7 @@ ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets*'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources'
+ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources ./*.info'
 
 DATA_DIRS='./logs'
 DATA_DIRS_GOG='./WFTOGame_Data/GameData'
@@ -128,9 +132,19 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Load extra archives (DLC)
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_UNDERLORD' 'ARCHIVE_GOG_UNDERLORD'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+
+if [ "$ARCHIVE_UNDERLORD" ]; then
+	touch "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_DATA_PATH_GOG/goggame-1906832216.info"
+fi
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
