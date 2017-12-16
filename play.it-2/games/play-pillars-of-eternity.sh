@@ -34,26 +34,36 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20171216.2
 
 # Set game-specific variables
 
 GAME_ID='pillars-of-eternity'
 GAME_NAME='Pillars of Eternity'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='gog_pillars_of_eternity_2.16.0.20.sh'
-ARCHIVE_GOG_MD5='0d21cf95bda070bdbfbe3e79f8fc32d6'
+ARCHIVE_GOG='pillars_of_eternity_en_3_07_16405.sh'
+ARCHIVE_GOG_MD5='e4271b5e72f1ecc9fbbc4d90937ede05'
 ARCHIVE_GOG_SIZE='15000000'
-ARCHIVE_GOG_VERSION='3.06.1254-gog2.16.0.20'
+ARCHIVE_GOG_VERSION='3.7.0.1284-gog16405'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_GOG_OLD='gog_pillars_of_eternity_2.15.0.19.sh'
-ARCHIVE_GOG_OLD_MD5='2000052541abb1ef8a644049734e8526'
+ARCHIVE_GOG_OLD='gog_pillars_of_eternity_2.16.0.20.sh'
+ARCHIVE_GOG_OLD_MD5='0d21cf95bda070bdbfbe3e79f8fc32d6'
 ARCHIVE_GOG_OLD_SIZE='15000000'
-ARCHIVE_GOG_OLD_VERSION='3.05.1186-gog2.15.0.19'
+ARCHIVE_GOG_OLD_VERSION='3.06.1254-gog2.16.0.20'
 ARCHIVE_GOG_OLD_TYPE='mojosetup_unzip'
+
+ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_2.15.0.19.sh'
+ARCHIVE_GOG_OLDER_MD5='2000052541abb1ef8a644049734e8526'
+ARCHIVE_GOG_OLDER_SIZE='15000000'
+ARCHIVE_GOG_OLDER_VERSION='3.05.1186-gog2.15.0.19'
+ARCHIVE_GOG_OLDER_TYPE='mojosetup_unzip'
+
+ARCHIVE_GOG_DEADFIRE='pillars_of_eternity_deadfire_pack_dlc_en_3_07_16380.sh'
+ARCHIVE_GOG_DEADFIRE_MD5='2fc0dc21648953be1c571e28b1e3d002'
+ARCHIVE_GOG_DEADFIRE_TYPE='mojosetup'
 
 ARCHIVE_GOG_DLC1='gog_pillars_of_eternity_kickstarter_item_dlc_2.0.0.2.sh'
 ARCHIVE_GOG_DLC1_MD5='b4c29ae17c87956471f2d76d8931a4e5'
@@ -64,40 +74,40 @@ ARCHIVE_GOG_DLC2_MD5='3653fc2a98ef578335f89b607f0b7968'
 ARCHIVE_GOG_DLC3='gog_pillars_of_eternity_preorder_item_and_pet_dlc_2.0.0.2.sh'
 ARCHIVE_GOG_DLC3_MD5='b86ad866acb62937d2127407e4beab19'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./PillarsOfEternity ./PillarsOfEternity_Data/Mono ./PillarsOfEternity_Data/Plugins'
 
-ARCHIVE_GAME_AREA_PATH='data/noarch/game'
-ARCHIVE_GAME_AREA_FILES='./PillarsOfEternity_Data/assetbundles/st_ar_*'
+ARCHIVE_GAME_AREAS_PATH='data/noarch/game'
+ARCHIVE_GAME_AREAS_FILES='./PillarsOfEternity_Data/assetbundles/st_ar_*'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./PillarsOfEternity_Data ./PillarsOfEternity.png'
+ARCHIVE_GAME_DATA_FILES='./PillarsOfEternity.png ./PillarsOfEternity_Data/assetbundles/art ./PillarsOfEternity_Data/assetbundles/override ./PillarsOfEternity_Data/assetbundles/prefabs ./PillarsOfEternity_Data/assetbundles/st_1501_yenwood.assetbundle ./PillarsOfEternity_Data/assetbundles/st_dfb_firstfires_ruins.assetbundle ./PillarsOfEternity_Data/assetbundles/st_pro* ./PillarsOfEternity_Data/assetbundles/st_px4_cave01.assetbundle ./PillarsOfEternity_Data/assetbundles/*.unity3d ./PillarsOfEternity_Data/assetbundles/vo ./PillarsOfEternity_Data/level* ./PillarsOfEternity_Data/*.assets ./PillarsOfEternity_Data/*.assets.resS ./PillarsOfEternity_Data/data ./PillarsOfEternity_Data/data_expansion4 ./PillarsOfEternity_Data/mainData ./PillarsOfEternity_Data/Managed ./PillarsOfEternity_Data/PlayerConnectionConfigFile ./PillarsOfEternity_Data/Resources ./PillarsOfEternity_Data/ScreenSelector.png ./PillarsOfEternity_Data/StreamingAssets'
 
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='PillarsOfEternity'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON1 APP_MAIN_ICON2'
-APP_MAIN_ICON1='./PillarsOfEternity.png'
-APP_MAIN_ICON1_RES='512'
-APP_MAIN_ICON2='./PillarsOfEternity_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON2_RES='128'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICONS_LIST_OLD="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_OLD"
+APP_MAIN_ICON='./PillarsOfEternity_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON_OLD='./PillarsOfEternity.png'
+APP_MAIN_ICON_OLD_RES='512'
 
-PACKAGES_LIST='PKG_AREA PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_AREAS PKG_DATA PKG_BIN'
 
-PKG_AREA_ID="${GAME_ID}-areas"
-PKG_AREA_DESCRIPTION='area'
+PKG_AREAS_ID="${GAME_ID}-areas"
+PKG_AREAS_DESCRIPTION='areas'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS_DEB="$PKG_AREA_ID, $PKG_DATA_ID, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_AREA_ID $PKG_DATA_ID glu libxcursor libxrandr"
+PKG_BIN_DEPS="$PKG_AREA_ID $PKG_DATA_ID glu xcursor libxrandr"
 
 # Load common functions
 
@@ -120,6 +130,7 @@ fi
 # Load extra archives (DLC)
 
 ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_DEADFIRE' 'ARCHIVE_GOG_DEADFIRE'
 set_archive 'ARCHIVE_DLC1' 'ARCHIVE_GOG_DLC1'
 set_archive 'ARCHIVE_DLC2' 'ARCHIVE_GOG_DLC2'
 set_archive 'ARCHIVE_DLC3' 'ARCHIVE_GOG_DLC3'
@@ -143,15 +154,14 @@ extract_data_from "$SOURCE_ARCHIVE"
 	fi
 )
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
+if [ "$ARCHIVE_DEADFIRE" ]; then
+	touch "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_DATA_PATH/PillarsOfEternity_Data/assetbundles/px4.unity3d"
+fi
 
-PKG='PKG_AREA'
-organize_data 'GAME_AREA' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -162,9 +172,14 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
+case "$ARCHIVE" in
+	('ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER')
+		APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST_OLD"
+	;;
+esac
 postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_BIN'
-write_metadata 'PKG_AREA' 'PKG_DATA'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_AREAS' 'PKG_BIN'
 build_pkg
 
 # Clean up

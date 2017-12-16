@@ -34,23 +34,31 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20171209.4
 
 # Set game-specific variables
+
+SCRIPT_DEPS='find dos2unix'
 
 GAME_ID='owlboy'
 GAME_NAME='Owlboy'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
-ARCHIVE_HUMBLE='owlboy-05232017-bin'
-ARCHIVE_HUMBLE_MD5='f35fba69fadffbf498ca8a38dbceeac1'
+ARCHIVE_HUMBLE='owlboy-11022017-bin'
+ARCHIVE_HUMBLE_MD5='d3a1e4753a604431c58eb1ea26c35543'
 ARCHIVE_HUMBLE_SIZE='570000'
-ARCHIVE_HUMBLE_VERSION='1.2.6382.15868-humble1'
+ARCHIVE_HUMBLE_VERSION='1.3.6515.19883-humble171102'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data'
-ARCHIVE_DOC_FILES='./Linux.README'
+ARCHIVE_HUMBLE_OLD='owlboy-05232017-bin'
+ARCHIVE_HUMBLE_OLD_MD5='f35fba69fadffbf498ca8a38dbceeac1'
+ARCHIVE_HUMBLE_OLD_SIZE='570000'
+ARCHIVE_HUMBLE_OLD_VERSION='1.2.6382.15868-humble1'
+ARCHIVE_HUMBLE_OLD_TYPE='mojosetup'
+
+ARCHIVE_DOC_DATA_PATH='data'
+ARCHIVE_DOC_DATA_FILES='./Linux.README'
 
 ARCHIVE_GAME_BIN32_PATH='data'
 ARCHIVE_GAME_BIN32_FILES='./Owlboy.bin.x86 ./lib'
@@ -61,7 +69,7 @@ ARCHIVE_GAME_BIN64_FILES='./Owlboy.bin.x86_64 ./lib64'
 ARCHIVE_GAME_DATA_PATH='data'
 ARCHIVE_GAME_DATA_FILES='./content ./*.dll ./*.config ./monoconfig ./monomachineconfig ./Owlboy.bmp ./Owlboy.exe'
 
-CONFIG_FILES='content/localizations/*/speechbubbleconfig.ini'
+CONFIG_FILES='./content/localizations/*/speechbubbleconfig.ini ./content/fonts/*.ini'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Owlboy.bin.x86'
@@ -75,16 +83,14 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -104,15 +110,10 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'GAME_DOC'  "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 res="$APP_MAIN_ICON_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
@@ -121,6 +122,10 @@ mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
 mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Convert .ini files to Unix-style line separators
+
+find "${PKG_DATA_PATH}${PATH_GAME}" -type f -name '*.ini' -exec dos2unix '{}' + > /dev/null 2>&1
 
 # Write launchers
 
@@ -135,7 +140,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
