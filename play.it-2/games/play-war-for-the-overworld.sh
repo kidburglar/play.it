@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171209.2
+script_version=20171216.1
 
 # Set game-specific variables
 
@@ -87,7 +87,9 @@ ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources'
 
-DATA_DIRS='./logs ./*_Data/GameData'
+DATA_DIRS='./logs'
+DATA_DIRS_GOG='./WFTOGame_Data/GameData'
+DATA_DIRS_HUMBLE='./WFTO_Data/GameData'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_GOG='WFTOGame.x86_64'
@@ -148,11 +150,13 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 # Write launchers
 
 case "$ARCHIVE" in
-	('ARCHIVE_GOG'|'ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER'|'ARCHIVE_GOG_OLDEST')
+	('ARCHIVE_GOG'*)
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
+		DATA_DIRS="$DATA_DIRS $DATA_DIRS_GOG"
 	;;
 	('ARCHIVE_HUMBLE')
 		APP_MAIN_EXE="$APP_MAIN_EXE_HUMBLE"
+		DATA_DIRS="$DATA_DIRS $DATA_DIRS_HUMBLE"
 	;;
 esac
 
