@@ -34,25 +34,30 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20171209.1
 
 # Set game-specific variables
 
-# Copy GAME_ID from play-pillars-of-eternity.sh
 GAME_ID='pillars-of-eternity'
 GAME_NAME='Pillars of Eternity: The White March Part I'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='gog_pillars_of_eternity_white_march_part_1_dlc_2.10.0.12.sh'
-ARCHIVE_GOG_MD5='8fafcb549fffd2de24f381a85e859622'
+ARCHIVE_GOG='pillars_of_eternity_white_march_part_1_dlc_en_3_07_16598.sh'
+ARCHIVE_GOG_MD5='054b6af430da1ed2635b9c6b4ed56866'
 ARCHIVE_GOG_SIZE='5500000'
-ARCHIVE_GOG_VERSION='3.06.1254-gog2.10.0.12'
+ARCHIVE_GOG_VERSION='3.7.0.1284-gog16598'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_pillars_of_eternity_white_march_part_1_dlc_2.9.0.11.sh'
-ARCHIVE_GOG_OLD_MD5='98424615626c82ed723860d421f187b6'
+ARCHIVE_GOG_OLD='gog_pillars_of_eternity_white_march_part_1_dlc_2.10.0.12.sh'
+ARCHIVE_GOG_OLD_MD5='8fafcb549fffd2de24f381a85e859622'
 ARCHIVE_GOG_OLD_SIZE='5500000'
-ARCHIVE_GOG_OLD_VERSION='3.05.1186-gog2.9.0.11'
+ARCHIVE_GOG_OLD_VERSION='3.06.1254-gog2.10.0.12'
+
+ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_white_march_part_1_dlc_2.9.0.11.sh'
+ARCHIVE_GOG_OLDER_MD5='98424615626c82ed723860d421f187b6'
+ARCHIVE_GOG_OLDER_SIZE='5500000'
+ARCHIVE_GOG_OLDER_VERSION='3.05.1186-gog2.9.0.11'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -63,17 +68,16 @@ ARCHIVE_GAME_FILES='./*'
 PACKAGES_LIST='PKG_MAIN'
 
 PKG_MAIN_ID="${GAME_ID}-px1"
-PKG_MAIN_DEPS_DEB="$GAME_ID"
-PKG_MAIN_DEPS_ARCH="$GAME_ID"
+PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.3'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
