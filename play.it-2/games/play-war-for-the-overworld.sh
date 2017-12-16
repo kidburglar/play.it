@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171216.3
+script_version=20171216.4
 
 # Set game-specific variables
 
@@ -94,6 +94,7 @@ ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource
 DATA_DIRS='./logs'
 DATA_DIRS_GOG='./WFTOGame_Data/GameData'
 DATA_DIRS_HUMBLE='./WFTO_Data/GameData'
+DATA_FILES='./WFTOGame_Data/uiresources/wftoUI/menu/vids/MPDTUT.webm'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_GOG='WFTOGame.x86_64'
