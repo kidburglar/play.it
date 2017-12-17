@@ -48,7 +48,6 @@ write_bin_run_native() {
 
 	cat >> "$file" <<- 'EOF'
 	"./$APP_EXE" $APP_OPTIONS $@
-
 	EOF
 }
 
@@ -70,7 +69,6 @@ write_bin_run_native_noprefix() {
 
 	cat >> "$file" <<- 'EOF'
 	"./$APP_EXE" $APP_OPTIONS $@
-
 	EOF
 }
 

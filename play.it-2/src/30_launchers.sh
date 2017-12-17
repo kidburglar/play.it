@@ -145,17 +145,6 @@ write_bin() {
 			cat >> "$file" <<- 'EOF'
 			# Set ./play.it functions
 
-			clean_userdir() {
-			  cd "$PATH_PREFIX"
-			  for file in $2; do
-			    if [ -f "$file" ] && [ ! -f "$1/$file" ]; then
-			      cp --parents "$file" "$1"
-			      rm "$file"
-			      ln --symbolic "$(readlink -e "$1/$file")" "$file"
-			    fi
-			  done
-			}
-
 			init_prefix_dirs() {
 			  (
 			    cd "$1"
@@ -263,14 +252,10 @@ write_bin() {
 			;;
 		esac
 
-		if [ $app_type != 'scummvm' ] && [ $app_type != 'native_no-prefix' ]; then
-			cat >> "$file" <<- 'EOF'
-			clean_userdir "$PATH_CONFIG" "$CONFIG_FILES"
-			clean_userdir "$PATH_DATA" "$DATA_FILES"
+		cat >> "$file" <<- 'EOF'
 
-			exit 0
-			EOF
-		fi
+		exit 0
+		EOF
 
 		sed -i 's/  /\t/g' "$file"
 		chmod 755 "$file"

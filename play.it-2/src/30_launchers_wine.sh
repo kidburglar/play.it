@@ -71,7 +71,6 @@ write_bin_run_wine() {
 	$app_prerun
 	wine "\$APP_EXE" \$APP_OPTIONS \$@
 	$app_postrun
-
 	EOF
 }
 

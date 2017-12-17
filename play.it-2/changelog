@@ -5,6 +5,8 @@
 
   * Do not store temporary files outside of prefix
 
+  * Drop post-run user directories clean-up, redundant with another function
+
 2.3.0
 
   * Improve handling of MojoSetup extraction with unzip ending with an error
