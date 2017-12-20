@@ -1,6 +1,6 @@
 # write winecfg launcher script
 # USAGE: write_bin_winecfg
-# NEEDED VARS: APP_POSTRUN APP_PRERUN CACHE_DIRS CACHE_FILES CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_POSTRUN APP_PRERUN CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
 # CALLS: write_bin
 # CALLED BY: write_bin
 write_bin_winecfg() {
@@ -71,7 +71,6 @@ write_bin_run_wine() {
 	$app_prerun
 	wine "\$APP_EXE" \$APP_OPTIONS \$@
 	$app_postrun
-
 	EOF
 }
 

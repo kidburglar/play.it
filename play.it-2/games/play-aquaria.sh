@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20171210.1
 
 # Set game-specific variables
 
@@ -65,7 +65,6 @@ ARCHIVE_GAME_BIN_FILES='./aquaria ./config ./*.xml'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./aquaria.png ./data ./gfx ./_mods ./mus ./scripts ./sfx ./vox'
 
-CACHE_DIRS='./maptemplates'
 CONFIG_FILES='./*.xml ./config/*'
 
 APP_MAIN_TYPE='native'

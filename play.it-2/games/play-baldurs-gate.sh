@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170925.1
+script_version=20171210.1
 
 # Set game-specific variables
 
@@ -73,7 +73,6 @@ ARCHIVE_GAME_DATA_PATH_GOG_EN="data/noarch/prefix/drive_c/gog games/baldur's gat
 ARCHIVE_GAME_DATA_PATH_GOG_FR="data/noarch/prefix/drive_c/gog games/baldur's gate (french)"
 ARCHIVE_GAME_DATA_FILES='./*.key ./characters ./music ./scripts ./*save/*/*.bmp ./*save/*/*.gam ./*save/*/*.sav ./data/area000a.bif ./data/area000b.bif ./data/area000d.bif ./data/area000e.bif ./data/area000f.bif ./data/area000g.bif ./data/area000h.bif ./data/area01* ./data/area02* ./data/area03* ./data/area04* ./data/area05* ./data/area06* ./data/area07* ./data/area08* ./data/area09* ./data/area1* ./data/area2* ./data/area3* ./data/area4* ./data/area5* ./data/areas.bif ./data/armisc.bif ./data/chaanim.bif ./data/creanim.bif ./data/creature.bif ./data/default.bif ./data/dialog.bif ./data/effects.bif ./data/exarmaps.bif ./data/expareas.bif ./data/gui.bif ./data/items.bif ./data/mpcreanm.bif ./data/mpgui.bif ./data/objanim.bif ./data/rndencnt.bif ./data/scripts.bif ./data/sfxsound.bif ./data/spells.bif ./movies/moviecd5.bif ./movies/moviecd6.bif ./movies/movies.bif ./override/*.2da ./override/*.are ./override/*.bam ./override/*.bcs ./override/*.bmp ./override/*.cre ./override/*.dlg ./override/*.itm ./override/*.mos ./override/*.spl ./override/*.sto ./override/*.wed ./override/*.wmp ./sounds/*.txt'
 
-CACHE_DIRS='./cache ./temp'
 CONFIG_FILES='./*.ini'
 DATA_DIRS='./characters ./mpsave ./override ./portraits ./save ./scripts'
 DATA_FILES='./*.tlk ./chitin.key'

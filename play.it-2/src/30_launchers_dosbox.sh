@@ -43,7 +43,6 @@ write_bin_run_dosbox() {
 
 	cat >> "$file" <<- 'EOF'
 	exit"
-
 	EOF
 }
 
