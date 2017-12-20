@@ -32,7 +32,7 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.3.1
+library_version=2.3.2
 library_revision=20171220.1
 
 # set package distribution-specific architecture
@@ -1538,7 +1538,7 @@ write_desktop() {
 		Type=Application
 		Name=$app_name
 		Icon=$app_id
-		Exec=${PATH_BIN}${app_id}
+		Exec=$PATH_BIN/$app_id
 		Categories=$app_cat
 		EOF
 	done
