@@ -34,36 +34,42 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171128.1
+script_version=20171226.1
 
 # Set game-specific variables
 
 GAME_ID='chaos-reborn'
 GAME_NAME='Chaos Reborn'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='chaos_reborn_en_1_131_14290.sh'
-ARCHIVE_GOG_MD5='fcfea11ad6a6cbdda2290c4f29bbeb2b'
+ARCHIVE_GOG='chaos_reborn_en_1_13_2_17223.sh'
+ARCHIVE_GOG_MD5='edb60d98710c87c0adea06f55be99567'
 ARCHIVE_GOG_SIZE='1700000'
 ARCHIVE_GOG_TYPE='mojosetup'
-ARCHIVE_GOG_VERSION='1.13.1-gog14290'
+ARCHIVE_GOG_VERSION='1.13.2-gog17223'
 
-ARCHIVE_GOG_OLD='gog_chaos_reborn_2.14.0.16.sh'
-ARCHIVE_GOG_OLD_MD5='97dbfc0a679a7fd104c744b6aa46db36'
+ARCHIVE_GOG_OLD='chaos_reborn_en_1_131_14290.sh'
+ARCHIVE_GOG_OLD_MD5='fcfea11ad6a6cbdda2290c4f29bbeb2b'
 ARCHIVE_GOG_OLD_SIZE='1700000'
-ARCHIVE_GOG_OLD_VERSION='1.13-gog2.14.0.16'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_GOG_OLD_VERSION='1.13.1-gog14290'
 
-ARCHIVE_GOG_OLDER='gog_chaos_reborn_2.13.0.15.sh'
-ARCHIVE_GOG_OLDER_MD5='a2abf12572eea8b43059a9bb8d5d3171'
+ARCHIVE_GOG_OLDER='gog_chaos_reborn_2.14.0.16.sh'
+ARCHIVE_GOG_OLDER_MD5='97dbfc0a679a7fd104c744b6aa46db36'
 ARCHIVE_GOG_OLDER_SIZE='1700000'
-ARCHIVE_GOG_OLDER_VERSION='1.12.2-gog2.13.0.15'
+ARCHIVE_GOG_OLDER_VERSION='1.13-gog2.14.0.16'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_GOG_OLDEST='gog_chaos_reborn_2.13.0.15.sh'
+ARCHIVE_GOG_OLDEST_MD5='a2abf12572eea8b43059a9bb8d5d3171'
+ARCHIVE_GOG_OLDEST_SIZE='1700000'
+ARCHIVE_GOG_OLDEST_VERSION='1.12.2-gog2.13.0.15'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./*.txt'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC1_DATA_FILES='./*'
+
+ARCHIVE_DOC2_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC2_DATA_FILES='./*.txt'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./*.x86 *_Data/*/x86'
@@ -93,18 +99,16 @@ APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-libxcursor"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs glu libxcursor"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -128,16 +132,11 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
