@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170610.1
+script_version=20171228.1
 
 # Set game-specific variables
 
@@ -84,12 +84,12 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu sdl2"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -113,11 +113,7 @@ organize_data 'GAME_BIN64' "$PATH_GAME"
 PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+get_icon_from_temp_dir 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 

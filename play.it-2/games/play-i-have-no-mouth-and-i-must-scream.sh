@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171028.1
+script_version=20171228.1
 
 # Set game-specific variables
 
@@ -79,7 +79,7 @@ PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -108,11 +108,7 @@ tolower "$PLAYIT_WORKDIR/gamedata"
 organize_data 'DOC1_MAIN' "$PATH_DOC"
 organize_data 'DOC2_MAIN' "$PATH_DOC"
 organize_data 'GAME_MAIN' "$PATH_GAME"
-
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "$PKG_MAIN_PATH/$PATH_ICON"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON" "$PKG_MAIN_PATH/$PATH_ICON/$GAME_ID.png"
+get_icon_from_temp_dir 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
