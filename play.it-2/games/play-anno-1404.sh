@@ -34,14 +34,14 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170928.1
+script_version=20171230.2
 
 # Set game-specific variables
 
 GAME_ID='anno-1404'
 GAME_NAME='Anno 1404'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='setup_anno_1404_gold_edition_2.01.5010_(13111).exe'
 ARCHIVE_GOG_MD5='b19333f57c1c15b788e29ff6751dac20'
@@ -54,13 +54,29 @@ ARCHIVE_GOG_PART2='setup_anno_1404_gold_edition_2.01.5010_(13111)-2.bin'
 ARCHIVE_GOG_PART2_MD5='2f71f5378b5f27a84a41cc481a482bd6'
 ARCHIVE_GOG_PART2_TYPE='innosetup'
 
+ARCHIVE_GOG_OLD='setup_anno_1404_2.0.0.2.exe'
+ARCHIVE_GOG_OLD_MD5='9c48c8159edaee14aaa6c7e7add60623'
+ARCHIVE_GOG_OLD_VERSION='2.01.5010-gog2.0.0.2'
+ARCHIVE_GOG_OLD_SIZE='6200000'
+ARCHIVE_GOG_OLD_TYPE='rar'
+ARCHIVE_GOG_OLD_GOGID='1440426004'
+ARCHIVE_GOG_OLD_PART1='setup_anno_1404_2.0.0.2-1.bin'
+ARCHIVE_GOG_OLD_PART1_MD5='b9ee29615dfcab8178608fecaa5d2e2b'
+ARCHIVE_GOG_OLD_PART1_TYPE='rar'
+ARCHIVE_GOG_OLD_PART2='setup_anno_1404_2.0.0.2-2.bin'
+ARCHIVE_GOG_OLD_PART2_MD5='eb49c917d6218b58e738dd781e9c6751'
+ARCHIVE_GOG_OLD_PART2_TYPE='rar'
+
 ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_PATH_GOG_OLD='game'
 ARCHIVE_DOC_DATA_FILES='./*.pdf'
 
 ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_PATH_GOG_OLD='game'
 ARCHIVE_GAME_BIN_FILES='./*.exe ./*.dll ./bin ./tools'
 
 ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_PATH_GOG_OLD='game'
 ARCHIVE_GAME_DATA_FILES='./addon ./data ./maindata ./resources'
 
 CONFIG_FILES='./*.ini'
@@ -116,16 +132,26 @@ fi
 
 # Check that all parts of the installer are present
 
-set_archive 'ARCHIVE_PART1' 'ARCHIVE_GOG_PART1'
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART1'
-set_archive 'ARCHIVE_PART2' 'ARCHIVE_GOG_PART2'
-[ "$ARCHIVE_PART2" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART2'
-ARCHIVE='ARCHIVE_GOG'
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
+set_archive 'ARCHIVE_PART2' "${ARCHIVE_MAIN}_PART2"
+[ "$ARCHIVE_PART2" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART2"
+ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
-extract_data_from "$SOURCE_ARCHIVE"
-set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
+case "$ARCHIVE" in
+	('ARCHIVE_GOG')
+		extract_data_from "$SOURCE_ARCHIVE"
+	;;
+	('ARCHIVE_GOG_OLD')
+		ln --symbolic "$(readlink --canonicalize $ARCHIVE_PART1)" "$PLAYIT_WORKDIR/$GAME_ID.r00"
+		ln --symbolic "$(readlink --canonicalize $ARCHIVE_PART2)" "$PLAYIT_WORKDIR/$GAME_ID.r01"
+		extract_data_from "$PLAYIT_WORKDIR/$GAME_ID.r00"
+		tolower "$PLAYIT_WORKDIR/gamedata"
+	;;
+esac
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "DOC_${PKG#PKG_}"   "$PATH_DOC"
