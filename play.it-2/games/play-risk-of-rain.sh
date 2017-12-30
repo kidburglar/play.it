@@ -29,62 +29,59 @@ set -o errexit
 ###
 
 ###
-# Aragami
+# Risk of Rain
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171226.2
+script_version=20171225.1
 
 # Set game-specific variables
 
-GAME_ID='aragami'
-GAME_NAME='Aragami'
+GAME_ID='risk-of-rain'
+GAME_NAME='Risk of Rain'
 
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='gog_aragami_2.9.0.12.sh'
-ARCHIVE_GOG_MD5='42d0952de9b0373786f2902aa596b4ff'
-ARCHIVE_GOG_SIZE='6800000'
-ARCHIVE_GOG_VERSION='01.08-gog2.9.0.12'
+ARCHIVE_GOG='gog_risk_of_rain_2.1.0.5.sh'
+ARCHIVE_GOG_MD5='34f8e1e2dddc6726a18c50b27c717468'
+ARCHIVE_GOG_SIZE='180000'
+ARCHIVE_GOG_VERSION='1.2.8-gog2.1.0.5'
 
-ARCHIVE_HUMBLE='aragami_01_08_Linux.zip'
-ARCHIVE_HUMBLE_MD5='4be0b7f674eec62184df216fcaba77b5'
-ARCHIVE_HUMBLE_SIZE='6800000'
-ARCHIVE_HUMBLE_VERSION='01.08-humble170503'
+ARCHIVE_HUMBLE='Risk_of_Rain_v1.3.0_DRM-Free_Linux_.zip'
+ARCHIVE_HUMBLE_MD5='21eb80a7b517d302478c4f86dd5ea9a2'
+ARCHIVE_HUMBLE_SIZE='100000'
+ARCHIVE_HUMBLE_VERSION='1.3.0-humble160519'
 
-ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN32_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
+ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
 
-ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN64_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC_FILES_GOG='./*'
+
+ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_HUMBLE='.'
+ARCHIVE_GAME_BIN_FILES='./Risk_of_Rain'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='.'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
-
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_FILES='./assets'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Aragami.x86'
-APP_MAIN_EXE_BIN64='./Aragami.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_EXE='Risk_of_Rain'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='assets/icon.png'
+APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor libxrandr"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu openal libxrandr"
+PKG_BIN_DEPS_ARCH='lib32-curl'
+PKG_BIN_DEPS_DEB='libcurl3'
 
 # Load common functions
 
@@ -104,39 +101,55 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Use libSSL 1.0.0 32-bit archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'LIBSSL' 'ARCHIVE_LIBSSL'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Include libSSL into the game directory
+
+if [ "$LIBSSL" ]; then
+	(
+		ARCHIVE='LIBSSL'
+		extract_data_from "$LIBSSL"
+	)
+	dir='libs'
+	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
+	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}/$dir"
+	APP_MAIN_LIBS="$dir"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
+
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
