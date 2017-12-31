@@ -29,11 +29,11 @@ set -o errexit
 ###
 
 ###
-# Airline Tycoon Deluxe'
+# Airline Tycoon Deluxe
 # build native Linux packages from the original installers
 ###
 
-script_version=20171128.1
+script_version=20171228.1
 
 # Set game-specific variables
 
@@ -82,7 +82,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 glx"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -114,10 +114,8 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-res="$APP_MAIN_ICON_GOG_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+PKG='PKG_DATA'
+get_icon_from_temp_dir 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 

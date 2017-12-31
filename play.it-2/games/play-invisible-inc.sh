@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171025.1
+script_version=20171228.1
 
 # Set game-specific variables
 
@@ -96,7 +96,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -134,13 +134,11 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+PKG='PKG_DATA'
 if [ "$ICONS_PACK" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
-	res="$APP_MAIN_ICON_GOG_RES"
-	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-	mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
-	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+	get_icon_from_temp_dir 'APP_MAIN'
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"

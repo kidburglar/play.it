@@ -1,3 +1,10 @@
+2.4.0
+
+  * Add option to load regedit files on WINE prefix initialization
+
+  * New function get_icon_from_temp_dir, to get an icon in .png format
+    directly from the source archive
+
 2.3.2
 
   * Fix launchers broken in 2.3.1

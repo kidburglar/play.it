@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.2
+script_version=20171228.1
 
 # Set game-specific variables
 
@@ -74,8 +74,8 @@ DATA_FILES='./*.txt'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='x86/abbeycore'
 APP_MAIN_EXE_BIN64='x86_64/abbeycore'
-APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
-APP_MAIN_ICON_GOG_RES='256'
+APP_MAIN_ICON='data/noarch/support/icon.png'
+APP_MAIN_ICON_RES='256'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -90,7 +90,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -115,10 +115,8 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-res="$APP_MAIN_ICON_GOG_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "$PKG_DATA_PATH/$PATH_ICON"
-mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PKG_DATA_PATH/$PATH_ICON/$GAME_ID.png"
+PKG='PKG_DATA'
+get_icon_from_temp_dir 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 

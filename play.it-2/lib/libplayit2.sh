@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.3.2
-library_revision=20171220.1
+library_version=2.4.0
+library_revision=20171231.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1121,6 +1121,42 @@ postinst_icons_linking() {
 	done
 }
 
+# get .png icon from temporary work directory
+# USAGE: get_icon_from_temp_dir $app[…]
+# NEEDED VARS: PKG PKG_PATH PATH_ICON_BASE APP_ID|GAME_ID PLAYIT_WORKDIR
+# CALLS: liberror
+get_icon_from_temp_dir() {
+	local app_icon
+	local app_icon_guessed
+	local app_id
+	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	for app in $@; do
+		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
+		unset app_icon
+		unset app_icon_guessed
+		if [ "$ARCHIVE" ]; then
+			app_icon_guessed="${app}_ICON_${ARCHIVE#ARCHIVE_}"
+			while [ "${app_icon_guessed#APP_*_ICON}" != "$app_icon_guessed" ]; do
+				if [ "$(eval printf -- '%b' \"\$$app_icon_guessed\")" ]; then
+					app_icon="$(eval printf -- '%b' \"\$$app_icon_guessed\")"
+					break;
+				fi
+				app_icon_guessed="${app_icon_guessed%_*}"
+			done
+		else
+			app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
+		fi
+		if [ "$app_icon" ]; then
+			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
+			[ "$app_id" ] || app_id="$GAME_ID"
+			res="$(eval printf -- '%b' \"\$${app_icon}_RES\")"
+			local icon_path="$PATH_ICON_BASE/${res}x${res}/apps"
+			mkdir --parents "${pkg_path}${icon_path}"
+			mv "$PLAYIT_WORKDIR/gamedata/$app_icon" "${pkg_path}${icon_path}/$app_id.png"
+		fi
+	done
+}
+
 # print installation instructions
 # USAGE: print_instructions $pkg[…]
 # NEEDED VARS: (GAME_NAME) (OPTION_PACKAGE) (PACKAGES_LIST)
@@ -1750,6 +1786,22 @@ write_bin_build_wine() {
 	if [ "$APP_WINETRICKS" ]; then
 		cat >> "$file" <<- EOF
 		  winetricks $APP_WINETRICKS
+		EOF
+	fi
+
+	if [ "$APP_REGEDIT" ]; then
+		cat >> "$file" <<- EOF
+		  for reg_file in $APP_REGEDIT; do
+		EOF
+		cat >> "$file" <<- 'EOF'
+		  (
+		    cd "$WINEPREFIX/drive_c/"
+		    cp "$PATH_GAME/$reg_file" .
+		    reg_file_basename="${reg_file##*/}"
+		    wine regedit "$reg_file_basename"
+		    rm "$reg_file_basename"
+		  )
+		  done
 		EOF
 	fi
 

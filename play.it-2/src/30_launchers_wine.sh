@@ -52,6 +52,22 @@ write_bin_build_wine() {
 		EOF
 	fi
 
+	if [ "$APP_REGEDIT" ]; then
+		cat >> "$file" <<- EOF
+		  for reg_file in $APP_REGEDIT; do
+		EOF
+		cat >> "$file" <<- 'EOF'
+		  (
+		    cd "$WINEPREFIX/drive_c/"
+		    cp "$PATH_GAME/$reg_file" .
+		    reg_file_basename="${reg_file##*/}"
+		    wine regedit "$reg_file_basename"
+		    rm "$reg_file_basename"
+		  )
+		  done
+		EOF
+	fi
+
 	cat >> "$file" <<- 'EOF'
 	fi
 	EOF
