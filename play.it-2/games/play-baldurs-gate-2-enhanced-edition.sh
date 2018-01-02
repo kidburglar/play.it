@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180102.1
 
 # Set game-specific variables
 
@@ -77,8 +77,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_AREAS_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libjson0, libopenal1"
-PKG_BIN_DEPS_ARCH="$PKG_AREAS_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-json-c"
+PKG_BIN_DEPS="$PKG_AREAS_ID $PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json"
 
 # Load common functions
 
@@ -137,7 +136,15 @@ write_launcher 'APP_MAIN'
 # Build package
 
 cat > "$postinst" << EOF
-if [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
+if [ ! -e /lib/i386-linux-gnu/libjson.so.0 ]; then
+	if [ -e /lib/i386-linux-gnu/libjson-c.so ] ; then
+		ln --symbolic libjson-c.so /lib/i386-linux-gnu/libjson.so.0
+	elif [ -e /lib/i386-linux-gnu/libjson-c.so.2 ] ; then
+		ln --symbolic libjson-c.so.2 /lib/i386-linux-gnu/libjson.so.0
+	elif [ -e /lib/i386-linux-gnu/libjson-c.so.3 ] ; then
+		ln --symbolic libjson-c.so.3 /lib/i386-linux-gnu/libjson.so.0
+	fi
+elif [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
 	ln --symbolic libjson-c.so /usr/lib32/libjson.so.0
 fi
 EOF
