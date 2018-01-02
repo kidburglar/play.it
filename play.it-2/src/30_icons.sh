@@ -145,30 +145,27 @@ postinst_icons_linking() {
 # CALLS: liberror
 get_icon_from_temp_dir() {
 	local app_icon
-	local app_icon_guessed
+	local app_icon_name
+	local app_icon_res
 	local app_id
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
-		unset app_icon
-		unset app_icon_guessed
+		unset app_icon_name
 		if [ "$ARCHIVE" ]; then
-			app_icon_guessed="${app}_ICON_${ARCHIVE#ARCHIVE_}"
-			while [ "${app_icon_guessed#APP_*_ICON}" != "$app_icon_guessed" ]; do
-				if [ "$(eval printf -- '%b' \"\$$app_icon_guessed\")" ]; then
-					app_icon="$(eval printf -- '%b' \"\$$app_icon_guessed\")"
-					break;
-				fi
-				app_icon_guessed="${app_icon_guessed%_*}"
+			app_icon_name="${app}_ICON_${ARCHIVE#ARCHIVE_}"
+			while [ "${app_icon_name#${app}_ICON}" != "$app_icon_name" ]; do
+				[ "$(eval printf -- '%b' \"\$$app_icon_name\")" ] && break
+				app_icon_name="${app_icon_name%_*}"
 			done
-		else
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 		fi
+		[ "$app_icon_name" ] || app_icon_name="${app}_ICON"
+		app_icon="$(eval printf -- '%b' \"\$$app_icon_name\")"
+		app_icon_res="$(eval printf -- '%b' \"\$${app_icon_name}_RES\")"
 		if [ "$app_icon" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 			[ "$app_id" ] || app_id="$GAME_ID"
-			res="$(eval printf -- '%b' \"\$${app_icon}_RES\")"
-			local icon_path="$PATH_ICON_BASE/${res}x${res}/apps"
+			local icon_path="$PATH_ICON_BASE/${app_icon_res}x${app_icon_res}/apps"
 			mkdir --parents "${pkg_path}${icon_path}"
 			mv "$PLAYIT_WORKDIR/gamedata/$app_icon" "${pkg_path}${icon_path}/$app_id.png"
 		fi

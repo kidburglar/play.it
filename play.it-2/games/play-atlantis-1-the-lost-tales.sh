@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# Kingdom New Lands
+# Atlantis: The Lost Tales
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -38,53 +38,64 @@ script_version=20171230.1
 
 # Set game-specific variables
 
-GAME_ID='kingdom-new-lands'
-GAME_NAME='Kingdom New Lands'
+GAME_ID='atlantis-1-the-lost-tales'
+GAME_NAME='Atlantis: The Lost Tales'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
-ARCHIVE_GOG='gog_kingdom_new_lands_2.6.0.8.sh'
-ARCHIVE_GOG_MD5='0d662366f75d5da214e259d792e720eb'
-ARCHIVE_GOG_SIZE='420000'
-ARCHIVE_GOG_VERSION='1.2.3-gog2.6.0.8'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG_EN='setup_atlantis_the_lost_tales_2.0.0.15.exe'
+ARCHIVE_GOG_EN_MD5='287170bea9041b4e29888d97f87eb9fc'
+ARCHIVE_GOG_EN_VERSION='1.0-gog2.0.0.15'
+ARCHIVE_GOG_EN_SIZE='1900000'
 
-DATA_DIRS='./logs'
+ARCHIVE_GOG_FR='setup_atlantis_the_lost_tales_french_2.1.0.15.exe'
+ARCHIVE_GOG_FR_MD5='0cb6b037a457d35dacd23e1f22aea57b'
+ARCHIVE_GOG_FR_VERSION='1.0-gog2.1.0.15'
+ARCHIVE_GOG_FR_SIZE='1900000'
 
-ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./manual.pdf'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./Kingdom_Data/Mono/x86 ./Kingdom_Data/Plugins/x86 ./Kingdom.x86'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./*.exe ./cryo.dll ./mss32.dll'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./Kingdom_Data/Mono/x86_64 ./Kingdom_Data/Plugins/x86_64 ./Kingdom.x86_64'
+ARCHIVE_GAME_L10N_PATH='app'
+ARCHIVE_GAME_L10N_FILES='./images/end.tga ./scenar ./sprlist ./wav'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./*.big ./cyclo ./dialog ./images/credit*.tga ./images/gover*.tga ./images/preintro.tga ./puzzles ./sprite ./ubb_vue ./wam'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='Kingdom.x86'
-APP_MAIN_EXE_BIN64='Kingdom.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_REGEDIT="$GAME_ID.reg"
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='atlantis.exe'
+APP_MAIN_ICON='atlantis.exe'
+APP_MAIN_ICON_RES='32'
+
+PACKAGES_LIST='PKG_DATA PKG_L10N PKG_BIN'
+
+PKG_L10N_ID="${GAME_ID}-l10n"
+PKG_L10N_ID_GOG_EN="${PKG_L10N_ID}-en"
+PKG_L10N_ID_GOG_FR="${PKG_L10N_ID}-fr"
+PKG_L10N_PROVIDE="$PKG_L10N_ID"
+PKG_L10N_DESCRIPTION_GOG_EN='English localization'
+PKG_L10N_DESCRIPTION_GOG_FR='French localization'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ID="$GAME_ID"
+PKG_BIN_ARCH='32'
+PKG_BIN_ID_GOG_EN="${PKG_BIN_ID}-en"
+PKG_BIN_ID_GOG_FR="${PKG_BIN_ID}-fr"
+PKG_BIN_PROVIDE="$PKG_BIN_ID"
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine"
+PKG_BIN_DESCRIPTION_GOG_EN='English version'
+PKG_BIN_DESCRIPTION_GOG_FR='French version'
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -103,37 +114,44 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+tolower "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Create registry file
+
+cat > "${PKG_BIN_PATH}${PATH_GAME}/$GAME_ID.reg" <<- 'EOF'
+REGEDIT4
+
+[HKEY_CURRENT_USER\Software\CRYO\Atlantis\GameDirectory]
+@="C:\\atlantis-1-the-lost-tales\\"
+EOF
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

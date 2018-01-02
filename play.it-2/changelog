@@ -1,3 +1,7 @@
+2.4.1
+
+  * Fix messed up icon path when using get_icon_from_temp_dir
+
 2.4.0
 
   * Add option to load regedit files on WINE prefix initialization
