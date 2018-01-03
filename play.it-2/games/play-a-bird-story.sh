@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180102.1
 
 # Set game-specific variables
 
 GAME_ID='a-bird-story'
 GAME_NAME='A Bird Story'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_a_bird_story_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='8f93d19265394a5fba61aeec23cabb8e'
+ARCHIVE_GOG='gog_a_bird_story_2.0.0.3.sh'
+ARCHIVE_GOG_MD5='6f334da4493e8c050a16d4b66987d3ff'
 ARCHIVE_GOG_SIZE='180000'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'
+
+ARCHIVE_GOG_OLD='gog_a_bird_story_2.0.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='8f93d19265394a5fba61aeec23cabb8e'
+ARCHIVE_GOG_OLD_SIZE='180000'
+ARCHIVE_GOG_OLD_VERSION='1.0-gog2.0.0.2'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -85,7 +90,7 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libvorbis openal sdl2 sdl2_image"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
