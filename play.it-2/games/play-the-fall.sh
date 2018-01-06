@@ -34,34 +34,38 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180106.1
 
 # Set game-specific variables
 
 GAME_ID='the-fall'
 GAME_NAME='The Fall'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
-ARCHIVE_HUMBLE='TheFall_2_31_Linux.rar'
-ARCHIVE_HUMBLE_MD5='ffac594dc2c9b9e446da5fa375aac6fa'
-ARCHIVE_HUMBLE_SIZE='340000'
-ARCHIVE_HUMBLE_VERSION='2.31-humble161116'
-ARCHIVE_HUMBLE_TYPE='rar'
+ARCHIVE_HUMBLE='TheFall_Linux_2_5.zip'
+ARCHIVE_HUMBLE_MD5='5493c159ce23d13d68b60f064ab37297'
+ARCHIVE_HUMBLE_SIZE='350000'
+ARCHIVE_HUMBLE_VERSION='2.5-humble171207'
+
+ARCHIVE_HUMBLE_OLD='TheFall_2_31_Linux.rar'
+ARCHIVE_HUMBLE_OLD_MD5='ffac594dc2c9b9e446da5fa375aac6fa'
+ARCHIVE_HUMBLE_OLD_SIZE='340000'
+ARCHIVE_HUMBLE_OLD_VERSION='2.31-humble161116'
 
 ARCHIVE_GAME_BIN32_PATH='.'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='./TheFall.x86 ./TheFall_Data/*/x86'
 
 ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
+ARCHIVE_GAME_DATA_FILES='./TheFall_Data/globalgamemanagers ./TheFall_Data/*.assets ./TheFall_Data/*.resS ./TheFall_Data/*.resource ./TheFall_Data/level* ./TheFall_Data/Mono/etc ./TheFall_Data/Managed ./TheFall_Data/Resources ./TheFall_Data/StreamingAssets'
 
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./TheFall.x86'
+APP_MAIN_EXE='./TheFall.x86'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='TheFall_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_BIN32 PKG_DATA'
@@ -70,12 +74,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libgl1-mesa-glx | libgl1, libxcursor1, libxrandr2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libgl lib32-libxcursor lib32-libxrandr"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor libxrandr"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -115,7 +118,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
