@@ -2,7 +2,7 @@
 set -o errexit
 
 ###
-# Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2015-2017, Antoine Le Gonidec
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,64 +29,53 @@ set -o errexit
 ###
 
 ###
-# A Bird Story
+# Teslagrad
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180102.1
+script_version=20180106.1
 
 # Set game-specific variables
 
-GAME_ID='a-bird-story'
-GAME_NAME='A Bird Story'
+GAME_ID='teslagrad'
+GAME_NAME='Teslagrad'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_a_bird_story_2.0.0.3.sh'
-ARCHIVE_GOG_MD5='6f334da4493e8c050a16d4b66987d3ff'
-ARCHIVE_GOG_SIZE='180000'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'
+ARCHIVE_GOG='gog_teslagrad_2.1.0.4.sh'
+ARCHIVE_GOG_MD5='e9683e188615ddd341f8a95a2e8102ed'
+ARCHIVE_GOG_VERSION='1.4-gog2.1.0.4'
+ARCHIVE_GOG_SIZE='1600000'
 
-ARCHIVE_GOG_OLD='gog_a_bird_story_2.0.0.2.sh'
-ARCHIVE_GOG_OLD_MD5='8f93d19265394a5fba61aeec23cabb8e'
-ARCHIVE_GOG_OLD_SIZE='180000'
-ARCHIVE_GOG_OLD_VERSION='1.0-gog2.0.0.2'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*.txt'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game/Teslagrad_linux32_fullversion_1_4'
+ARCHIVE_GAME_BIN32_FILES='./Teslagrad ./Teslagrad_Data/Mono ./Teslagrad_Data/Managed'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./legal ./LICENSE.txt'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game/Teslagrad_linux64_fullversion_1_4'
+ARCHIVE_GAME_BIN64_FILES='./Teslagrad ./Teslagrad_Data/Mono ./Teslagrad_Data/Managed'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./ABirdStory.x86 ./lib'
-
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./ABirdStory.amd64 ./lib64'
-
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Audio.dat ./croptextures ./Game.ini ./Game.rgssad ./icon.png ./mkxp.conf ./preload'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game/Teslagrad_linux32_fullversion_1_4'
+ARCHIVE_GAME_DATA_FILES='./Teslagrad_Data'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='ABirdStory.x86'
-APP_MAIN_EXE_BIN64='ABirdStory.amd64'
+APP_MAIN_EXE='Teslagrad'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='icon.png'
-APP_MAIN_ICON_RES='48'
+APP_MAIN_ICON='Teslagrad_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libvorbisfile3, libopenal1, libsdl2-2.0-0, libsdl2-image-2.0-0"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-libvorbis lib32-openal lib32-sdl2 lib32-sdl2_image"
+PKG_BIN32_DEPS="$PKG_DATA_ID glu xcursor glibc libstdc++"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc libvorbis openal sdl2 sdl2_image"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -109,17 +98,12 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1' "$PATH_DOC"
-organize_data 'DOC2' "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -138,7 +122,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
