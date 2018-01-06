@@ -34,27 +34,33 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180106.1
 
 # Set game-specific variables
 
 GAME_ID='dont-starve'
 GAME_NAME='Don’t Starve'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='gog_don_t_starve_2.7.0.9.sh'
-ARCHIVE_GOG_MD5='01d7496de1c5a28ffc82172e89dd9cd6'
-ARCHIVE_GOG_SIZE='660000'
-ARCHIVE_GOG_VERSION='1.222215-gog2.7.0.9'
+ARCHIVE_GOG='don_t_starve_en_20171215_17629.sh'
+ARCHIVE_GOG_MD5='f7dda3b3bdb15ac62acb212a89b24623'
+ARCHIVE_GOG_SIZE='670000'
+ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG_VERSION='20171215-gog17629'
 
-ARCHIVE_GOG_OLD='gog_don_t_starve_2.6.0.8.sh'
-ARCHIVE_GOG_OLD_MD5='2b0d363bea53654c0267ae424de7130a'
-ARCHIVE_GOG_OLD_SIZE='650000'
-ARCHIVE_GOG_OLD_VERSION='1.198251-gog2.6.0.8'
+ARCHIVE_GOG_OLD='gog_don_t_starve_2.7.0.9.sh'
+ARCHIVE_GOG_OLD_MD5='01d7496de1c5a28ffc82172e89dd9cd6'
+ARCHIVE_GOG_OLD_SIZE='660000'
+ARCHIVE_GOG_OLD_VERSION='1.222215-gog2.7.0.9'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GOG_OLDER='gog_don_t_starve_2.6.0.8.sh'
+ARCHIVE_GOG_OLDER_MD5='2b0d363bea53654c0267ae424de7130a'
+ARCHIVE_GOG_OLDER_SIZE='650000'
+ARCHIVE_GOG_OLDER_VERSION='1.198251-gog2.6.0.8'
+
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game/dontstarve32'
 ARCHIVE_GAME_BIN32_FILES='./*.json ./bin'
@@ -79,16 +85,14 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, xdg-utils, libcurl3-gnutls, libglu1-mesa | libglu1, libsdl2-2.0-0, libxrandr2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-libcurl-gnutls lib32-glu lib32-sdl2"
+PKG_BIN32_DEPS="$PKG_DATA_ID libcurl-gnutls glu sdl2"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID libcurl-gnutls glu sdl2"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -108,15 +112,10 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -128,10 +127,15 @@ done
 
 # Set working directory to the directory containing the game binary before running it
 
-sed --in-place 's|cd "$PATH_PREFIX"|cd "$PATH_PREFIX/${APP_EXE%/*}"|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|cd "$PATH_PREFIX"|cd "$PATH_PREFIX/${APP_EXE%/*}"|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|"\./$APP_EXE" \($APP_OPTIONS $@\)|"./${APP_EXE##*/}" \1|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|"\./$APP_EXE" \($APP_OPTIONS $@\)|"./${APP_EXE##*/}" \1|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+for pattern in \
+'s|^cd "$PATH_PREFIX"$|cd "$PATH_PREFIX/${APP_EXE%/*}"|' \
+'s|^"\./$APP_EXE"|"./${APP_EXE##*/}"|'; do
+	for file in \
+	"${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID" \
+	"${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"; do
+		sed --in-place "$pattern" "$file"
+	done
+done
 
 # Build package
 
