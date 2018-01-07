@@ -34,36 +34,48 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171216.2
+script_version=20180107.1
 
 # Set game-specific variables
 
 GAME_ID='pillars-of-eternity'
 GAME_NAME='Pillars of Eternity'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='pillars_of_eternity_en_3_07_16405.sh'
-ARCHIVE_GOG_MD5='e4271b5e72f1ecc9fbbc4d90937ede05'
+ARCHIVE_GOG='pillars_of_eternity_en_3_07_0_1318_17461.sh'
+ARCHIVE_GOG_MD5='57164ad0cbc53d188dde0b38e7491916'
 ARCHIVE_GOG_SIZE='15000000'
-ARCHIVE_GOG_VERSION='3.7.0.1284-gog16405'
+ARCHIVE_GOG_VERSION='3.7.0.1318-gog17461'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_GOG_OLD='gog_pillars_of_eternity_2.16.0.20.sh'
-ARCHIVE_GOG_OLD_MD5='0d21cf95bda070bdbfbe3e79f8fc32d6'
+ARCHIVE_GOG_OLD='pillars_of_eternity_en_3_07_16405.sh'
+ARCHIVE_GOG_OLD_MD5='e4271b5e72f1ecc9fbbc4d90937ede05'
 ARCHIVE_GOG_OLD_SIZE='15000000'
-ARCHIVE_GOG_OLD_VERSION='3.06.1254-gog2.16.0.20'
+ARCHIVE_GOG_OLD_VERSION='3.7.0.1284-gog16405'
 ARCHIVE_GOG_OLD_TYPE='mojosetup_unzip'
 
-ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_2.15.0.19.sh'
-ARCHIVE_GOG_OLDER_MD5='2000052541abb1ef8a644049734e8526'
+ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_2.16.0.20.sh'
+ARCHIVE_GOG_OLDER_MD5='0d21cf95bda070bdbfbe3e79f8fc32d6'
 ARCHIVE_GOG_OLDER_SIZE='15000000'
-ARCHIVE_GOG_OLDER_VERSION='3.05.1186-gog2.15.0.19'
+ARCHIVE_GOG_OLDER_VERSION='3.06.1254-gog2.16.0.20'
 ARCHIVE_GOG_OLDER_TYPE='mojosetup_unzip'
 
-ARCHIVE_GOG_DEADFIRE='pillars_of_eternity_deadfire_pack_dlc_en_3_07_16380.sh'
-ARCHIVE_GOG_DEADFIRE_MD5='2fc0dc21648953be1c571e28b1e3d002'
-ARCHIVE_GOG_DEADFIRE_TYPE='mojosetup'
+ARCHIVE_GOG_OLDEST='gog_pillars_of_eternity_2.15.0.19.sh'
+ARCHIVE_GOG_OLDEST_MD5='2000052541abb1ef8a644049734e8526'
+ARCHIVE_GOG_OLDEST_SIZE='15000000'
+ARCHIVE_GOG_OLDEST_VERSION='3.05.1186-gog2.15.0.19'
+ARCHIVE_GOG_OLDEST_TYPE='mojosetup_unzip'
+
+ARCHIVES_DEADFIRE_LIST='ARCHIVE_DEADFIRE_GOG ARCHIVE_DEADFIRE_GOG_OLD'
+
+ARCHIVE_DEADFIRE_GOG='pillars_of_eternity_deadfire_pack_dlc_en_3_07_0_1318_17462.sh'
+ARCHIVE_DEADFIRE_GOG_MD5='021362da5912dc8a3e47473e97726f7f'
+ARCHIVE_DEADFIRE_GOG_TYPE='mojosetup'
+
+ARCHIVE_DEADFIRE_GOG_OLD='pillars_of_eternity_deadfire_pack_dlc_en_3_07_16380.sh'
+ARCHIVE_DEADFIRE_GOG_OLD_MD5='2fc0dc21648953be1c571e28b1e3d002'
+ARCHIVE_DEADFIRE_GOG_OLD_TYPE='mojosetup'
 
 ARCHIVE_GOG_DLC1='gog_pillars_of_eternity_kickstarter_item_dlc_2.0.0.2.sh'
 ARCHIVE_GOG_DLC1_MD5='b4c29ae17c87956471f2d76d8931a4e5'
@@ -111,7 +123,7 @@ PKG_BIN_DEPS="$PKG_AREA_ID $PKG_DATA_ID glu xcursor libxrandr"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -130,10 +142,12 @@ fi
 # Load extra archives (DLC)
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_DEADFIRE' 'ARCHIVE_GOG_DEADFIRE'
-set_archive 'ARCHIVE_DLC1' 'ARCHIVE_GOG_DLC1'
-set_archive 'ARCHIVE_DLC2' 'ARCHIVE_GOG_DLC2'
-set_archive 'ARCHIVE_DLC3' 'ARCHIVE_GOG_DLC3'
+for archive in $ARCHIVES_DEADFIRE_LIST; do
+	[ "$ARCHIVE_DEADFIRE" ] || set_archive 'ARCHIVE_DEADFIRE' "$archive"
+done
+for dlc in 'DLC1' 'DLC2' 'DLC3'; do
+	set_archive "ARCHIVE_$dlc" "ARCHIVE_GOG_$dlc"
+done
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
@@ -173,7 +187,7 @@ write_launcher 'APP_MAIN'
 # Build package
 
 case "$ARCHIVE" in
-	('ARCHIVE_GOG_OLD'|'ARCHIVE_GOG_OLDER')
+	('ARCHIVE_GOG_OLDER'|'ARCHIVE_GOG_OLDEST')
 		APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST_OLD"
 	;;
 esac
