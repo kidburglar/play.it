@@ -2,7 +2,7 @@
 set -o errexit
 
 ###
-# Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2015-2017, Antoine Le Gonidec
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,57 +29,52 @@ set -o errexit
 ###
 
 ###
-# Jazzpunk
+# Oxenfree
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180107.2
 
 # Set game-specific variables
 
-GAME_ID='jazzpunk'
-GAME_NAME='Jazzpunk'
+GAME_ID='oxenfree'
+GAME_NAME='Oxenfree'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_HUMBLE='Jazzpunk-Oct-30-2017-Linux.zip'
-ARCHIVE_HUMBLE_MD5='e8ecf692ded05cea80701d417fa565c1'
-ARCHIVE_HUMBLE_SIZE='2800000'
-ARCHIVE_HUMBLE_VERSION='171030-humble171121'
+ARCHIVE_GOG='oxenfree_en_2_6_0_15278.sh'
+ARCHIVE_GOG_MD5='9f9e9c4a3f4b73fa85a8d29714f5959e'
+ARCHIVE_GOG_VERSION='2.6.0f30-gog15278'
+ARCHIVE_GOG_SIZE='3000000'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_HUMBLE_OLD='Jazzpunk-July6-2014-Linux.zip'
-ARCHIVE_HUMBLE_OLD_MD5='50ad5722cafe16dc384e83a4a4e19480'
-ARCHIVE_HUMBLE_OLD_SIZE='1600000'
-ARCHIVE_HUMBLE_OLD_VERSION='140706-humble140708'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*.txt'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
 
-ARCHIVE_GAME_BIN32_PATH='./'
-ARCHIVE_GAME_BIN32_FILES='./Jazzpunk.x86 ./Jazzpunk_Data/*/x86'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 
-ARCHIVE_GAME_BIN64_PATH='./'
-ARCHIVE_GAME_BIN64_FILES='./Jazzpunk.x86_64 ./Jazzpunk_Data/*/x86_64'
-
-ARCHIVE_GAME_DATA_PATH='./'
-ARCHIVE_GAME_DATA_FILES='./Jazzpunk_Data/level* ./Jazzpunk_Data/mainData ./Jazzpunk_Data/Managed ./Jazzpunk_Data/Mono/etc ./Jazzpunk_Data/PlayerConnectionConfigFile ./Jazzpunk_Data/Resources ./Jazzpunk_Data/*.assets ./Jazzpunk_Data/ScreenSelector.png ./Jazzpunk_Data/StreamingAssets'
-
-ARCHIVE_ICONS_PATH='.'
-ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./128x128 ./256x256'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Jazzpunk.x86'
-APP_MAIN_EXE_BIN64='./Jazzpunk.x86_64'
+APP_MAIN_EXE_BIN32='Oxenfree.x86'
+APP_MAIN_EXE_BIN64='Oxenfree.x86_64'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32'
-PACKAGES_LIST_OLD='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN64_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor"
+PKG_BIN32_DEPS="$PKG_DATA_ID glx xcursor glibc libstdc++ libxrandr"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
@@ -102,57 +97,28 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Set packages list according to source archive
-
-if [ "$ARCHIVE" = 'ARCHIVE_HUMBLE_OLD' ]; then
-	PACKAGES_LIST="$PACKAGES_LIST_OLD"
-	set_temp_directories $PACKAGES_LIST
-fi
-
-# Try to load icons archive
-
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
-ARCHIVE="$ARCHIVE_MAIN"
-
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
-	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
-	)
-fi
 
 for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
-
-if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
-	organize_data 'ICONS' "$PATH_ICON_BASE"
-fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-case "$ARCHIVE" in
-	('ARCHIVE_HUMBLE')
-		PKG='PKG_BIN32'
-		write_launcher 'APP_MAIN'
-	;;
-	('ARCHIVE_HUMBLE_OLD')
-		for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-			write_launcher 'APP_MAIN'
-		done
-	;;
-esac
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
-write_metadata
+postinst_icons_linking 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
@@ -161,17 +127,10 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-case "$ARCHIVE" in
-	('ARCHIVE_HUMBLE')
-		print_instructions
-	;;
-	('ARCHIVE_HUMBLE_OLD')
-		printf '\n'
-		printf '32-bit:'
-		print_instructions 'PKG_DATA' 'PKG_BIN32'
-		printf '64-bit:'
-		print_instructions 'PKG_DATA' 'PKG_BIN64'
-	;;
-esac
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0

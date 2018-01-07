@@ -2,7 +2,7 @@
 set -o errexit
 
 ###
-# Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2015-2017, Antoine Le Gonidec
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,52 +29,43 @@ set -o errexit
 ###
 
 ###
-# The Fall
+# Total Annihilation Kingdoms
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180107.1
 
 # Set game-specific variables
 
-GAME_ID='the-fall'
-GAME_NAME='The Fall'
+GAME_ID='total-annihilation-kingdoms'
+GAME_NAME='Total Annihilation Kingdoms'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_HUMBLE='TheFall_Linux_2_5.zip'
-ARCHIVE_HUMBLE_MD5='5493c159ce23d13d68b60f064ab37297'
-ARCHIVE_HUMBLE_SIZE='350000'
-ARCHIVE_HUMBLE_VERSION='2.5-humble171207'
+ARCHIVE_GOG='setup_total_annihilation_kingdoms_2.0.0.22.exe'
+ARCHIVE_GOG_MD5='e0eb1f17ca2285fc3de10e16b394bfb0'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.22'
+ARCHIVE_GOG_SIZE='1004300'
 
-ARCHIVE_HUMBLE_OLD='TheFall_2_31_Linux.rar'
-ARCHIVE_HUMBLE_OLD_MD5='ffac594dc2c9b9e446da5fa375aac6fa'
-ARCHIVE_HUMBLE_OLD_SIZE='340000'
-ARCHIVE_HUMBLE_OLD_VERSION='2.31-humble161116'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./*.asi ./*.dll ./*.exe ./*.tsk'
 
-ARCHIVE_GAME_BIN32_PATH='.'
-ARCHIVE_GAME_BIN32_FILES='./TheFall.x86 ./TheFall_Data/*/x86'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./*.256 ./*.esk  ./*.hpi ./*.htm ./*.icd ./*.id ./*.isu ./*.key ./*.mmz ./*.pdf ./*.tdf ./*.txt ./atlas ./boneyards ./docs ./gc ./maps ./movies ./music'
 
-ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='./TheFall_Data/globalgamemanagers ./TheFall_Data/*.assets ./TheFall_Data/*.resS ./TheFall_Data/*.resource ./TheFall_Data/level* ./TheFall_Data/Mono/etc ./TheFall_Data/Managed ./TheFall_Data/Resources ./TheFall_Data/StreamingAssets'
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='kingdoms.exe'
+APP_MAIN_ICON='kingdoms.exe'
+APP_MAIN_ICON_RES='16 32'
 
-DATA_DIRS='./logs'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./TheFall.x86'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='TheFall_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
-
-PACKAGES_LIST='PKG_BIN32 PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor libxrandr"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -102,18 +93,19 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN32'
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32'
+write_metadata
 build_pkg
 
 # Clean up

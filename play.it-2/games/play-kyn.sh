@@ -29,52 +29,50 @@ set -o errexit
 ###
 
 ###
-# The Fall
+# Kyn
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180107.2
 
 # Set game-specific variables
 
-GAME_ID='the-fall'
-GAME_NAME='The Fall'
+GAME_ID='kyn'
+GAME_NAME='Kyn'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_HUMBLE='TheFall_Linux_2_5.zip'
-ARCHIVE_HUMBLE_MD5='5493c159ce23d13d68b60f064ab37297'
-ARCHIVE_HUMBLE_SIZE='350000'
-ARCHIVE_HUMBLE_VERSION='2.5-humble171207'
-
-ARCHIVE_HUMBLE_OLD='TheFall_2_31_Linux.rar'
-ARCHIVE_HUMBLE_OLD_MD5='ffac594dc2c9b9e446da5fa375aac6fa'
-ARCHIVE_HUMBLE_OLD_SIZE='340000'
-ARCHIVE_HUMBLE_OLD_VERSION='2.31-humble161116'
-
-ARCHIVE_GAME_BIN32_PATH='.'
-ARCHIVE_GAME_BIN32_FILES='./TheFall.x86 ./TheFall_Data/*/x86'
-
-ARCHIVE_GAME_DATA_PATH='.'
-ARCHIVE_GAME_DATA_FILES='./TheFall_Data/globalgamemanagers ./TheFall_Data/*.assets ./TheFall_Data/*.resS ./TheFall_Data/*.resource ./TheFall_Data/level* ./TheFall_Data/Mono/etc ./TheFall_Data/Managed ./TheFall_Data/Resources ./TheFall_Data/StreamingAssets'
+ARCHIVE_GOG='setup_kyn_2.1.0.4.exe'
+ARCHIVE_GOG_MD5='a40cb85cdd40b7464eec92b2b9166f84'
+ARCHIVE_GOG_SIZE='7900000'
+ARCHIVE_GOG_VERSION='1.0-gog2.1.0.4'
+ARCHIVE_GOG_TYPE='rar'
+ARCHIVE_GOG_PART1='setup_kyn_2.1.0.4-1.bin'
+ARCHIVE_GOG_PART1_MD5='4cfdca351969f2570a3657c772fd492e'
+ARCHIVE_GOG_PART1_TYPE='rar'
 
 DATA_DIRS='./logs'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./TheFall.x86'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='TheFall_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+ARCHIVE_GAME_BIN_PATH='game'
+ARCHIVE_GAME_BIN_FILES='./kyn.exe kyn_data/mono kyn_data/plugins kyn_data/managed'
 
-PACKAGES_LIST='PKG_BIN32 PKG_DATA'
+ARCHIVE_GAME_DATA_PATH='game'
+ARCHIVE_GAME_DATA_FILES='kyn_data/resources kyn_data/level* kyn_data/maindata kyn_data/playerconnectionconfigfile kyn_data/resources.assets kyn_data/sharedassets*'
+
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='kyn.exe'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICON='kyn.exe'
+APP_MAIN_ICON_RES='16 24 32 48 64 96 128 256'
+
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor libxrandr"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
@@ -94,31 +92,54 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Check that all parts of the installer are present
+
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_PART1' 'ARCHIVE_GOG_PART1'
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART1'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
-extract_data_from "$SOURCE_ARCHIVE"
+extract_data_from "$ARCHIVE_PART1"
+tolower "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN32'
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
+# Store saved games outside of WINE prefix
+
+save_path='$WINEPREFIX/drive_c/users/$(whoami)/AppData/LocalLow/Tangrin Entertainment/Kyn/Saves'
+pattern='s#cp --force --recursive --symbolic-link --update "$PATH_GAME"/\* "$PATH_PREFIX"#&\n'
+pattern="$pattern\tmkdir --parents \"${save_path%/*}\"\n"
+pattern="$pattern\tmkdir --parents \"\$PATH_DATA/saves\"\n"
+pattern="$pattern\tln --symbolic \"\$PATH_DATA/saves\" \"$save_path\"#"
+for file in "${PKG_BIN_PATH}${PATH_BIN}"/*; do
+	sed --in-place "$pattern" "$file"
+done
 
 # Build package
 
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
 
-rm --recursive "$PLAYIT_WORKDIR"
+rm --recursive "${PLAYIT_WORKDIR}"
 
 # Print instructions
 
