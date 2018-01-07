@@ -34,30 +34,36 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171209.1
+script_version=20180107.1
 
 # Set game-specific variables
 
 GAME_ID='pillars-of-eternity'
 GAME_NAME='Pillars of Eternity: The White March Part II'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
-ARCHIVE_GOG='pillars_of_eternity_white_march_part_2_dlc_en_3_07_16598.sh'
-ARCHIVE_GOG_MD5='db3a345b2b2782e2ad075dd32567f303'
-ARCHIVE_GOG_SIZE='4300000'
-ARCHIVE_GOG_VERSION='3.7.0.1284-gog16598'
+ARCHIVE_GOG='pillars_of_eternity_white_march_part_2_dlc_en_3_07_0_1318_17464.sh'
+ARCHIVE_GOG_MD5='03067ebdd878cc16c283f63ddf015e90'
+ARCHIVE_GOG_SIZE='4400000'
+ARCHIVE_GOG_VERSION='3.7.0.1318-gog17464'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_pillars_of_eternity_white_march_part_2_dlc_2.6.0.7.sh'
-ARCHIVE_GOG_OLD_MD5='fdc1446661a358961379fbec24c44680'
-ARCHIVE_GOG_OLD_SIZE='4400000'
-ARCHIVE_GOG_OLD_VERSION='3.06.1254-gog2.6.0.7'
+ARCHIVE_GOG_OLD='pillars_of_eternity_white_march_part_2_dlc_en_3_07_16598.sh'
+ARCHIVE_GOG_OLD_MD5='db3a345b2b2782e2ad075dd32567f303'
+ARCHIVE_GOG_OLD_SIZE='4300000'
+ARCHIVE_GOG_OLD_VERSION='3.7.0.1284-gog16598'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_white_march_part_2_dlc_2.5.0.6.sh'
-ARCHIVE_GOG_OLDER_MD5='483d4b8cc046a07ec91a6306d3409e23'
+ARCHIVE_GOG_OLDER='gog_pillars_of_eternity_white_march_part_2_dlc_2.6.0.7.sh'
+ARCHIVE_GOG_OLDER_MD5='fdc1446661a358961379fbec24c44680'
 ARCHIVE_GOG_OLDER_SIZE='4400000'
-ARCHIVE_GOG_OLDER_VERSION='3.05.1186-gog2.5.0.6'
+ARCHIVE_GOG_OLDER_VERSION='3.06.1254-gog2.6.0.7'
+
+ARCHIVE_GOG_OLDEST='gog_pillars_of_eternity_white_march_part_2_dlc_2.5.0.6.sh'
+ARCHIVE_GOG_OLDEST_MD5='483d4b8cc046a07ec91a6306d3409e23'
+ARCHIVE_GOG_OLDEST_SIZE='4400000'
+ARCHIVE_GOG_OLDEST_VERSION='3.05.1186-gog2.5.0.6'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -72,7 +78,7 @@ PKG_MAIN_DEPS="$GAME_ID ${GAME_ID}-px1"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
