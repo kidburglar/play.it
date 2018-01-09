@@ -1,5 +1,7 @@
 2.5.0
 
+  * Add 'xrandr' and 'xgamma' to the generic dependencies
+
   * Add automatic dependencies detection for archive types 'mojosetup_unzip'
     and 'tar'
 

@@ -181,6 +181,12 @@ pkg_set_deps_arch32() {
 			('xft')
 				pkg_dep='lib32-libxft'
 			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
+			;;
 			(*)
 				pkg_deps="$dep"
 			;;
@@ -272,6 +278,12 @@ pkg_set_deps_arch64() {
 			;;
 			('xft')
 				pkg_dep='libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_dep="$dep"

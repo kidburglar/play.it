@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.1
+library_revision=20180117.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -2141,6 +2141,12 @@ pkg_set_deps_arch32() {
 			('xft')
 				pkg_dep='lib32-libxft'
 			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
+			;;
 			(*)
 				pkg_deps="$dep"
 			;;
@@ -2232,6 +2238,12 @@ pkg_set_deps_arch64() {
 			;;
 			('xft')
 				pkg_dep='libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_dep="$dep"
@@ -2462,6 +2474,9 @@ pkg_set_deps_deb() {
 			;;
 			('xft')
 				pkg_dep='libxft2'
+			;;
+			('xgamma'|'xrandr')
+				pkg_dep='x11-xserver-utils:amd64 | x11-xserver-utils'
 			;;
 			(*)
 				pkg_dep="$dep"

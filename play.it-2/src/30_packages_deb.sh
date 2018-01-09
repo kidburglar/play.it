@@ -173,6 +173,9 @@ pkg_set_deps_deb() {
 			('xft')
 				pkg_dep='libxft2'
 			;;
+			('xgamma'|'xrandr')
+				pkg_dep='x11-xserver-utils:amd64 | x11-xserver-utils'
+			;;
 			(*)
 				pkg_dep="$dep"
 			;;
