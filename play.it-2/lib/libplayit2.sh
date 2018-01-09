@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.4.2
-library_revision=20180114.1
+library_version=2.5.0~dev
+library_revision=20180117.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -459,11 +459,14 @@ check_deps() {
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('zip')
+			('mojosetup_unzip'|'zip')
 				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
 			;;
 			('rar')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
+			;;
+			('tar')
+				SCRIPT_DEPS="$SCRIPT_DEPS tar"
 			;;
 			('tar.gz')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar"

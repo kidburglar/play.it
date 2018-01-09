@@ -1,3 +1,8 @@
+2.5.0
+
+  * Add automatic dependencies detection for archive types 'mojosetup_unzip'
+    and 'tar'
+
 2.4.2
 
   * Fix handling by init_prefix_files of files created after the first game
