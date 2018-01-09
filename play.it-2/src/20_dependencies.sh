@@ -8,7 +8,7 @@ check_deps() {
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
-			('innosetup')
+			('innosetup'*)
 				SCRIPT_DEPS="$SCRIPT_DEPS innoextract"
 			;;
 			('nixstaller')

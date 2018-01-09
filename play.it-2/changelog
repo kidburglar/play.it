@@ -1,5 +1,8 @@
 2.5.0
 
+  * New archive type value 'innosetup_nolowercase' allowing to skip files
+    names conversion to lower case
+
   * New archive type 'zip_unclean'
 
   * New function use_package_specific_value allowing to get package-specific

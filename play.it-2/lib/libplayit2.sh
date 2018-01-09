@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.5
+library_revision=20180117.6
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -479,7 +479,7 @@ check_deps() {
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
-			('innosetup')
+			('innosetup'*)
 				SCRIPT_DEPS="$SCRIPT_DEPS innoextract"
 			;;
 			('nixstaller')
@@ -886,9 +886,13 @@ extract_data_from() {
 			('debian')
 				dpkg-deb --extract "$file" "$destination"
 			;;
-			('innosetup')
+			('innosetup'*)
+				options='--progress=1 --silent'
+				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+					options="$options --lowercase"
+				fi
 				printf '\n'
-				innoextract --extract --lowercase --output-dir "$destination" --progress=1 --silent "$file"
+				innoextract $options --extract --output-dir "$destination" "$file"
 			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"

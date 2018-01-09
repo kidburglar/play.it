@@ -19,9 +19,13 @@ extract_data_from() {
 			('debian')
 				dpkg-deb --extract "$file" "$destination"
 			;;
-			('innosetup')
+			('innosetup'*)
+				options='--progress=1 --silent'
+				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+					options="$options --lowercase"
+				fi
 				printf '\n'
-				innoextract --extract --lowercase --output-dir "$destination" --progress=1 --silent "$file"
+				innoextract $options --extract --output-dir "$destination" "$file"
 			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"
