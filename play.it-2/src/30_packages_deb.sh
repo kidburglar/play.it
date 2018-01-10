@@ -157,7 +157,18 @@ pkg_set_deps_deb() {
 				pkg_dep='libvorbisfile3'
 			;;
 			('wine')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32' ;;
+					('64') pkg_set_deps_deb 'wine64' ;;
+				esac
+			;;
+			('wine32')
 				pkg_dep='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
+			;;
+			('wine64')
+				pkg_dep='wine64-development | wine64 | wine64-bin | wine-amd64 | wine-staging-amd64, wine'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'

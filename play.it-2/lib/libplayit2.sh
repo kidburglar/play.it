@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.9
+library_revision=20180117.10
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1341,7 +1341,10 @@ write_bin() {
 		fi
 
 		# Write winecfg launcher for WINE games
-		if [ "$app_type" = 'wine' ]; then
+		if [ "$app_type" = 'wine' ] || \
+		   [ "$app_type" = 'wine32' ] || \
+		   [ "$app_type" = 'wine64' ]
+		then
 			write_bin_winecfg
 		fi
 
@@ -1403,7 +1406,10 @@ write_bin() {
 			PATH_CONFIG="$XDG_CONFIG_HOME/$PREFIX_ID"
 			PATH_DATA="$XDG_DATA_HOME/games/$PREFIX_ID"
 			EOF
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ]
+			then
 				write_bin_set_wine
 			else
 				cat >> "$file" <<- 'EOF'
@@ -1499,7 +1505,10 @@ write_bin() {
 			EOF
 
 			# Build game prefix
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ]
+			then
 				write_bin_build_wine
 			fi
 			cat >> "$file" <<- 'EOF'
@@ -1528,7 +1537,7 @@ write_bin() {
 			('scummvm')
 				write_bin_run_scummvm
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				write_bin_run_wine
 			;;
 		esac
@@ -1554,7 +1563,11 @@ write_desktop() {
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
-		if [ "$winecfg_desktop" != 'done' ] && [ "$app_type" = 'wine' ]; then
+		if [ "$winecfg_desktop" != 'done' ] && \
+		   ( [ "$app_type" = 'wine' ] || \
+		     [ "$app_type" = 'wine32' ] ||\
+		     [ "$app_type" = 'wine64' ] )
+		then
 			winecfg_desktop='done'
 			write_desktop_winecfg
 		fi
@@ -1773,8 +1786,22 @@ write_bin_winecfg() {
 # USAGE: write_bin_set_wine
 # CALLED BY: write_bin
 write_bin_set_wine() {
+	case "$app_type" in
+		('wine')
+			use_archive_specific_value "${PKG}_ARCH"
+			local architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
+			case "$architecture" in
+				('32') winearch='win32' ;;
+				('64') winearch='win64' ;;
+			esac
+		;;
+		('wine32') winearch='win32' ;;
+		('wine64') winearch='win64' ;;
+	esac
+	cat >> "$file" <<- EOF
+	export WINEARCH='$winearch'
+	EOF
 	cat >> "$file" <<- 'EOF'
-	export WINEARCH='win32'
 	export WINEDEBUG='-all'
 	export WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
 	export WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
@@ -2126,7 +2153,7 @@ pkg_set_deps_arch32() {
 			('vorbis')
 				pkg_dep='lib32-libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')
@@ -2224,7 +2251,7 @@ pkg_set_deps_arch64() {
 			('vorbis')
 				pkg_dep='libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')
@@ -2456,7 +2483,18 @@ pkg_set_deps_deb() {
 				pkg_dep='libvorbisfile3'
 			;;
 			('wine')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32' ;;
+					('64') pkg_set_deps_deb 'wine64' ;;
+				esac
+			;;
+			('wine32')
 				pkg_dep='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
+			;;
+			('wine64')
+				pkg_dep='wine64-development | wine64 | wine64-bin | wine-amd64 | wine-staging-amd64, wine'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'

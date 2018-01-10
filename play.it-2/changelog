@@ -1,5 +1,7 @@
 2.5.0
 
+  * Add support for 64-bit WINE games
+
   * Add support for Windows MSI installers
 
   * Add support for Microsoft cabinet archives

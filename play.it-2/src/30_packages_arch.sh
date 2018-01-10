@@ -164,7 +164,7 @@ pkg_set_deps_arch32() {
 			('vorbis')
 				pkg_dep='lib32-libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')
@@ -262,7 +262,7 @@ pkg_set_deps_arch64() {
 			('vorbis')
 				pkg_dep='libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')

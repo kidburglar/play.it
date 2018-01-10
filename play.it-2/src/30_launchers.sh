@@ -45,7 +45,10 @@ write_bin() {
 		fi
 
 		# Write winecfg launcher for WINE games
-		if [ "$app_type" = 'wine' ]; then
+		if [ "$app_type" = 'wine' ] || \
+		   [ "$app_type" = 'wine32' ] || \
+		   [ "$app_type" = 'wine64' ]
+		then
 			write_bin_winecfg
 		fi
 
@@ -107,7 +110,10 @@ write_bin() {
 			PATH_CONFIG="$XDG_CONFIG_HOME/$PREFIX_ID"
 			PATH_DATA="$XDG_DATA_HOME/games/$PREFIX_ID"
 			EOF
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ]
+			then
 				write_bin_set_wine
 			else
 				cat >> "$file" <<- 'EOF'
@@ -203,7 +209,10 @@ write_bin() {
 			EOF
 
 			# Build game prefix
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ]
+			then
 				write_bin_build_wine
 			fi
 			cat >> "$file" <<- 'EOF'
@@ -232,7 +241,7 @@ write_bin() {
 			('scummvm')
 				write_bin_run_scummvm
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				write_bin_run_wine
 			;;
 		esac
@@ -258,7 +267,11 @@ write_desktop() {
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
-		if [ "$winecfg_desktop" != 'done' ] && [ "$app_type" = 'wine' ]; then
+		if [ "$winecfg_desktop" != 'done' ] && \
+		   ( [ "$app_type" = 'wine' ] || \
+		     [ "$app_type" = 'wine32' ] ||\
+		     [ "$app_type" = 'wine64' ] )
+		then
 			winecfg_desktop='done'
 			write_desktop_winecfg
 		fi
