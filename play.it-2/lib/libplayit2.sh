@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.4
+library_revision=20180117.5
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -488,9 +488,6 @@ check_deps() {
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('mojosetup_unzip'|'zip')
-				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
-			;;
 			('rar')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
 			;;
@@ -499,6 +496,9 @@ check_deps() {
 			;;
 			('tar.gz')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar"
+			;;
+			('zip'|'zip_unclean'|'mojosetup_unzip')
+				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
 			;;
 		esac
 	fi
@@ -894,12 +894,6 @@ extract_data_from() {
 				bsdtar --directory "$destination" --extract --file "$file"
 				set_standard_permissions "$destination"
 			;;
-			('mojosetup_unzip')
-				set +e
-				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1
-				set -e
-				set_standard_permissions "$destination"
-			;;
 			('nix_stage1')
 				local input_blocksize=$(head --lines=514 "$file" | wc --bytes | tr --delete ' ')
 				dd if="$file" ibs=$input_blocksize skip=1 obs=1024 conv=sync 2>/dev/null | gunzip --stdout | tar --extract --file - --directory "$destination"
@@ -922,6 +916,12 @@ extract_data_from() {
 			;;
 			('zip')
 				unzip -d "$destination" "$file" 1>/dev/null
+			;;
+			('zip_unclean'|'mojosetup_unzip')
+				set +o errexit
+				unzip -d "$destination" "$file" 1>/dev/null 2>&1
+				set -o errexit
+				set_standard_permissions "$destination"
 			;;
 			(*)
 				liberror 'ARCHIVE_TYPE' 'extract_data_from'

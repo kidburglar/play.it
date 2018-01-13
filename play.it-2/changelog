@@ -1,5 +1,7 @@
 2.5.0
 
+  * New archive type 'zip_unclean'
+
   * New function use_package_specific_value allowing to get package-specific
     value for a given variable name (if such value exists)
 
