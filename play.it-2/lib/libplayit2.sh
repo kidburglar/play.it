@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.6
+library_revision=20180117.7
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -488,7 +488,7 @@ check_deps() {
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
 			;;
 			('tar')
@@ -905,7 +905,7 @@ extract_data_from() {
 			('nix_stage2')
 				tar --extract --xz --file "$file" --directory "$destination"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				# compute archive password from GOG id
 				if [ -z "$ARCHIVE_PASSWD" ] && [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" ]; then
 					ARCHIVE_PASSWD="$(printf '%s' "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" | md5sum | cut -d' ' -f1)"

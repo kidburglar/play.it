@@ -1,5 +1,7 @@
 2.5.0
 
+  * New archive type 'nullsoft-installer'
+
   * New archive type value 'innosetup_nolowercase' allowing to skip files
     names conversion to lower case
 

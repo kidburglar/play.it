@@ -38,7 +38,7 @@ extract_data_from() {
 			('nix_stage2')
 				tar --extract --xz --file "$file" --directory "$destination"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				# compute archive password from GOG id
 				if [ -z "$ARCHIVE_PASSWD" ] && [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" ]; then
 					ARCHIVE_PASSWD="$(printf '%s' "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" | md5sum | cut -d' ' -f1)"

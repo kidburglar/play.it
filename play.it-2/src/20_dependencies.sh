@@ -17,7 +17,7 @@ check_deps() {
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
 			;;
 			('tar')
