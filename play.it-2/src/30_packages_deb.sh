@@ -170,6 +170,20 @@ pkg_set_deps_deb() {
 			('wine64')
 				pkg_dep='wine64-development | wine64 | wine64-bin | wine-amd64 | wine-staging-amd64, wine'
 			;;
+			('wine-staging')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32-staging' ;;
+					('64') pkg_set_deps_deb 'wine64-staging' ;;
+				esac
+			;;
+			('wine32-staging')
+				pkg_dep='wine-staging-i386, winehq-staging:amd64 | winehq-staging'
+			;;
+			('wine64-staging')
+				pkg_dep='wine-staging-amd64, winehq-staging'
+			;;
 			('winetricks')
 				pkg_dep='winetricks'
 			;;

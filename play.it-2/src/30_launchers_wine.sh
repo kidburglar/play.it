@@ -22,7 +22,7 @@ write_bin_winecfg() {
 # CALLED BY: write_bin
 write_bin_set_wine() {
 	case "$app_type" in
-		('wine')
+		('wine'|'wine-staging')
 			use_archive_specific_value "${PKG}_ARCH"
 			local architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
 			case "$architecture" in
@@ -30,8 +30,8 @@ write_bin_set_wine() {
 				('64') winearch='win64' ;;
 			esac
 		;;
-		('wine32') winearch='win32' ;;
-		('wine64') winearch='win64' ;;
+		('wine32'|'wine32-staging') winearch='win32' ;;
+		('wine64'|'wine64-staging') winearch='win64' ;;
 	esac
 	cat >> "$file" <<- EOF
 	export WINEARCH='$winearch'

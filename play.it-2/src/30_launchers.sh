@@ -47,7 +47,10 @@ write_bin() {
 		# Write winecfg launcher for WINE games
 		if [ "$app_type" = 'wine' ] || \
 		   [ "$app_type" = 'wine32' ] || \
-		   [ "$app_type" = 'wine64' ]
+		   [ "$app_type" = 'wine64' ] || \
+		   [ "$app_type" = 'wine-staging' ] || \
+		   [ "$app_type" = 'wine32-staging' ] || \
+		   [ "$app_type" = 'wine64-staging' ]
 		then
 			write_bin_winecfg
 		fi
@@ -112,7 +115,10 @@ write_bin() {
 			EOF
 			if [ "$app_type" = 'wine' ] || \
 			   [ "$app_type" = 'wine32' ] || \
-			   [ "$app_type" = 'wine64' ]
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
 			then
 				write_bin_set_wine
 			else
@@ -211,7 +217,10 @@ write_bin() {
 			# Build game prefix
 			if [ "$app_type" = 'wine' ] || \
 			   [ "$app_type" = 'wine32' ] || \
-			   [ "$app_type" = 'wine64' ]
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
 			then
 				write_bin_build_wine
 			fi
@@ -241,7 +250,7 @@ write_bin() {
 			('scummvm')
 				write_bin_run_scummvm
 			;;
-			('wine'|'wine32'|'wine64')
+			('wine'|'wine32'|'wine64'|'wine-staging'|'wine32-staging'|'wine64-staging')
 				write_bin_run_wine
 			;;
 		esac
@@ -269,8 +278,11 @@ write_desktop() {
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
 		   ( [ "$app_type" = 'wine' ] || \
-		     [ "$app_type" = 'wine32' ] ||\
-		     [ "$app_type" = 'wine64' ] )
+		     [ "$app_type" = 'wine32' ] || \
+		     [ "$app_type" = 'wine64' ] || \
+		     [ "$app_type" = 'wine-staging' ] || \
+		     [ "$app_type" = 'wine32-staging' ] || \
+		     [ "$app_type" = 'wine64-staging' ] )
 		then
 			winecfg_desktop='done'
 			write_desktop_winecfg

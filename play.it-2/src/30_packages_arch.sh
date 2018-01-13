@@ -167,6 +167,9 @@ pkg_set_deps_arch32() {
 			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
+			('wine-staging'|'wine32-staging'|'wine64-staging')
+				pkg_dep='wine-staging'
+			;;
 			('winetricks')
 				pkg_dep='winetricks'
 			;;
