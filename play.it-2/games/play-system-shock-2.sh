@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171001.2
+script_version=20180114.2
 
 # Set game-specific variables
 
@@ -64,6 +64,8 @@ CONFIG_FILES='./*.bnd ./*.cfg ./*.ini'
 DATA_DIRS='./current ./save_0 ./save_1 ./save_2 ./save_3 ./save_4 ./save_5 ./save_6 ./save_7 ./save_8 ./save_9 ./save_10 ./save_11 ./save_12 ./save_13 ./save_14'
 DATA_FILES='./*.log'
 
+APP_WINETRICKS="vd=\$(xrandr|grep '\*'|awk '{print \$1}')"
+
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='shock2.exe'
 APP_MAIN_ICON='shock2.exe'
@@ -75,12 +77,13 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine"
+PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
+PKG_BIN_DEPS_DEB='x11-xserver-utils:amd64 | x11-xserver-utils'
+PKG_BIN_DEPS_ARCH='xorg-xrandr'
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
