@@ -184,6 +184,16 @@ write_bin() {
 			      fi
 			    done
 			  )
+			  (
+			    cd "$PATH_PREFIX"
+			    for file in $2; do
+			      if [ -e "$file" ] && [ ! -e "$1/$file" ]; then
+			        cp --parents "$file" "$1"
+			        rm --force "$file"
+			        ln --symbolic "$1/$file" "$file"
+			      fi
+			    done
+			  )
 			}
 
 			init_userdir_files() {
@@ -226,8 +236,8 @@ write_bin() {
 			  mkdir --parents "$PATH_PREFIX"
 			  cp --force --recursive --symbolic-link --update "$PATH_GAME"/* "$PATH_PREFIX"
 			fi
-			init_prefix_files "$PATH_CONFIG"
-			init_prefix_files "$PATH_DATA"
+			init_prefix_files "$PATH_CONFIG" "$CONFIG_FILES"
+			init_prefix_files "$PATH_DATA" "$DATA_FILES"
 			init_prefix_dirs "$PATH_CONFIG" "$CONFIG_DIRS"
 			init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"
 
