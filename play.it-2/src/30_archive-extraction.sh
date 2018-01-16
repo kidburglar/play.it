@@ -31,6 +31,10 @@ extract_data_from() {
 				printf '\n'
 				innoextract $options --extract --output-dir "$destination" "$file"
 			;;
+			('msi')
+				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
+				tolower "$destination"
+			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"
 				set_standard_permissions "$destination"

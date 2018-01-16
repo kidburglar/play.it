@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.8
+library_revision=20180117.9
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -344,6 +344,9 @@ archive_guess_type() {
 		(gog_*.sh)
 			export ${ARCHIVE}_TYPE='mojosetup'
 		;;
+		(*.msi)
+			export ${ARCHIVE}_TYPE='msi'
+		;;
 		(*.rar)
 			export ${ARCHIVE}_TYPE='rar'
 		;;
@@ -490,6 +493,9 @@ check_deps() {
 			;;
 			('nixstaller')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar unxz"
+			;;
+			('msi')
+				SCRIPT_DEPS="$SCRIPT_DEPS msiextract"
 			;;
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
@@ -903,6 +909,10 @@ extract_data_from() {
 				fi
 				printf '\n'
 				innoextract $options --extract --output-dir "$destination" "$file"
+			;;
+			('msi')
+				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
+				tolower "$destination"
 			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"

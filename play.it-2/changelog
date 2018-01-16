@@ -1,5 +1,7 @@
 2.5.0
 
+  * Add support for Windows MSI installers
+
   * Add support for Microsoft cabinet archives
 
   * New archive type 'nullsoft-installer'

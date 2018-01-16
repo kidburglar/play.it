@@ -134,6 +134,9 @@ archive_guess_type() {
 		(gog_*.sh)
 			export ${ARCHIVE}_TYPE='mojosetup'
 		;;
+		(*.msi)
+			export ${ARCHIVE}_TYPE='msi'
+		;;
 		(*.rar)
 			export ${ARCHIVE}_TYPE='rar'
 		;;

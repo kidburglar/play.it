@@ -17,6 +17,9 @@ check_deps() {
 			('nixstaller')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar unxz"
 			;;
+			('msi')
+				SCRIPT_DEPS="$SCRIPT_DEPS msiextract"
+			;;
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
