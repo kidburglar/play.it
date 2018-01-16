@@ -34,24 +34,29 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171108.2
+script_version=20180114.2
 
 # Set game-specific variables
 
 GAME_ID='deus-ex'
 GAME_NAME='Deus Ex'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
-ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.3.0.1)_(16231).exe'
-ARCHIVE_GOG_MD5='eaaf7c7c3052fbf71f5226e2d4495268'
-ARCHIVE_GOG_VERSION='1.112fm-gog16231'
+ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.3.1)_(17719).exe'
+ARCHIVE_GOG_MD5='92e9e6a33642f9e6c41cb24055df9b3c'
+ARCHIVE_GOG_VERSION='1.112fm-gog17719'
 ARCHIVE_GOG_SIZE='750000'
 
-ARCHIVE_GOG_OLD='setup_deus_ex_goty_1.112fm(revision_1.2.2)_(15442).exe'
-ARCHIVE_GOG_OLD_MD5='573582142424ba1b5aba1f6727276450'
-ARCHIVE_GOG_OLD_VERSION='1.112fm-gog15442'
+ARCHIVE_GOG_OLD='setup_deus_ex_goty_1.112fm(revision_1.3.0.1)_(16231).exe'
+ARCHIVE_GOG_OLD_MD5='eaaf7c7c3052fbf71f5226e2d4495268'
+ARCHIVE_GOG_OLD_VERSION='1.112fm-gog16231'
 ARCHIVE_GOG_OLD_SIZE='750000'
+
+ARCHIVE_GOG_OLDER='setup_deus_ex_goty_1.112fm(revision_1.2.2)_(15442).exe'
+ARCHIVE_GOG_OLDER_MD5='573582142424ba1b5aba1f6727276450'
+ARCHIVE_GOG_OLDER_VERSION='1.112fm-gog15442'
+ARCHIVE_GOG_OLDER_SIZE='750000'
 
 ARCHIVE_DOC_DATA_PATH='app'
 ARCHIVE_DOC_DATA_FILES='./manual.pdf ./system/*.txt'
@@ -70,7 +75,7 @@ APP_MAIN_TYPE='wine'
 APP_MAIN_PRERUN="rgamma=\$(xgamma 2>&1|sed 's/->//'|cut -d',' -f1|awk '{print \$2}')
 ggamma=\$(xgamma 2>&1|sed 's/->//'|cut -d',' -f2|awk '{print \$2}')
 bgamma=\$(xgamma 2>&1|sed 's/->//'|cut -d',' -f3|awk '{print \$2}')"
-APP_MAIN_POSTRUN='xgamma -rgamma $rgamma -ggamma $ggamma -bgamma $bgamma' # Works only with library version >= 2.2
+APP_MAIN_POSTRUN='xgamma -rgamma $rgamma -ggamma $ggamma -bgamma $bgamma'
 APP_MAIN_EXE='system/deusex.exe'
 APP_MAIN_ICON='system/deusex.exe'
 APP_MAIN_ICON_RES='16 32'
@@ -81,12 +86,13 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine, x11-xserver-utils:amd64 | x11-xserver-utils"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine xorg-xgamma"
+PKG_BIND_DEPS="$PKG_DATA_ID wine"
+PKG_BIN_DEPS_DEB='x11-xserver-utils:amd64 | x11-xserver-utils'
+PKG_BIN_DEPS_ARCH='xorg-xgamma'
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.4'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

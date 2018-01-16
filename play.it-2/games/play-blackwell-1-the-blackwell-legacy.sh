@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180113.2
+script_version=20180115.1
 
 # Set game-specific variables
 
@@ -61,7 +61,7 @@ ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./ac2game.dat ./acsetup.cfg ./audio.vox ./Legacy.png ./speech.vox'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN64='Legacy.bin.x86'
+APP_MAIN_EXE_BIN32='Legacy.bin.x86'
 APP_MAIN_EXE_BIN64='Legacy.bin.x86_64'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='./Legacy.png'

@@ -29,57 +29,55 @@ set -o errexit
 ###
 
 ###
-# System Shock 2
+# A Virus Named Tom
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180114.2
+script_version=20180115.1
 
 # Set game-specific variables
 
-GAME_ID='system-shock-2'
-GAME_NAME='System Shock 2'
+GAME_ID='a-virus-named-tom'
+GAME_NAME='A Virus Named Tom'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
-ARCHIVE_GOG='setup_system_shock_2_2.46_nd_(11004).exe'
-ARCHIVE_GOG_MD5='98c3d01d53bb2b0dc25d7ed7093a67d3'
-ARCHIVE_GOG_SIZE='680000'
-ARCHIVE_GOG_VERSION='2.46-gog11004'
+ARCHIVE_HUMBLE='avnt-09172013-bin'
+ARCHIVE_HUMBLE_MD5='85d11d3f05ad966a06a7e2f77e2fee45'
+ARCHIVE_HUMBLE_SIZE='270000'
+ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_DOC_DATA_PATH='app'
-ARCHIVE_DOC_DATA_FILES='./*.pdf ./*.txt ./*.wri ./doc ./editor/*.txt'
+ARCHIVE_DOC_DATA_PATH='data'
+ARCHIVE_DOC_DATA_FILES='./Linux.README'
 
-ARCHIVE_GAME1_BIN_PATH='app'
-ARCHIVE_GAME1_BIN_FILES='./*.ax ./*.bnd ./*.cfg ./*.exe ./*.osm ./7z.dll ./d3dx9_43.dll ./ffmpeg.dll ./fmsel.dll ./ir41_32.dll ./ir50_32.dll ./lgvid.dll ./msvcrt40.dll ./editor/*.cfg ./editor/*.dll ./editor/*.exe ./microsoft.vc90.crt'
+ARCHIVE_GAME_BIN32_PATH='data'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./lib'
 
-ARCHIVE_GAME2_BIN_PATH='app/__support/app'
-ARCHIVE_GAME2_BIN_FILES='./*.cfg ./*.ini'
+ARCHIVE_GAME_BIN64_PATH='data'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./lib64'
 
-ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='./*.bin ./*.dif ./*.dml ./ilist.* ./patch* ./binds ./data ./sq_scripts'
+ARCHIVE_GAME_DATA_PATH='data'
+ARCHIVE_GAME_DATA_FILES='./A?Virus?Named?TOM.bmp ./AVirusNamedTOM ./*.dll ./*.exe ./Content ./mono ./*.config ./Xml'
 
-CONFIG_FILES='./*.bnd ./*.cfg ./*.ini'
-DATA_DIRS='./current ./save_0 ./save_1 ./save_2 ./save_3 ./save_4 ./save_5 ./save_6 ./save_7 ./save_8 ./save_9 ./save_10 ./save_11 ./save_12 ./save_13 ./save_14'
-DATA_FILES='./*.log'
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE_BIN32='CircuitGame.bin.x86'
+APP_MAIN_EXE_BIN64='CircuitGame.bin.x86_64'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='A?Virus?Named?TOM.bmp'
+APP_MAIN_ICON_RES='128'
 
-APP_WINETRICKS="vd=\$(xrandr|grep '\*'|awk '{print \$1}')"
-
-APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='shock2.exe'
-APP_MAIN_ICON='shock2.exe'
-APP_MAIN_ICON_RES='16 32 48 64'
-
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
-PKG_BIN_DEPS_DEB='x11-xserver-utils:amd64 | x11-xserver-utils'
-PKG_BIN_DEPS_ARCH='xorg-xrandr'
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -104,26 +102,30 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"   "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}"  "$PATH_GAME"
-	organize_data "GAME1_${PKG#PKG_}" "$PATH_GAME"
-	organize_data "GAME2_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
+PKG='PKG_DATA'
+res="$APP_MAIN_ICON_RES"
+PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
+mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
-write_metadata
+postinst_icons_linking 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
@@ -132,6 +134,10 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-print_instructions
+printf '\n'
+printf '32-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN32'
+printf '64-bit:'
+print_instructions 'PKG_DATA' 'PKG_BIN64'
 
 exit 0
