@@ -122,6 +122,9 @@ set_archive_vars() {
 # CALLED BY: set_archive_vars
 archive_guess_type() {
 	case "${1##*/}" in
+		(*.cab)
+			export ${ARCHIVE}_TYPE='cabinet'
+		;;
 		(*.deb)
 			export ${ARCHIVE}_TYPE='debian'
 		;;

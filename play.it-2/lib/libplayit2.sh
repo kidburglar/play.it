@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.7
+library_revision=20180117.8
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -332,6 +332,9 @@ set_archive_vars() {
 # CALLED BY: set_archive_vars
 archive_guess_type() {
 	case "${1##*/}" in
+		(*.cab)
+			export ${ARCHIVE}_TYPE='cabinet'
+		;;
 		(*.deb)
 			export ${ARCHIVE}_TYPE='debian'
 		;;
@@ -476,6 +479,9 @@ file_checksum_error() {
 check_deps() {
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
+			('cabinet')
+				SCRIPT_DEPS="$SCRIPT_DEPS cabextract"
+			;;
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
@@ -882,6 +888,10 @@ extract_data_from() {
 		case "$archive_type" in
 			('7z')
 				extract_7z "$file" "$destination"
+			;;
+			('cabinet')
+				cabextract -d "$destination" -q "$file"
+				tolower "$destination"
 			;;
 			('debian')
 				dpkg-deb --extract "$file" "$destination"

@@ -5,6 +5,9 @@
 check_deps() {
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
+			('cabinet')
+				SCRIPT_DEPS="$SCRIPT_DEPS cabextract"
+			;;
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
