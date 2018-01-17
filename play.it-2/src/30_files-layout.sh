@@ -5,25 +5,10 @@ organize_data() {
 	if [ -z "$PKG" ]; then
 		organize_data_error_missing_pkg
 	fi
-	local archive_path
-	local guessed_path="ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_path#ARCHIVE_*_PATH}" != "$guessed_path" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_path}\")" ]; then
-			archive_path="$(eval printf -- '%b' \"\$${guessed_path}\")"
-			break
-		fi
-		guessed_path="${guessed_path%_*}"
-	done
-
-	local archive_files
-	local guessed_files="ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_files#ARCHIVE_*_FILES}" != "$guessed_files" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_files}\")" ]; then
-			archive_files="$(eval printf -- '%b' \"\$${guessed_files}\")"
-			break
-		fi
-		guessed_files="${guessed_files%_*}"
-	done
+	use_archive_specific_value "ARCHIVE_${1}_PATH"
+	use_archive_specific_value "ARCHIVE_${1}_FILES"
+	local archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
+	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")${2}"

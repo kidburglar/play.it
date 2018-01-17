@@ -1,5 +1,8 @@
 2.5.0
 
+  * New function use_archive_specific_value allowing to get archive-specific
+    value for a given variable name (if such value exists)
+
   * Add 'xrandr' and 'xgamma' to the generic dependencies
 
   * Add automatic dependencies detection for archive types 'mojosetup_unzip'

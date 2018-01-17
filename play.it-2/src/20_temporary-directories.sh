@@ -66,15 +66,12 @@ set_temp_directories() {
 set_temp_directories_pkg() {
 
 	# Get package ID
-	local pkg_id
-	if [ "$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${1}_ID\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
-	else
+	use_archive_specific_value "${1}_ID"
+	local pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	if [ -z "$pkg_id" ]; then
+		export ${1}_ID="$GAME_ID"
 		pkg_id="$GAME_ID"
 	fi
-	export ${1}_ID="$pkg_id"
 
 	# Get package version
 	local pkg_version

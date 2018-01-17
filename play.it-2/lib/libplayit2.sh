@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.2
+library_revision=20180117.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -41,13 +41,8 @@ library_revision=20180117.2
 # NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) (PKG_ARCH)
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
-	local architecture
-	if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-		export ${1}_ARCH="$architecture"
-	else
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
-	fi
+	use_archive_specific_value "${1}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
 	case $OPTION_PACKAGE in
 		('arch')
 			set_architecture_arch "$architecture"
@@ -146,6 +141,23 @@ liberror() {
 	esac
 	printf "$string" "$var" "$func" "$value"
 	return 1
+}
+
+# get archive-specific value for a given variable name, or use default value
+# USAGE: use_archive_specific_value $var_name
+use_archive_specific_value() {
+	[ -n "$ARCHIVE" ] || return 0
+	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
 }
 
 # set distribution-specific package architecture for Arch Linux target
@@ -767,15 +779,12 @@ set_temp_directories() {
 set_temp_directories_pkg() {
 
 	# Get package ID
-	local pkg_id
-	if [ "$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${1}_ID\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
-	else
+	use_archive_specific_value "${1}_ID"
+	local pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	if [ -z "$pkg_id" ]; then
+		export ${1}_ID="$GAME_ID"
 		pkg_id="$GAME_ID"
 	fi
-	export ${1}_ID="$pkg_id"
 
 	# Get package version
 	local pkg_version
@@ -931,25 +940,10 @@ organize_data() {
 	if [ -z "$PKG" ]; then
 		organize_data_error_missing_pkg
 	fi
-	local archive_path
-	local guessed_path="ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_path#ARCHIVE_*_PATH}" != "$guessed_path" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_path}\")" ]; then
-			archive_path="$(eval printf -- '%b' \"\$${guessed_path}\")"
-			break
-		fi
-		guessed_path="${guessed_path%_*}"
-	done
-
-	local archive_files
-	local guessed_files="ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_files#ARCHIVE_*_FILES}" != "$guessed_files" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_files}\")" ]; then
-			archive_files="$(eval printf -- '%b' \"\$${guessed_files}\")"
-			break
-		fi
-		guessed_files="${guessed_files%_*}"
-	done
+	use_archive_specific_value "ARCHIVE_${1}_PATH"
+	use_archive_specific_value "ARCHIVE_${1}_FILES"
+	local archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
+	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")${2}"
@@ -1048,13 +1042,8 @@ extract_and_sort_icons_from() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
-
-		if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")" ]; then
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")"
-			export ${app}_ICON="$app_icon"
-		else
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
-		fi
+		use_archive_specific_value "${app}_ICON"
+		local app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 
 		if [ ! "$WRESTOOL_NAME" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_ID\")" ]; then
 			WRESTOOL_NAME="$(eval printf -- '%b' \"\$${app}_ICON_ID\")"
@@ -1871,11 +1860,8 @@ write_metadata() {
 		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		local pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
-		if [ "$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")" ]; then
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-		fi
+		use_archive_specific_value "${pkg}_DESCRIPTION"
+		local pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
 
 		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
 			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
@@ -1967,9 +1953,8 @@ pkg_write_arch() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_arch $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_ARCH"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
 		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
 	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
@@ -2041,12 +2026,8 @@ pkg_write_arch() {
 # CALLS: pkg_set_deps_arch32 pkg_set_deps_arch64
 # CALLED BY: pkg_write_arch
 pkg_set_deps_arch() {
-	local architecture
-	if [ "$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	else
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
-	fi
+	use_archive_specific_value "${pkg}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 	case $architecture in
 		('32')
 			pkg_set_deps_arch32 $@
@@ -2309,13 +2290,8 @@ pkg_write_deb() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_deb $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")" ]; then
-		if [ -n "$pkg_deps" ]; then
-			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		fi
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_DEB"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
 		if [ -n "$pkg_deps" ]; then
 			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		else

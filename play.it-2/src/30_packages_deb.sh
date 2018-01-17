@@ -7,13 +7,8 @@ pkg_write_deb() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_deb $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")" ]; then
-		if [ -n "$pkg_deps" ]; then
-			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		fi
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_DEB"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
 		if [ -n "$pkg_deps" ]; then
 			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		else

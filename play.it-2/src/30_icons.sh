@@ -63,13 +63,8 @@ extract_and_sort_icons_from() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
-
-		if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")" ]; then
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")"
-			export ${app}_ICON="$app_icon"
-		else
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
-		fi
+		use_archive_specific_value "${app}_ICON"
+		local app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 
 		if [ ! "$WRESTOOL_NAME" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_ID\")" ]; then
 			WRESTOOL_NAME="$(eval printf -- '%b' \"\$${app}_ICON_ID\")"
