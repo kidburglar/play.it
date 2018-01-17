@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.5.0
-library_revision=20180117.12
+library_version=2.5.1~dev
+library_revision=20180117.13
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -175,6 +175,23 @@ use_package_specific_value() {
 		fi
 		name="${name%_*}"
 	done
+}
+
+# display an error when PKG value seems invalid
+# USAGE: missing_pkg_error $function_name $PKG
+# NEEDED VARS: (LANG)
+missing_pkg_error() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s semble incorrecte : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s seems erroneous: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
+	exit 1
 }
 
 # set distribution-specific package architecture for Arch Linux target
@@ -976,7 +993,7 @@ extract_data_from_print() {
 
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
-# NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) PKG_PATH
+# NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) (PKG_PATH)
 organize_data() {
 	if [ -z "$PKG" ]; then
 		organize_data_error_missing_pkg
@@ -987,7 +1004,9 @@ organize_data() {
 	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
-		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")${2}"
+		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
+		pkg_path="${pkg_path}$2"
 		mkdir --parents "$pkg_path"
 		(
 			cd "$PLAYIT_WORKDIR/gamedata/$archive_path"
@@ -1050,7 +1069,7 @@ extract_icon_from() {
 
 # create icons layout
 # USAGE: sort_icons $app[…]
-# NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG PKG_PATH
+# NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
 for app in $@; do
 	testvar "$app" 'APP' || liberror 'app' 'sort_icons'
@@ -1064,6 +1083,7 @@ for app in $@; do
 
 	local icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
 	for res in $icon_res; do
 		path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
 		mkdir --parents "${pkg_path}${path_icon}"
@@ -1076,11 +1096,12 @@ done
 
 # extract and sort icons from given .ico or .exe file
 # USAGE: extract_and_sort_icons_from $app[…]
-# NEEDED VARS: APP_ICON APP_ICON_RES (APP_ID) GAME_ID PKG PKG_PATH PLAYIT_WORKDIR
+# NEEDED VARS: APP_ICON APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH) PLAYIT_WORKDIR
 # CALLS: extract_icon_from liberror sort_icons
 extract_and_sort_icons_from() {
 	local app_icon
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
@@ -1104,10 +1125,12 @@ extract_and_sort_icons_from() {
 
 # move icons to the target package
 # USAGE: move_icons_to $pkg
-# NEEDED VARS: PATH_ICON_BASE PKG
+# NEEDED VARS: PATH_ICON_BASE PKG (PKG_PATH)
 move_icons_to() {
 	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$source_path" ] || missing_pkg_error 'move_icons_to' "$PKG"
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
+	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
 	(
 		cd "$source_path"
 		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
@@ -1156,7 +1179,7 @@ postinst_icons_linking() {
 
 # get .png icon from temporary work directory
 # USAGE: get_icon_from_temp_dir $app[…]
-# NEEDED VARS: PKG PKG_PATH PATH_ICON_BASE APP_ID|GAME_ID PLAYIT_WORKDIR
+# NEEDED VARS: PKG (PKG_PATH) PATH_ICON_BASE APP_ID|GAME_ID PLAYIT_WORKDIR
 # CALLS: liberror
 get_icon_from_temp_dir() {
 	local app_icon
@@ -1164,6 +1187,7 @@ get_icon_from_temp_dir() {
 	local app_icon_res
 	local app_id
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
@@ -1296,7 +1320,7 @@ print_instructions_deb_common() {
 
 # alias calling write_bin() and write_desktop()
 # USAGE: write_launcher $app[…]
-# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG PKG_PATH
+# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
 	write_bin $@
@@ -1305,11 +1329,12 @@ write_launcher() {
 
 # write launcher script
 # USAGE: write_bin $app[…]
-# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG (PKG_PATH)
 # CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
@@ -1563,7 +1588,7 @@ write_bin() {
 
 # write menu entry
 # USAGE: write_desktop $app[…]
-# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_NAME|GAME_NAME APP_TYPE (LANG) PATH_DESK PKG PKG_PATH
+# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_NAME|GAME_NAME APP_TYPE (LANG) PATH_DESK PKG (PKG_PATH)
 # CALLS: liberror testvar write_desktop_winecfg
 # CALLED BY: write_launcher
 write_desktop() {
@@ -1606,6 +1631,7 @@ write_desktop() {
 		fi
 
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop' "$PKG"
 		local target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
 		mkdir --parents "${target%/*}"
 		cat > "$target" <<- EOF
@@ -1777,7 +1803,7 @@ write_bin_run_scummvm() {
 
 # write winecfg launcher script
 # USAGE: write_bin_winecfg
-# NEEDED VARS: APP_POSTRUN APP_PRERUN CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_POSTRUN APP_PRERUN CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin
 # CALLED BY: write_bin
 write_bin_winecfg() {
@@ -1883,11 +1909,12 @@ write_bin_run_wine() {
 
 # write winecfg menu entry
 # USAGE: write_desktop_winecfg
-# NEEDED VARS: (LANG) PATH_DESK PKG PKG_PATH
+# NEEDED VARS: (LANG) PATH_DESK PKG (PKG_PATH)
 # CALLS: write_desktop
 # CALLED BY: write_desktop
 write_desktop_winecfg() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop_winecfg' "$PKG"
 	APP_WINECFG_ID="${GAME_ID}_winecfg"
 	APP_WINECFG_NAME="$GAME_NAME - WINE configuration"
 	APP_WINECFG_CAT='Settings'
@@ -1897,7 +1924,7 @@ write_desktop_winecfg() {
 
 # write package meta-data
 # USAGE: write_metadata [$pkg…]
-# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID PKG_PATH PKG_PROVIDE PKG_VERSION
+# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE PKG_VERSION
 # CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
 write_metadata() {
 	if [ $# = 0 ]; then
@@ -1913,6 +1940,7 @@ write_metadata() {
 		local pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\")"
 		local pkg_maint="$(whoami)@$(hostname)"
 		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
 		local pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
@@ -1941,7 +1969,7 @@ write_metadata() {
 
 # build .pkg.tar or .deb package
 # USAGE: build_pkg [$pkg…]
-# NEEDED VARS: (OPTION_COMPRESSION) (LANG) (OPTION_PACKAGE) PACKAGES_LIST PKG_PATH PLAYIT_WORKDIR
+# NEEDED VARS: (OPTION_COMPRESSION) (LANG) (OPTION_PACKAGE) PACKAGES_LIST (PKG_PATH) PLAYIT_WORKDIR
 # CALLS: liberror pkg_build_arch pkg_build_deb testvar
 build_pkg() {
 	if [ $# = 0 ]; then
@@ -1951,6 +1979,7 @@ build_pkg() {
 	for pkg in $@; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'build_pkg'
 		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
 			('arch')
 				pkg_build_arch "$pkg_path"

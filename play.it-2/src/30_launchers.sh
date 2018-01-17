@@ -1,6 +1,6 @@
 # alias calling write_bin() and write_desktop()
 # USAGE: write_launcher $app[…]
-# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG PKG_PATH
+# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
 	write_bin $@
@@ -9,11 +9,12 @@ write_launcher() {
 
 # write launcher script
 # USAGE: write_bin $app[…]
-# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_ID|GAME_ID APP_EXE APP_LIBS APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG (PKG_PATH)
 # CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
@@ -267,7 +268,7 @@ write_bin() {
 
 # write menu entry
 # USAGE: write_desktop $app[…]
-# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_NAME|GAME_NAME APP_TYPE (LANG) PATH_DESK PKG PKG_PATH
+# NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_NAME|GAME_NAME APP_TYPE (LANG) PATH_DESK PKG (PKG_PATH)
 # CALLS: liberror testvar write_desktop_winecfg
 # CALLED BY: write_launcher
 write_desktop() {
@@ -310,6 +311,7 @@ write_desktop() {
 		fi
 
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop' "$PKG"
 		local target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
 		mkdir --parents "${target%/*}"
 		cat > "$target" <<- EOF

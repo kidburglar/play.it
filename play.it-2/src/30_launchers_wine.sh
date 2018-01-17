@@ -1,6 +1,6 @@
 # write winecfg launcher script
 # USAGE: write_bin_winecfg
-# NEEDED VARS: APP_POSTRUN APP_PRERUN CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG PKG_PATH
+# NEEDED VARS: APP_POSTRUN APP_PRERUN CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin
 # CALLED BY: write_bin
 write_bin_winecfg() {
@@ -106,11 +106,12 @@ write_bin_run_wine() {
 
 # write winecfg menu entry
 # USAGE: write_desktop_winecfg
-# NEEDED VARS: (LANG) PATH_DESK PKG PKG_PATH
+# NEEDED VARS: (LANG) PATH_DESK PKG (PKG_PATH)
 # CALLS: write_desktop
 # CALLED BY: write_desktop
 write_desktop_winecfg() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop_winecfg' "$PKG"
 	APP_WINECFG_ID="${GAME_ID}_winecfg"
 	APP_WINECFG_NAME="$GAME_NAME - WINE configuration"
 	APP_WINECFG_CAT='Settings'

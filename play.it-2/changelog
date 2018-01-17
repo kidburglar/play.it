@@ -7,6 +7,8 @@
 
   * Improve patches syntax following ShellCheck feedback
 
+  * Display an error when using an invalid value for PKG
+
 2.5.0
 
   * Add support for games requiring wine-staging patches

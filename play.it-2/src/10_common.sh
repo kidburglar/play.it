@@ -140,3 +140,20 @@ use_package_specific_value() {
 	done
 }
 
+# display an error when PKG value seems invalid
+# USAGE: missing_pkg_error $function_name $PKG
+# NEEDED VARS: (LANG)
+missing_pkg_error() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s semble incorrecte : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s seems erroneous: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
+	exit 1
+}
+

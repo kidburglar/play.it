@@ -30,7 +30,7 @@ extract_icon_from() {
 
 # create icons layout
 # USAGE: sort_icons $app[…]
-# NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG PKG_PATH
+# NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
 for app in $@; do
 	testvar "$app" 'APP' || liberror 'app' 'sort_icons'
@@ -44,6 +44,7 @@ for app in $@; do
 
 	local icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
 	for res in $icon_res; do
 		path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
 		mkdir --parents "${pkg_path}${path_icon}"
@@ -56,11 +57,12 @@ done
 
 # extract and sort icons from given .ico or .exe file
 # USAGE: extract_and_sort_icons_from $app[…]
-# NEEDED VARS: APP_ICON APP_ICON_RES (APP_ID) GAME_ID PKG PKG_PATH PLAYIT_WORKDIR
+# NEEDED VARS: APP_ICON APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH) PLAYIT_WORKDIR
 # CALLS: extract_icon_from liberror sort_icons
 extract_and_sort_icons_from() {
 	local app_icon
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
@@ -84,10 +86,12 @@ extract_and_sort_icons_from() {
 
 # move icons to the target package
 # USAGE: move_icons_to $pkg
-# NEEDED VARS: PATH_ICON_BASE PKG
+# NEEDED VARS: PATH_ICON_BASE PKG (PKG_PATH)
 move_icons_to() {
 	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$source_path" ] || missing_pkg_error 'move_icons_to' "$PKG"
 	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
+	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
 	(
 		cd "$source_path"
 		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
@@ -136,7 +140,7 @@ postinst_icons_linking() {
 
 # get .png icon from temporary work directory
 # USAGE: get_icon_from_temp_dir $app[…]
-# NEEDED VARS: PKG PKG_PATH PATH_ICON_BASE APP_ID|GAME_ID PLAYIT_WORKDIR
+# NEEDED VARS: PKG (PKG_PATH) PATH_ICON_BASE APP_ID|GAME_ID PLAYIT_WORKDIR
 # CALLS: liberror
 get_icon_from_temp_dir() {
 	local app_icon
@@ -144,6 +148,7 @@ get_icon_from_temp_dir() {
 	local app_icon_res
 	local app_id
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
