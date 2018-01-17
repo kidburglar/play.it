@@ -123,3 +123,20 @@ use_archive_specific_value() {
 	done
 }
 
+# get package-specific value for a given variable name, or use default value
+# USAGE: use_package_specific_value $var_name
+use_package_specific_value() {
+	[ -n "$PKG" ] || return 0
+	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${PKG#PKG_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
+}
+

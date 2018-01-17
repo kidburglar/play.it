@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.0~dev
-library_revision=20180117.3
+library_revision=20180117.4
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -150,6 +150,23 @@ use_archive_specific_value() {
 	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
 	local name_real="$1"
 	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
+}
+
+# get package-specific value for a given variable name, or use default value
+# USAGE: use_package_specific_value $var_name
+use_package_specific_value() {
+	[ -n "$PKG" ] || return 0
+	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${PKG#PKG_}"
 	while [ "$name" != "$name_real" ]; do
 		local value="$(eval printf -- '%b' \"\$$name\")"
 		if [ -n "$value" ]; then
@@ -1283,41 +1300,16 @@ write_bin() {
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
-			local app_options
-			if [ -n "$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")" ]; then
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")"
-			else
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			fi
-
-			local app_prerun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")" ]; then
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")"
-			else
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
-			fi
-
-			local app_postrun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")" ]; then
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")"
-			else
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
-			fi
-
-			local app_exe
-			if [ -n "$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")" ]; then
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")"
-			else
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
-			fi
-
-			local app_libs
-			if [ -n "$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")" ]; then
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")"
-			else
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
-			fi
-
+			use_package_specific_value "${app}_EXE"
+			use_package_specific_value "${app}_LIBS"
+			use_package_specific_value "${app}_OPTIONS"
+			use_package_specific_value "${app}_POSTRUN"
+			use_package_specific_value "${app}_PRERUN"
+			local app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
+			local app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
+			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
 			if [ "$app_type" = 'native' ] ||\
 			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
