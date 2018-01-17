@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.4.2
-library_revision=20180114.1
+library_version=2.5.0
+library_revision=20180117.12
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -41,13 +41,8 @@ library_revision=20180114.1
 # NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) (PKG_ARCH)
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
-	local architecture
-	if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-		export ${1}_ARCH="$architecture"
-	else
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
-	fi
+	use_archive_specific_value "${1}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
 	case $OPTION_PACKAGE in
 		('arch')
 			set_architecture_arch "$architecture"
@@ -146,6 +141,40 @@ liberror() {
 	esac
 	printf "$string" "$var" "$func" "$value"
 	return 1
+}
+
+# get archive-specific value for a given variable name, or use default value
+# USAGE: use_archive_specific_value $var_name
+use_archive_specific_value() {
+	[ -n "$ARCHIVE" ] || return 0
+	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
+}
+
+# get package-specific value for a given variable name, or use default value
+# USAGE: use_package_specific_value $var_name
+use_package_specific_value() {
+	[ -n "$PKG" ] || return 0
+	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${PKG#PKG_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
 }
 
 # set distribution-specific package architecture for Arch Linux target
@@ -303,6 +332,9 @@ set_archive_vars() {
 # CALLED BY: set_archive_vars
 archive_guess_type() {
 	case "${1##*/}" in
+		(*.cab)
+			export ${ARCHIVE}_TYPE='cabinet'
+		;;
 		(*.deb)
 			export ${ARCHIVE}_TYPE='debian'
 		;;
@@ -311,6 +343,9 @@ archive_guess_type() {
 		;;
 		(gog_*.sh)
 			export ${ARCHIVE}_TYPE='mojosetup'
+		;;
+		(*.msi)
+			export ${ARCHIVE}_TYPE='msi'
 		;;
 		(*.rar)
 			export ${ARCHIVE}_TYPE='rar'
@@ -447,26 +482,35 @@ file_checksum_error() {
 check_deps() {
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
+			('cabinet')
+				SCRIPT_DEPS="$SCRIPT_DEPS cabextract"
+			;;
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
-			('innosetup')
+			('innosetup'*)
 				SCRIPT_DEPS="$SCRIPT_DEPS innoextract"
 			;;
 			('nixstaller')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar unxz"
 			;;
+			('msi')
+				SCRIPT_DEPS="$SCRIPT_DEPS msiextract"
+			;;
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('zip')
-				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
-			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
+			;;
+			('tar')
+				SCRIPT_DEPS="$SCRIPT_DEPS tar"
 			;;
 			('tar.gz')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar"
+			;;
+			('zip'|'zip_unclean'|'mojosetup_unzip')
+				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
 			;;
 		esac
 	fi
@@ -764,15 +808,12 @@ set_temp_directories() {
 set_temp_directories_pkg() {
 
 	# Get package ID
-	local pkg_id
-	if [ "$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${1}_ID\")" ]; then
-		pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
-	else
+	use_archive_specific_value "${1}_ID"
+	local pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	if [ -z "$pkg_id" ]; then
+		export ${1}_ID="$GAME_ID"
 		pkg_id="$GAME_ID"
 	fi
-	export ${1}_ID="$pkg_id"
 
 	# Get package version
 	local pkg_version
@@ -854,21 +895,27 @@ extract_data_from() {
 			('7z')
 				extract_7z "$file" "$destination"
 			;;
+			('cabinet')
+				cabextract -d "$destination" -q "$file"
+				tolower "$destination"
+			;;
 			('debian')
 				dpkg-deb --extract "$file" "$destination"
 			;;
-			('innosetup')
+			('innosetup'*)
+				options='--progress=1 --silent'
+				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+					options="$options --lowercase"
+				fi
 				printf '\n'
-				innoextract --extract --lowercase --output-dir "$destination" --progress=1 --silent "$file"
+				innoextract $options --extract --output-dir "$destination" "$file"
+			;;
+			('msi')
+				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
+				tolower "$destination"
 			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"
-				set_standard_permissions "$destination"
-			;;
-			('mojosetup_unzip')
-				set +e
-				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1
-				set -e
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')
@@ -878,7 +925,7 @@ extract_data_from() {
 			('nix_stage2')
 				tar --extract --xz --file "$file" --directory "$destination"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				# compute archive password from GOG id
 				if [ -z "$ARCHIVE_PASSWD" ] && [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" ]; then
 					ARCHIVE_PASSWD="$(printf '%s' "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" | md5sum | cut -d' ' -f1)"
@@ -893,6 +940,12 @@ extract_data_from() {
 			;;
 			('zip')
 				unzip -d "$destination" "$file" 1>/dev/null
+			;;
+			('zip_unclean'|'mojosetup_unzip')
+				set +o errexit
+				unzip -d "$destination" "$file" 1>/dev/null 2>&1
+				set -o errexit
+				set_standard_permissions "$destination"
 			;;
 			(*)
 				liberror 'ARCHIVE_TYPE' 'extract_data_from'
@@ -928,25 +981,10 @@ organize_data() {
 	if [ -z "$PKG" ]; then
 		organize_data_error_missing_pkg
 	fi
-	local archive_path
-	local guessed_path="ARCHIVE_${1}_PATH_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_path#ARCHIVE_*_PATH}" != "$guessed_path" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_path}\")" ]; then
-			archive_path="$(eval printf -- '%b' \"\$${guessed_path}\")"
-			break
-		fi
-		guessed_path="${guessed_path%_*}"
-	done
-
-	local archive_files
-	local guessed_files="ARCHIVE_${1}_FILES_${ARCHIVE#ARCHIVE_}"
-	while [ "${guessed_files#ARCHIVE_*_FILES}" != "$guessed_files" ]; do
-		if [ -n "$(eval printf -- '%b' \"\$${guessed_files}\")" ]; then
-			archive_files="$(eval printf -- '%b' \"\$${guessed_files}\")"
-			break
-		fi
-		guessed_files="${guessed_files%_*}"
-	done
+	use_archive_specific_value "ARCHIVE_${1}_PATH"
+	use_archive_specific_value "ARCHIVE_${1}_FILES"
+	local archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
+	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
 		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")${2}"
@@ -1045,13 +1083,8 @@ extract_and_sort_icons_from() {
 	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	for app in $@; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
-
-		if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")" ]; then
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON_${ARCHIVE#ARCHIVE_}\")"
-			export ${app}_ICON="$app_icon"
-		else
-			app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
-		fi
+		use_archive_specific_value "${app}_ICON"
+		local app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 
 		if [ ! "$WRESTOOL_NAME" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_ID\")" ]; then
 			WRESTOOL_NAME="$(eval printf -- '%b' \"\$${app}_ICON_ID\")"
@@ -1291,41 +1324,16 @@ write_bin() {
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
-			local app_options
-			if [ -n "$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")" ]; then
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")"
-			else
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			fi
-
-			local app_prerun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")" ]; then
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")"
-			else
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
-			fi
-
-			local app_postrun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")" ]; then
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")"
-			else
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
-			fi
-
-			local app_exe
-			if [ -n "$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")" ]; then
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")"
-			else
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
-			fi
-
-			local app_libs
-			if [ -n "$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")" ]; then
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")"
-			else
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
-			fi
-
+			use_package_specific_value "${app}_EXE"
+			use_package_specific_value "${app}_LIBS"
+			use_package_specific_value "${app}_OPTIONS"
+			use_package_specific_value "${app}_POSTRUN"
+			use_package_specific_value "${app}_PRERUN"
+			local app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
+			local app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
+			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
 			if [ "$app_type" = 'native' ] ||\
 			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
@@ -1333,7 +1341,13 @@ write_bin() {
 		fi
 
 		# Write winecfg launcher for WINE games
-		if [ "$app_type" = 'wine' ]; then
+		if [ "$app_type" = 'wine' ] || \
+		   [ "$app_type" = 'wine32' ] || \
+		   [ "$app_type" = 'wine64' ] || \
+		   [ "$app_type" = 'wine-staging' ] || \
+		   [ "$app_type" = 'wine32-staging' ] || \
+		   [ "$app_type" = 'wine64-staging' ]
+		then
 			write_bin_winecfg
 		fi
 
@@ -1395,7 +1409,13 @@ write_bin() {
 			PATH_CONFIG="$XDG_CONFIG_HOME/$PREFIX_ID"
 			PATH_DATA="$XDG_DATA_HOME/games/$PREFIX_ID"
 			EOF
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
+			then
 				write_bin_set_wine
 			else
 				cat >> "$file" <<- 'EOF'
@@ -1491,7 +1511,13 @@ write_bin() {
 			EOF
 
 			# Build game prefix
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
+			then
 				write_bin_build_wine
 			fi
 			cat >> "$file" <<- 'EOF'
@@ -1520,7 +1546,7 @@ write_bin() {
 			('scummvm')
 				write_bin_run_scummvm
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64'|'wine-staging'|'wine32-staging'|'wine64-staging')
 				write_bin_run_wine
 			;;
 		esac
@@ -1546,7 +1572,14 @@ write_desktop() {
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
-		if [ "$winecfg_desktop" != 'done' ] && [ "$app_type" = 'wine' ]; then
+		if [ "$winecfg_desktop" != 'done' ] && \
+		   ( [ "$app_type" = 'wine' ] || \
+		     [ "$app_type" = 'wine32' ] || \
+		     [ "$app_type" = 'wine64' ] || \
+		     [ "$app_type" = 'wine-staging' ] || \
+		     [ "$app_type" = 'wine32-staging' ] || \
+		     [ "$app_type" = 'wine64-staging' ] )
+		then
 			winecfg_desktop='done'
 			write_desktop_winecfg
 		fi
@@ -1765,8 +1798,22 @@ write_bin_winecfg() {
 # USAGE: write_bin_set_wine
 # CALLED BY: write_bin
 write_bin_set_wine() {
+	case "$app_type" in
+		('wine'|'wine-staging')
+			use_archive_specific_value "${PKG}_ARCH"
+			local architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
+			case "$architecture" in
+				('32') winearch='win32' ;;
+				('64') winearch='win64' ;;
+			esac
+		;;
+		('wine32'|'wine32-staging') winearch='win32' ;;
+		('wine64'|'wine64-staging') winearch='win64' ;;
+	esac
+	cat >> "$file" <<- EOF
+	export WINEARCH='$winearch'
+	EOF
 	cat >> "$file" <<- 'EOF'
-	export WINEARCH='win32'
 	export WINEDEBUG='-all'
 	export WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
 	export WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
@@ -1868,11 +1915,8 @@ write_metadata() {
 		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		local pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
-		if [ "$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")" ]; then
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-		fi
+		use_archive_specific_value "${pkg}_DESCRIPTION"
+		local pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
 
 		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
 			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
@@ -1964,9 +2008,8 @@ pkg_write_arch() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_arch $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_ARCH"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
 		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
 	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
@@ -2038,12 +2081,8 @@ pkg_write_arch() {
 # CALLS: pkg_set_deps_arch32 pkg_set_deps_arch64
 # CALLED BY: pkg_write_arch
 pkg_set_deps_arch() {
-	local architecture
-	if [ "$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	else
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
-	fi
+	use_archive_specific_value "${pkg}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 	case $architecture in
 		('32')
 			pkg_set_deps_arch32 $@
@@ -2126,8 +2165,11 @@ pkg_set_deps_arch32() {
 			('vorbis')
 				pkg_dep='lib32-libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
+			;;
+			('wine-staging'|'wine32-staging'|'wine64-staging')
+				pkg_dep='wine-staging'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'
@@ -2137,6 +2179,12 @@ pkg_set_deps_arch32() {
 			;;
 			('xft')
 				pkg_dep='lib32-libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_deps="$dep"
@@ -2218,7 +2266,7 @@ pkg_set_deps_arch64() {
 			('vorbis')
 				pkg_dep='libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')
@@ -2229,6 +2277,12 @@ pkg_set_deps_arch64() {
 			;;
 			('xft')
 				pkg_dep='libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_dep="$dep"
@@ -2294,13 +2348,8 @@ pkg_write_deb() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_deb $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")" ]; then
-		if [ -n "$pkg_deps" ]; then
-			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		fi
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_DEB"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
 		if [ -n "$pkg_deps" ]; then
 			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		else
@@ -2449,7 +2498,32 @@ pkg_set_deps_deb() {
 				pkg_dep='libvorbisfile3'
 			;;
 			('wine')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32' ;;
+					('64') pkg_set_deps_deb 'wine64' ;;
+				esac
+			;;
+			('wine32')
 				pkg_dep='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
+			;;
+			('wine64')
+				pkg_dep='wine64-development | wine64 | wine64-bin | wine-amd64 | wine-staging-amd64, wine'
+			;;
+			('wine-staging')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32-staging' ;;
+					('64') pkg_set_deps_deb 'wine64-staging' ;;
+				esac
+			;;
+			('wine32-staging')
+				pkg_dep='wine-staging-i386, winehq-staging:amd64 | winehq-staging'
+			;;
+			('wine64-staging')
+				pkg_dep='wine-staging-amd64, winehq-staging'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'
@@ -2459,6 +2533,9 @@ pkg_set_deps_deb() {
 			;;
 			('xft')
 				pkg_dep='libxft2'
+			;;
+			('xgamma'|'xrandr')
+				pkg_dep='x11-xserver-utils:amd64 | x11-xserver-utils'
 			;;
 			(*)
 				pkg_dep="$dep"

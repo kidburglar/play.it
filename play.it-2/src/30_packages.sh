@@ -18,11 +18,8 @@ write_metadata() {
 		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		local pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
-		if [ "$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")" ]; then
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-		fi
+		use_archive_specific_value "${pkg}_DESCRIPTION"
+		local pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
 
 		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
 			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"

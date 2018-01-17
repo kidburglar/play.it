@@ -7,13 +7,8 @@ pkg_write_deb() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_deb $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")" ]; then
-		if [ -n "$pkg_deps" ]; then
-			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		else
-			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB_${ARCHIVE#ARCHIVE_}\")"
-		fi
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_DEB"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")" ]; then
 		if [ -n "$pkg_deps" ]; then
 			pkg_deps="$pkg_deps, $(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		else
@@ -162,7 +157,32 @@ pkg_set_deps_deb() {
 				pkg_dep='libvorbisfile3'
 			;;
 			('wine')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32' ;;
+					('64') pkg_set_deps_deb 'wine64' ;;
+				esac
+			;;
+			('wine32')
 				pkg_dep='wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine'
+			;;
+			('wine64')
+				pkg_dep='wine64-development | wine64 | wine64-bin | wine-amd64 | wine-staging-amd64, wine'
+			;;
+			('wine-staging')
+				use_archive_specific_value "${pkg}_ARCH"
+				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_deb 'wine32-staging' ;;
+					('64') pkg_set_deps_deb 'wine64-staging' ;;
+				esac
+			;;
+			('wine32-staging')
+				pkg_dep='wine-staging-i386, winehq-staging:amd64 | winehq-staging'
+			;;
+			('wine64-staging')
+				pkg_dep='wine-staging-amd64, winehq-staging'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'
@@ -172,6 +192,9 @@ pkg_set_deps_deb() {
 			;;
 			('xft')
 				pkg_dep='libxft2'
+			;;
+			('xgamma'|'xrandr')
+				pkg_dep='x11-xserver-utils:amd64 | x11-xserver-utils'
 			;;
 			(*)
 				pkg_dep="$dep"

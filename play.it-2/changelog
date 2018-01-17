@@ -1,3 +1,31 @@
+2.5.0
+
+  * Add support for games requiring wine-staging patches
+
+  * Add support for 64-bit WINE games
+
+  * Add support for Windows MSI installers
+
+  * Add support for Microsoft cabinet archives
+
+  * New archive type 'nullsoft-installer'
+
+  * New archive type value 'innosetup_nolowercase' allowing to skip files
+    names conversion to lower case
+
+  * New archive type 'zip_unclean'
+
+  * New function use_package_specific_value allowing to get package-specific
+    value for a given variable name (if such value exists)
+
+  * New function use_archive_specific_value allowing to get archive-specific
+    value for a given variable name (if such value exists)
+
+  * Add 'xrandr' and 'xgamma' to the generic dependencies
+
+  * Add automatic dependencies detection for archive types 'mojosetup_unzip'
+    and 'tar'
+
 2.4.2
 
   * Fix handling by init_prefix_files of files created after the first game

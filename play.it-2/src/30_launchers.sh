@@ -28,41 +28,16 @@ write_bin() {
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
-			local app_options
-			if [ -n "$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")" ]; then
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS_${PKG#PKG_}\")"
-			else
-				app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			fi
-
-			local app_prerun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")" ]; then
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN_${PKG#PKG_}\")"
-			else
-				app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
-			fi
-
-			local app_postrun
-			if [ -n "$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")" ]; then
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN_${PKG#PKG_}\")"
-			else
-				app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
-			fi
-
-			local app_exe
-			if [ -n "$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")" ]; then
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE_${PKG#PKG_}\")"
-			else
-				app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
-			fi
-
-			local app_libs
-			if [ -n "$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")" ]; then
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS_${PKG#PKG_}\")"
-			else
-				app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
-			fi
-
+			use_package_specific_value "${app}_EXE"
+			use_package_specific_value "${app}_LIBS"
+			use_package_specific_value "${app}_OPTIONS"
+			use_package_specific_value "${app}_POSTRUN"
+			use_package_specific_value "${app}_PRERUN"
+			local app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
+			local app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
+			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
 			if [ "$app_type" = 'native' ] ||\
 			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
@@ -70,7 +45,13 @@ write_bin() {
 		fi
 
 		# Write winecfg launcher for WINE games
-		if [ "$app_type" = 'wine' ]; then
+		if [ "$app_type" = 'wine' ] || \
+		   [ "$app_type" = 'wine32' ] || \
+		   [ "$app_type" = 'wine64' ] || \
+		   [ "$app_type" = 'wine-staging' ] || \
+		   [ "$app_type" = 'wine32-staging' ] || \
+		   [ "$app_type" = 'wine64-staging' ]
+		then
 			write_bin_winecfg
 		fi
 
@@ -132,7 +113,13 @@ write_bin() {
 			PATH_CONFIG="$XDG_CONFIG_HOME/$PREFIX_ID"
 			PATH_DATA="$XDG_DATA_HOME/games/$PREFIX_ID"
 			EOF
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
+			then
 				write_bin_set_wine
 			else
 				cat >> "$file" <<- 'EOF'
@@ -228,7 +215,13 @@ write_bin() {
 			EOF
 
 			# Build game prefix
-			if [ "$app_type" = 'wine' ]; then
+			if [ "$app_type" = 'wine' ] || \
+			   [ "$app_type" = 'wine32' ] || \
+			   [ "$app_type" = 'wine64' ] || \
+			   [ "$app_type" = 'wine-staging' ] || \
+			   [ "$app_type" = 'wine32-staging' ] || \
+			   [ "$app_type" = 'wine64-staging' ]
+			then
 				write_bin_build_wine
 			fi
 			cat >> "$file" <<- 'EOF'
@@ -257,7 +250,7 @@ write_bin() {
 			('scummvm')
 				write_bin_run_scummvm
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64'|'wine-staging'|'wine32-staging'|'wine64-staging')
 				write_bin_run_wine
 			;;
 		esac
@@ -283,7 +276,14 @@ write_desktop() {
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
 		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
-		if [ "$winecfg_desktop" != 'done' ] && [ "$app_type" = 'wine' ]; then
+		if [ "$winecfg_desktop" != 'done' ] && \
+		   ( [ "$app_type" = 'wine' ] || \
+		     [ "$app_type" = 'wine32' ] || \
+		     [ "$app_type" = 'wine64' ] || \
+		     [ "$app_type" = 'wine-staging' ] || \
+		     [ "$app_type" = 'wine32-staging' ] || \
+		     [ "$app_type" = 'wine64-staging' ] )
+		then
 			winecfg_desktop='done'
 			write_desktop_winecfg
 		fi

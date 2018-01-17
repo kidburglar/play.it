@@ -4,13 +4,8 @@
 # NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) (PKG_ARCH)
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
-	local architecture
-	if [ "$ARCHIVE" ] && [ -n "$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-		export ${1}_ARCH="$architecture"
-	else
-		architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
-	fi
+	use_archive_specific_value "${1}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
 	case $OPTION_PACKAGE in
 		('arch')
 			set_architecture_arch "$architecture"
@@ -109,5 +104,39 @@ liberror() {
 	esac
 	printf "$string" "$var" "$func" "$value"
 	return 1
+}
+
+# get archive-specific value for a given variable name, or use default value
+# USAGE: use_archive_specific_value $var_name
+use_archive_specific_value() {
+	[ -n "$ARCHIVE" ] || return 0
+	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
+}
+
+# get package-specific value for a given variable name, or use default value
+# USAGE: use_package_specific_value $var_name
+use_package_specific_value() {
+	[ -n "$PKG" ] || return 0
+	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
+	local name_real="$1"
+	local name="${name_real}_${PKG#PKG_}"
+	while [ "$name" != "$name_real" ]; do
+		local value="$(eval printf -- '%b' \"\$$name\")"
+		if [ -n "$value" ]; then
+			export $name_real="$value"
+			return 0
+		fi
+		name="${name%_*}"
+	done
 }
 

@@ -16,21 +16,27 @@ extract_data_from() {
 			('7z')
 				extract_7z "$file" "$destination"
 			;;
+			('cabinet')
+				cabextract -d "$destination" -q "$file"
+				tolower "$destination"
+			;;
 			('debian')
 				dpkg-deb --extract "$file" "$destination"
 			;;
-			('innosetup')
+			('innosetup'*)
+				options='--progress=1 --silent'
+				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+					options="$options --lowercase"
+				fi
 				printf '\n'
-				innoextract --extract --lowercase --output-dir "$destination" --progress=1 --silent "$file"
+				innoextract $options --extract --output-dir "$destination" "$file"
+			;;
+			('msi')
+				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
+				tolower "$destination"
 			;;
 			('mojosetup')
 				bsdtar --directory "$destination" --extract --file "$file"
-				set_standard_permissions "$destination"
-			;;
-			('mojosetup_unzip')
-				set +e
-				unzip -o -d "$destination" "$file" 1>/dev/null 2>&1
-				set -e
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')
@@ -40,7 +46,7 @@ extract_data_from() {
 			('nix_stage2')
 				tar --extract --xz --file "$file" --directory "$destination"
 			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				# compute archive password from GOG id
 				if [ -z "$ARCHIVE_PASSWD" ] && [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" ]; then
 					ARCHIVE_PASSWD="$(printf '%s' "$(eval printf -- '%b' \"\$${ARCHIVE}_GOGID\")" | md5sum | cut -d' ' -f1)"
@@ -55,6 +61,12 @@ extract_data_from() {
 			;;
 			('zip')
 				unzip -d "$destination" "$file" 1>/dev/null
+			;;
+			('zip_unclean'|'mojosetup_unzip')
+				set +o errexit
+				unzip -d "$destination" "$file" 1>/dev/null 2>&1
+				set -o errexit
+				set_standard_permissions "$destination"
 			;;
 			(*)
 				liberror 'ARCHIVE_TYPE' 'extract_data_from'

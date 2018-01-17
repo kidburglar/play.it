@@ -7,9 +7,8 @@ pkg_write_arch() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
 		pkg_set_deps_arch $(eval printf -- '%b' \"\$${pkg}_DEPS\")
 	fi
-	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	elif [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
+	use_archive_specific_value "${pkg}_DEPS_ARCH"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
 		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
 	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
@@ -81,12 +80,8 @@ pkg_write_arch() {
 # CALLS: pkg_set_deps_arch32 pkg_set_deps_arch64
 # CALLED BY: pkg_write_arch
 pkg_set_deps_arch() {
-	local architecture
-	if [ "$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")" ]; then
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH_${ARCHIVE#ARCHIVE_}\")"
-	else
-		architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
-	fi
+	use_archive_specific_value "${pkg}_ARCH"
+	local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 	case $architecture in
 		('32')
 			pkg_set_deps_arch32 $@
@@ -169,8 +164,11 @@ pkg_set_deps_arch32() {
 			('vorbis')
 				pkg_dep='lib32-libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
+			;;
+			('wine-staging'|'wine32-staging'|'wine64-staging')
+				pkg_dep='wine-staging'
 			;;
 			('winetricks')
 				pkg_dep='winetricks'
@@ -180,6 +178,12 @@ pkg_set_deps_arch32() {
 			;;
 			('xft')
 				pkg_dep='lib32-libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_deps="$dep"
@@ -261,7 +265,7 @@ pkg_set_deps_arch64() {
 			('vorbis')
 				pkg_dep='libvorbis'
 			;;
-			('wine')
+			('wine'|'wine32'|'wine64')
 				pkg_dep='wine'
 			;;
 			('winetricks')
@@ -272,6 +276,12 @@ pkg_set_deps_arch64() {
 			;;
 			('xft')
 				pkg_dep='libxft'
+			;;
+			('xgamma')
+				pkg_dep='xorg-xgamma'
+			;;
+			('xrandr')
+				pkg_dep='xorg-xrandr'
 			;;
 			(*)
 				pkg_dep="$dep"

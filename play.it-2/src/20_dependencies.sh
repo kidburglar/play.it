@@ -5,26 +5,35 @@
 check_deps() {
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
+			('cabinet')
+				SCRIPT_DEPS="$SCRIPT_DEPS cabextract"
+			;;
 			('debian')
 				SCRIPT_DEPS="$SCRIPT_DEPS dpkg"
 			;;
-			('innosetup')
+			('innosetup'*)
 				SCRIPT_DEPS="$SCRIPT_DEPS innoextract"
 			;;
 			('nixstaller')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar unxz"
 			;;
+			('msi')
+				SCRIPT_DEPS="$SCRIPT_DEPS msiextract"
+			;;
 			('mojosetup')
 				SCRIPT_DEPS="$SCRIPT_DEPS bsdtar"
 			;;
-			('zip')
-				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
-			;;
-			('rar')
+			('rar'|'nullsoft-installer')
 				SCRIPT_DEPS="$SCRIPT_DEPS unar"
+			;;
+			('tar')
+				SCRIPT_DEPS="$SCRIPT_DEPS tar"
 			;;
 			('tar.gz')
 				SCRIPT_DEPS="$SCRIPT_DEPS gzip tar"
+			;;
+			('zip'|'zip_unclean'|'mojosetup_unzip')
+				SCRIPT_DEPS="$SCRIPT_DEPS unzip"
 			;;
 		esac
 	fi

@@ -21,8 +21,22 @@ write_bin_winecfg() {
 # USAGE: write_bin_set_wine
 # CALLED BY: write_bin
 write_bin_set_wine() {
+	case "$app_type" in
+		('wine'|'wine-staging')
+			use_archive_specific_value "${PKG}_ARCH"
+			local architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
+			case "$architecture" in
+				('32') winearch='win32' ;;
+				('64') winearch='win64' ;;
+			esac
+		;;
+		('wine32'|'wine32-staging') winearch='win32' ;;
+		('wine64'|'wine64-staging') winearch='win64' ;;
+	esac
+	cat >> "$file" <<- EOF
+	export WINEARCH='$winearch'
+	EOF
 	cat >> "$file" <<- 'EOF'
-	export WINEARCH='win32'
 	export WINEDEBUG='-all'
 	export WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
 	export WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
