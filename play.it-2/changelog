@@ -1,3 +1,10 @@
+2.5.1
+
+  * Add a patch allowing to chose wether or not the desktop files should
+    include the full path to the launcher script (default includes it and does
+    not use $PATH, so custom values for installation prefix can be used
+    without further tweaking)
+
 2.5.0
 
   * Add support for games requiring wine-staging patches
