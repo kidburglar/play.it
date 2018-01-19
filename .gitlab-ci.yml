@@ -1,0 +1,12 @@
+image: base/archlinux
+
+stages:
+    - check
+
+shellcheck:
+    stage: check
+    before_script:
+        - pacman -Sy
+        - pacman --noconfirm -S shellcheck
+    script:
+        - ./tests/shellcheck-lib.sh
