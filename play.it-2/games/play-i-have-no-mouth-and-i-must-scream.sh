@@ -34,26 +34,38 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180121.1
 
 # Set game-specific variables
 
-SCRIPT_DEPS='unar'
+SCRIPT_DEPS_GOG_OLD='unar'
 
 GAME_ID='i-have-no-mouth-and-i-must-scream'
 GAME_NAME='I Have No Mouth And I Must Scream'
 
-ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
+ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
-ARCHIVE_GOG_EN='gog_i_have_no_mouth_and_i_must_scream_2.0.0.4.sh'
-ARCHIVE_GOG_EN_MD5='be690cfa08a87b350c26cbfdde5de401'
-ARCHIVE_GOG_EN_SIZE='780000'
-ARCHIVE_GOG_EN_VERSION='1.0-gog2.0.0.4'
+ARCHIVE_GOG_EN='i_have_no_mouth_and_i_must_scream_en_1_0_17913.sh'
+ARCHIVE_GOG_EN_MD5='93640c6a4dc73f4ed2d40b210b95ba4c'
+ARCHIVE_GOG_EN_SIZE='750000'
+ARCHIVE_GOG_EN_VERSION='1.0-gog17913'
+ARCHIVE_GOG_EN_TYPE='mojosetup'
 
-ARCHIVE_GOG_FR='gog_i_have_no_mouth_and_i_must_scream_french_2.0.0.4.sh'
-ARCHIVE_GOG_FR_MD5='e59029d2736ffa2859d73d56899055ee'
-ARCHIVE_GOG_FR_SIZE='500000'
-ARCHIVE_GOG_FR_VERSION='1.0-gog2.0.0.4'
+ARCHIVE_GOG_EN_OLD='gog_i_have_no_mouth_and_i_must_scream_2.0.0.4.sh'
+ARCHIVE_GOG_EN_OLD_MD5='be690cfa08a87b350c26cbfdde5de401'
+ARCHIVE_GOG_EN_OLD_SIZE='780000'
+ARCHIVE_GOG_EN_OLD_VERSION='1.0-gog2.0.0.4'
+
+ARCHIVE_GOG_FR='i_have_no_mouth_and_i_must_scream_fr_1_0_17913.sh'
+ARCHIVE_GOG_FR_MD5='9124d7ccef36d4bb01dfae4d97cfbdea'
+ARCHIVE_GOG_FR_SIZE='570000'
+ARCHIVE_GOG_FR_VERSION='1.0-gog17913'
+ARCHIVE_GOG_FR_TYPE='mojosetup'
+
+ARCHIVE_GOG_FR_OLD='gog_i_have_no_mouth_and_i_must_scream_french_2.0.0.4.sh'
+ARCHIVE_GOG_FR_OLD_MD5='e59029d2736ffa2859d73d56899055ee'
+ARCHIVE_GOG_FR_OLD_SIZE='500000'
+ARCHIVE_GOG_FR_OLD_VERSION='1.0-gog2.0.0.4'
 
 ARCHIVE_DOC1_MAIN_PATH='data/noarch/docs'
 ARCHIVE_DOC1_MAIN_FILES='./*.pdf ./*.txt'
@@ -61,7 +73,9 @@ ARCHIVE_DOC1_MAIN_FILES='./*.pdf ./*.txt'
 ARCHIVE_DOC2_MAIN_PATH='data/noarch/data/scream'
 ARCHIVE_DOC2_MAIN_FILES='./readme.txt'
 
-ARCHIVE_GAME_MAIN_PATH='.'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/data'
+ARCHIVE_GAME_MAIN_PATH_GOG_EN_OLD='.'
+ARCHIVE_GAME_MAIN_PATH_GOG_FR_OLD='.'
 ARCHIVE_GAME_MAIN_FILES='./*.res ./*.re_'
 
 APP_MAIN_TYPE='scummvm'
@@ -79,7 +93,7 @@ PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -95,14 +109,21 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Check dependencies
+
+if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ] || [ "$ARCHIVE" = 'ARCHIVE_GOG_FR_OLD' ]; then
+	SCRIPT_DEPS="$SCRIPT_DEPS $SCRIPT_DEPS_GOG_OLD"
+	check_deps
+fi
 
 # Extract data from game
 
 extract_data_from "$SOURCE_ARCHIVE"
-rm --force --recursive "$PLAYIT_WORKDIR/gamedata/data/noarch/dosbox"
-tolower "$PLAYIT_WORKDIR/gamedata"
-export ${ARCHIVE}_TYPE='rar'
-extract_data_from "$PLAYIT_WORKDIR/gamedata/data/noarch/data/nomouth.dat"
+if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ] || [ "$ARCHIVE" = 'ARCHIVE_GOG_FR_OLD' ]; then
+	rm --force --recursive "$PLAYIT_WORKDIR/gamedata/data/noarch/dosbox"
+	eval ${ARCHIVE}_TYPE='rar'
+	extract_data_from "$PLAYIT_WORKDIR/gamedata/data/noarch/data/NoMouth.dat"
+fi
 tolower "$PLAYIT_WORKDIR/gamedata"
 
 organize_data 'DOC1_MAIN' "$PATH_DOC"
