@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180117.2
+script_version=20180128.1
 
 # Set game-specific variables
 
@@ -61,7 +61,7 @@ ARCHIVE_GAME_DATA_FILES='./*_Data/*.assets ./*_Data/mainData ./*_Data/Mono/etc .
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN64='Caravan.x86'
+APP_MAIN_EXE_BIN32='Caravan.x86'
 APP_MAIN_EXE_BIN64='Caravan.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
