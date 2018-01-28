@@ -29,67 +29,48 @@ set -o errexit
 ###
 
 ###
-# I Have No Mouth And I Must Scream
+# Machinarium
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180121.1
+script_version=20180124.3
 
 # Set game-specific variables
 
-SCRIPT_DEPS_GOG_OLD='unar'
+GAME_ID='machinarium'
+GAME_NAME='Machinarium'
 
-GAME_ID='i-have-no-mouth-and-i-must-scream'
-GAME_NAME='I Have No Mouth And I Must Scream'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
+ARCHIVE_GOG='gog_machinarium_2.0.0.2.sh'
+ARCHIVE_GOG_MD5='4a66896935fbf29f4816e615748bb679'
+ARCHIVE_GOG_SIZE='370000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'
 
-ARCHIVE_GOG_EN='i_have_no_mouth_and_i_must_scream_en_1_0_17913.sh'
-ARCHIVE_GOG_EN_MD5='93640c6a4dc73f4ed2d40b210b95ba4c'
-ARCHIVE_GOG_EN_SIZE='750000'
-ARCHIVE_GOG_EN_VERSION='1.0-gog17913'
-ARCHIVE_GOG_EN_TYPE='mojosetup'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
-ARCHIVE_GOG_EN_OLD='gog_i_have_no_mouth_and_i_must_scream_2.0.0.4.sh'
-ARCHIVE_GOG_EN_OLD_MD5='be690cfa08a87b350c26cbfdde5de401'
-ARCHIVE_GOG_EN_OLD_SIZE='780000'
-ARCHIVE_GOG_EN_OLD_VERSION='1.0-gog2.0.0.4'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./Machinarium'
 
-ARCHIVE_GOG_FR='i_have_no_mouth_and_i_must_scream_fr_1_0_17913.sh'
-ARCHIVE_GOG_FR_MD5='9124d7ccef36d4bb01dfae4d97cfbdea'
-ARCHIVE_GOG_FR_SIZE='570000'
-ARCHIVE_GOG_FR_VERSION='1.0-gog17913'
-ARCHIVE_GOG_FR_TYPE='mojosetup'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./00 ./01 ./10 ./11'
 
-ARCHIVE_GOG_FR_OLD='gog_i_have_no_mouth_and_i_must_scream_french_2.0.0.4.sh'
-ARCHIVE_GOG_FR_OLD_MD5='e59029d2736ffa2859d73d56899055ee'
-ARCHIVE_GOG_FR_OLD_SIZE='500000'
-ARCHIVE_GOG_FR_OLD_VERSION='1.0-gog2.0.0.4'
-
-ARCHIVE_DOC1_MAIN_PATH='data/noarch/docs'
-ARCHIVE_DOC1_MAIN_FILES='./*.pdf ./*.txt'
-
-ARCHIVE_DOC2_MAIN_PATH='data/noarch/data/scream'
-ARCHIVE_DOC2_MAIN_FILES='./readme.txt'
-
-ARCHIVE_GAME_MAIN_PATH='data/noarch/data'
-ARCHIVE_GAME_MAIN_PATH_GOG_EN_OLD='.'
-ARCHIVE_GAME_MAIN_PATH_GOG_FR_OLD='.'
-ARCHIVE_GAME_MAIN_FILES='./*.res ./*.re_'
-
-APP_MAIN_TYPE='scummvm'
-APP_MAIN_SCUMMID='saga'
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='Machinarium'
 APP_MAIN_ICON='data/noarch/support/icon.png'
 APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_MAIN'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
-PKG_MAIN_ID="$GAME_ID"
-PKG_MAIN_ID_GOG_EN="${GAME_ID}-en"
-PKG_MAIN_ID_GOG_FR="${GAME_ID}-fr"
-PKG_MAIN_PROVIDE="$PKG_MAIN_ID"
-PKG_MAIN_DEPS='scummvm'
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glx sdl2 xcursor libcurl-gnutls"
+PKG_BIN_DEPS_ARCH='lib32-libxt'
+PKG_BIN_DEPS_DEB='libxt6'
 
 # Load common functions
 
@@ -109,32 +90,23 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Check dependencies
-
-if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ] || [ "$ARCHIVE" = 'ARCHIVE_GOG_FR_OLD' ]; then
-	SCRIPT_DEPS="$SCRIPT_DEPS $SCRIPT_DEPS_GOG_OLD"
-	check_deps
-fi
-
-# Extract data from game
+# Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ] || [ "$ARCHIVE" = 'ARCHIVE_GOG_FR_OLD' ]; then
-	rm --force --recursive "$PLAYIT_WORKDIR/gamedata/data/noarch/dosbox"
-	eval ${ARCHIVE}_TYPE='rar'
-	extract_data_from "$PLAYIT_WORKDIR/gamedata/data/noarch/data/NoMouth.dat"
-fi
-tolower "$PLAYIT_WORKDIR/gamedata"
 
-organize_data 'DOC1_MAIN' "$PATH_DOC"
-organize_data 'DOC2_MAIN' "$PATH_DOC"
-organize_data 'GAME_MAIN' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
+
+PKG='PKG_DATA'
 get_icon_from_temp_dir 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
