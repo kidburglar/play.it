@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180130.2
 
 # Set game-specific variables
 
@@ -51,8 +51,8 @@ ARCHIVE_GOG_VERSION='1.4.0-gog2.1.0.5'
 ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
 
-ARCHIVE_ICONS='icewind-dale-enhanced-edition_icons.tar.gz'
-ARCHIVE_ICONS_MD5='afe7a2a8013a859f7b56a3104eacd783'
+ARCHIVE_ICONS_PACK='icewind-dale-enhanced-edition_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='afe7a2a8013a859f7b56a3104eacd783'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -107,7 +107,7 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Use libSSL 1.0.0 32-bit archive
@@ -119,10 +119,10 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -135,7 +135,9 @@ organize_data 'GAME_L10N' "$PATH_GAME"
 PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-if [ "$ICONS_PACK" ]; then
+
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -64,8 +64,8 @@ ARCHIVE_GOG_OLDEST_MD5='8a6e7c3d26461aa2fa959b8607e676f7'
 ARCHIVE_GOG_OLDEST_SIZE='1500000'
 ARCHIVE_GOG_OLDEST_VERSION='1.27-gog2.3.0.5'
 
-ARCHIVE_ICONS='crypt-of-the-necrodancer_icons.tar.gz'
-ARCHIVE_ICONS_MD5='04d2bb19adc13dbadce6161bd92bf59a'
+ARCHIVE_ICONS_PACK='crypt-of-the-necrodancer_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='04d2bb19adc13dbadce6161bd92bf59a'
 
 ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC1_DATA_FILES='./*'
@@ -109,7 +109,7 @@ PKG_BIN_DEPS_ARCH="$PKG_MUSIC_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-l
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -128,16 +128,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -148,7 +148,7 @@ for PKG in $PACKAGES_LIST; do
 done
 
 PKG='PKG_DATA'
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'

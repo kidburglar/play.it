@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -53,8 +53,8 @@ ARCHIVE_HUMBLE_OLD_MD5='50ad5722cafe16dc384e83a4a4e19480'
 ARCHIVE_HUMBLE_OLD_SIZE='1600000'
 ARCHIVE_HUMBLE_OLD_VERSION='140706-humble140708'
 
-ARCHIVE_ICONS='jazzpunk_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d1fe700322ad08f9ac3dec1c29512f94'
+ARCHIVE_ICONS_PACK='jazzpunk_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='d1fe700322ad08f9ac3dec1c29512f94'
 
 ARCHIVE_GAME_BIN32_PATH='./'
 ARCHIVE_GAME_BIN32_FILES='./Jazzpunk.x86 ./Jazzpunk_Data/*/x86'
@@ -86,7 +86,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -112,16 +112,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -129,8 +129,8 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 fi
 

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -48,8 +48,8 @@ ARCHIVE_GOG_MD5='58becebfaf5a3705fe3f34d5531298d3'
 ARCHIVE_GOG_SIZE='3100000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
 
-ARCHIVE_ICONS='julia-among-the-stars_icons.tar.gz'
-ARCHIVE_ICONS_MD5='8e9e8ec585123eb3b6e5d31723b7909c'
+ARCHIVE_ICONS_PACK='julia-among-the-stars_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='8e9e8ec585123eb3b6e5d31723b7909c'
 
 ARCHIVE_DOC1_PATH='data/noarch/docs'
 ARCHIVE_DOC1_FILES='./*'
@@ -95,7 +95,7 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc glu pcre harfbuzz bzip2 gcc-libs freetyp
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -114,16 +114,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -137,7 +137,9 @@ PKG='PKG_DATA'
 organize_data 'DOC1' "$PATH_DOC"
 organize_data 'DOC2' "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-if [ "$ICONS_PACK" ]; then
+
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'
