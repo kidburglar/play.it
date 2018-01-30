@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170805.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -66,26 +66,26 @@ ARCHIVE_GOG_FR_OLD_MD5='ca8e4726acd7b5bc13c782d59c5a459b'
 ARCHIVE_GOG_FR_OLD_VERSION='3.0-gog2.1.0.20'
 ARCHIVE_GOG_FR_OLD_SIZE='1100000'
 
-ARCHIVE_DOC1_PATH='tmp'
-ARCHIVE_DOC1_FILES='./*eula.txt'
+ARCHIVE_DOC1_DATA_PATH='tmp'
+ARCHIVE_DOC1_DATA_FILES='./*eula.txt'
 
-ARCHIVE_DOC2_PATH='app'
-ARCHIVE_DOC2_FILES='./eula ./*.cnt ./*.hlp ./*.pdf ./*.txt'
+ARCHIVE_DOC2_DATA_PATH='app'
+ARCHIVE_DOC2_DATA_FILES='./eula ./*.cnt ./*.hlp ./*.pdf ./*.txt'
 
 ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./*.exe ./binkw32.dll ./ifc20.dll ./ifc21.dll ./mcp.dll ./mp3dec.asi ./mss32.dll ./smackw32.dll'
 
+ARCHIVE_GAME_PATCH_BIN_PATH='tmp'
+ARCHIVE_GAME_PATCH_BIN_FILES='./heroes3.exe'
+
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='./data ./maps ./mp3'
 
-ARCHIVE_GAME_PATCH_PATH='tmp'
-ARCHIVE_GAME_PATCH_FILES='./heroes3.exe'
-
 CONFIG_DIRS='./config'
 DATA_DIRS='./games ./maps ./random_maps'
-DATA_FILES='data/h3ab_bmp.lod data/h3ab_spr.lod data/h3bitmap.lod data/h3sprite.lod'
+DATA_FILES='./data/h3ab_bmp.lod ./data/h3ab_spr.lod ./data/h3bitmap.lod ./data/h3sprite.lod'
 
-APP_WINETRICKS='vd=800x600'
+APP_WINETRICKS="vd=\$(xrandr|grep '\*'|awk '{print \$1}')"
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='./heroes3.exe'
@@ -110,30 +110,25 @@ PACKAGES_LIST='PKG_DATA PKG_BIN'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_ID_GOG_EN="${PKG_DATA_ID}-en"
-PKG_DATA_ID_GOG_EN_OLD="$PKG_DATA_ID_GOG_EN"
 PKG_DATA_ID_GOG_FR="${PKG_DATA_ID}-fr"
-PKG_DATA_ID_GOG_FR_OLD="$PKG_DATA_ID_GOG_FR"
 PKG_DATA_PROVIDE="${PKG_DATA_ID}"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ID="$GAME_ID"
 PKG_BIN_ID_GOG_EN="${PKG_BIN_ID}-en"
-PKG_BIN_ID_GOG_EN_OLD="$PKG_BIN_ID_EN"
 PKG_BIN_ID_GOG_FR="${PKG_BIN_ID}-fr"
-PKG_BIN_ID_GOG_FR_OLD="$PKG_BIN_ID_FR"
 PKG_BIN_PROVIDE="$PKG_BIN_ID"
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, winetricks, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID winetricks wine"
+PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -148,7 +143,7 @@ fi
 
 if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ]; then
 	ARCHIVE_MAIN="$ARCHIVE"
-	set_archive 'PATCH_ARCHIVE' 'ARCHIVE_GOG_OLD_EN_PATCH'
+	set_archive 'ARCHIVE_PATCH' 'ARCHIVE_GOG_OLD_EN_PATCH'
 	ARCHIVE="$ARCHIVE_MAIN"
 	set_temp_directories $PACKAGES_LIST
 fi
@@ -156,21 +151,19 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$PATCH_ARCHIVE" ]; then
+if [ "$ARCHIVE_PATCH" ]; then
 	(
-		ARCHIVE='PATCH_ARCHIVE'
-		extract_data_from "$PATCH_ARCHIVE"
+		ARCHIVE='ARCHIVE_PATCH'
+		extract_data_from "$ARCHIVE_PATCH"
 	)
 fi
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN'   "$PATH_GAME"
-organize_data 'GAME_PATCH' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "GAME_${PKG#PKG_}"       "$PATH_GAME"
+	organize_data "GAME_PATCH_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "DOC1_${PKG#PKG_}"       "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}"       "$PATH_DOC"
+done
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN' 'APP_EDITOR_MAP' 'APP_EDITOR_CAMPAIGN'
