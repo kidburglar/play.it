@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -48,14 +48,14 @@ ARCHIVE_GOG_MD5='0e8d2338b568222b28cf3c31059b4960'
 ARCHIVE_GOG_SIZE='1500000'
 ARCHIVE_GOG_VERSION='2.12.508-gog2.0.0.2'
 
-ARCHIVE_LIBPNG='libpng_1.2_32-bit.tar.gz'
-ARCHIVE_LIBPNG_MD5='15156525b3c6040571f320514a0caa80'
+ARCHIVE_LIBPNG_32='libpng_1.2_32-bit.tar.gz'
+ARCHIVE_LIBPNG_32_MD5='15156525b3c6040571f320514a0caa80'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC1_DATA_FILES='./*'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./*.txt'
+ARCHIVE_DOC2_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC2_DATA_FILES='./*.txt'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./bin/trine1_* ./lib'
@@ -66,6 +66,7 @@ ARCHIVE_GAME_DATA_FILES='./*.fbq ./trine1.png ./data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_PRERUN='pulseaudio --start'
 APP_MAIN_EXE='bin/trine1_linux_launcher_32bit'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='trine1.png'
@@ -77,12 +78,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libgtk2.0-0, libasound2-plugins, libopenal1, libvorbisfile3"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-gtk2 lib32-alsa-lib lib32-openal lib32-libvorbis"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu gtk2 alsa openal vorbis pulseaudio"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -100,29 +100,27 @@ fi
 
 # Use libpng 1.2 32-bit archive
 
-set_archive 'LIBPNG' 'ARCHIVE_LIBPNG'
+set_archive 'ARCHIVE_LIBPNG' 'ARCHIVE_LIBPNG_32'
 ARCHIVE='ARCHIVE_GOG'
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
+	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libpng into the game directory
 
-if [ "$LIBPNG" ]; then
+if [ "$ARCHIVE_LIBPNG" ]; then
 	dir='libs'
-	ARCHIVE='LIBPNG'
-	extract_data_from "$LIBPNG"
+	ARCHIVE='ARCHIVE_LIBPNG'
+	extract_data_from "$ARCHIVE_LIBPNG"
 	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
 	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}/$dir"
 	APP_MAIN_LIBS="$dir"
