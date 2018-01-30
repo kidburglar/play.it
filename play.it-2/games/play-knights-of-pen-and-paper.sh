@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -50,8 +50,8 @@ ARCHIVE_GOG_SIZE='120000'
 ARCHIVE_GOG_DLC='gog_knights_of_pen_and_paper_1_deluxier_edition_upgrade_2.0.0.1.sh'
 ARCHIVE_GOG_DLC_MD5='b3033693afd93cc885883aede7ede4b0'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/*/x86'
@@ -74,12 +74,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-libxcursor lib32-libxrandr"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor libxrandr"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -98,25 +97,23 @@ fi
 # Load extra archive (DLC)
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'DLC_ARCHIVE' 'ARCHIVE_GOG_DLC'
+set_archive 'ARCHIVE_DLC' 'ARCHIVE_GOG_DLC'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$DLC_ARCHIVE" ]; then
+if [ "$ARCHIVE_DLC" ]; then
 	(
-		ARCHIVE='DLC_ARCHIVE'
-		extract_data_from "$DLC_ARCHIVE"
+		ARCHIVE='ARCHIVE_DLC'
+		extract_data_from "$ARCHIVE_DLC"
 	)
 fi
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN'  "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
