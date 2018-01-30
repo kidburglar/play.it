@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -48,8 +48,8 @@ ARCHIVE_GOG_MD5='fc7244f4793eec365b8ac41d91a4edbb'
 ARCHIVE_GOG_SIZE='2900000'
 ARCHIVE_GOG_VERSION='1.4.0-gog2.1.0.5'
 
-ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
-ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
+ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
+ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
 
 ARCHIVE_ICONS='icewind-dale-enhanced-edition_icons.tar.gz'
 ARCHIVE_ICONS_MD5='afe7a2a8013a859f7b56a3104eacd783'
@@ -88,7 +88,7 @@ PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-json
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -113,7 +113,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Use libSSL 1.0.0 32-bit archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'LIBSSL' 'ARCHIVE_LIBSSL'
+set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
