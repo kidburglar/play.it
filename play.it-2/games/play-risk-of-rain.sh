@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171225.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -53,8 +53,8 @@ ARCHIVE_HUMBLE_MD5='21eb80a7b517d302478c4f86dd5ea9a2'
 ARCHIVE_HUMBLE_SIZE='100000'
 ARCHIVE_HUMBLE_VERSION='1.3.0-humble160519'
 
-ARCHIVE_LIBSSL='libssl_1.0.0_32-bit.tar.gz'
-ARCHIVE_LIBSSL_MD5='9443cad4a640b2512920495eaf7582c4'
+ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
+ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
 
 ARCHIVE_DOC_PATH_GOG='data/noarch/docs'
 ARCHIVE_DOC_FILES_GOG='./*'
@@ -85,7 +85,7 @@ PKG_BIN_DEPS_DEB='libcurl3'
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -104,7 +104,7 @@ fi
 # Use libSSL 1.0.0 32-bit archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'LIBSSL' 'ARCHIVE_LIBSSL'
+set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
