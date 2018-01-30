@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -49,8 +49,8 @@ ARCHIVE_GOG_VERSION='1.6.7-gog16815'
 ARCHIVE_GOG_SIZE='720000'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_ICONS='pandora-first-contact_icons.tar.gz'
-ARCHIVE_ICONS_MD5='66b1d99166b738b2130449a49b9cd58c'
+ARCHIVE_ICONS_PACK='pandora-first-contact_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='66b1d99166b738b2130449a49b9cd58c'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/game/Documents'
 ARCHIVE_DOC_DATA_FILES='./*'
@@ -80,7 +80,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor libxrandr vorbis"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -99,16 +99,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -118,7 +118,7 @@ for PKG in $PACKAGES_LIST; do
 done
 
 PKG='PKG_DATA'
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'

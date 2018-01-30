@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170701.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -53,8 +53,8 @@ ARCHIVE_HUMBLE_MD5='1fe92f0faf379541440895de68a1a14e'
 ARCHIVE_HUMBLE_SIZE='3700000'
 ARCHIVE_HUMBLE_VERSION='3.2.0.3320-humble'
 
-ARCHIVE_ICONS='deponia-3_icons.tar.gz'
-ARCHIVE_ICONS_MD5='d57dfcd4b23ff2c7f4163b9db20329f2'
+ARCHIVE_ICONS_PACK='deponia-3_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='d57dfcd4b23ff2c7f4163b9db20329f2'
 
 ARCHIVE_DOC_PATH_GOG='data/noarch/game'
 ARCHIVE_DOC_PATH_HUMBLE='Goodbye Deponia'
@@ -98,7 +98,7 @@ PKG_BIN_DEPS_ARCH="$PKG_VIDEOS_ID $PKG_DATA_ID libgl openal"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -117,17 +117,17 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -141,13 +141,12 @@ PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'DOC2'      "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-if [ "$ICONS_PACK" ]; then
+
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 elif [ "$ARCHIVE" = 'ARCHIVE_GOG' ]; then
-	res="$APP_MAIN_ICON_RES_GOG"
-	PATH_ICON="${PKG_DATA_PATH}${PATH_ICON_BASE}/${res}x${res}/apps"
-	mkdir --parents "$PATH_ICON"
-	mv "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG" "$PATH_ICON/$GAME_ID.png"
+	get_icon_from_temp_dir 'APP_MAIN'
 fi
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"

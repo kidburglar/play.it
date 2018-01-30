@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -48,8 +48,8 @@ ARCHIVE_HUMBLE_MD5='4461dfdcaba9e8793e3044b458b0e301'
 ARCHIVE_HUMBLE_SIZE='120000'
 ARCHIVE_HUMBLE_VERSION='1.0.8-humble160421'
 
-ARCHIVE_ICONS='a-good-snowman-is-hard-to-build_icons.tar.gz'
-ARCHIVE_ICONS_MD5='8d595a7758ae8cd6dbc441ab79579fb4'
+ARCHIVE_ICONS_PACK='a-good-snowman-is-hard-to-build_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='8d595a7758ae8cd6dbc441ab79579fb4'
 
 ARCHIVE_GAME_BIN32_PATH='snowman'
 ARCHIVE_GAME_BIN32_FILES='./bin32'
@@ -86,7 +86,7 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -105,16 +105,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -122,8 +122,8 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 fi
 

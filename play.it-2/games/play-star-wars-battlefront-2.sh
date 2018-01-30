@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -78,8 +78,8 @@ ARCHIVE_GOG_SINGLE_PART2='setup_sw_battlefront2_2.0.0.5-2.bin'
 ARCHIVE_GOG_SINGLE_PART2_MD5='5d4000fd480a80b6e7c7b73c5a745368'
 ARCHIVE_GOG_SINGLE_PART2_TYPE='rar'
 
-ARCHIVE_ICONS='star-wars-battlefront-2_icons.tar.gz'
-ARCHIVE_ICONS_MD5='322275011d37ac219f1c06c196477fa4'
+ARCHIVE_ICONS_PACK='star-wars-battlefront-2_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='322275011d37ac219f1c06c196477fa4'
 
 ARCHIVE_DOC_DATA_PATH_GOG_MULTI='app'
 ARCHIVE_DOC_DATA_PATH_GOG_SINGLE='game'
@@ -124,7 +124,7 @@ PKG_BIN_DEPS_ARCH='lib32-libtxc_dxtn'
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -152,7 +152,7 @@ ARCHIVE="$ARCHIVE_MAIN"
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
@@ -169,10 +169,10 @@ case "$ARCHIVE" in
 	;;
 esac
 
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -181,13 +181,12 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	case "$ARCHIVE" in
 		('ARCHIVE_GOG_MULTI'*)
-			PKG='PKG_DATA'
 			APP_MAIN_ICON_RES="$APP_MAIN_ICON_GOG_MULTI_RES"
 			extract_icon_from "$PLAYIT_WORKDIR/gamedata/$APP_MAIN_ICON_GOG_MULTI"
 			sort_icons 'APP_MAIN'

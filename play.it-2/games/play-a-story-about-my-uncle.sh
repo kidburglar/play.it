@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170829.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -48,8 +48,8 @@ ARCHIVE_HUMBLE_MD5='71f9f3add29a733c4a1a7d18d738d3d6'
 ARCHIVE_HUMBLE_SIZE='1300000'
 ARCHIVE_HUMBLE_VERSION='5188-humble170516'
 
-ARCHIVE_ICONS='a-story-about-my-uncle_icons.tar.gz'
-ARCHIVE_ICONS_MD5='db4eb7ab666e61ea5fc983102099ab31'
+ARCHIVE_ICONS_PACK='a-story-about-my-uncle_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='db4eb7ab666e61ea5fc983102099ab31'
 
 ARCHIVE_GAME_BIN32_PATH='.'
 ARCHIVE_GAME_BIN32_FILES='Binaries/linux-x86 Binaries/SDL2/lib/linux-x86'
@@ -85,7 +85,7 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs sdl2 openal libgl"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -104,17 +104,17 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -122,8 +122,8 @@ for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
-if [ "$ICONS_PACK" ]; then
-	PKG='PKG_DATA'
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 fi
 

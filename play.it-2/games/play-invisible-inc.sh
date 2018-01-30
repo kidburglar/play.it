@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -54,8 +54,8 @@ ARCHIVE_GOG_OLD_MD5='97e6efdc9237ec17deb02b5cf5185cf5'
 ARCHIVE_GOG_OLD_SIZE='1200000'
 ARCHIVE_GOG_OLD_VERSION='2016.04.13-gog2.6.0.11'
 
-ARCHIVE_ICONS='invisible-inc_icons.tar.gz'
-ARCHIVE_ICONS_MD5='37a62fed1dc4185e95db3e82e6695c1d'
+ARCHIVE_ICONS_PACK='invisible-inc_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='37a62fed1dc4185e95db3e82e6695c1d'
 
 ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC1_DATA_FILES='./*'
@@ -96,7 +96,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -115,16 +115,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-if [ "$ICONS_PACK" ]; then  
+if [ "$ARCHIVE_ICONS" ]; then  
 	(
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	)
 fi
 
@@ -135,7 +135,7 @@ for PKG in $PACKAGES_LIST; do
 done
 
 PKG='PKG_DATA'
-if [ "$ICONS_PACK" ]; then
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'

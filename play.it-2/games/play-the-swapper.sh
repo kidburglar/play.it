@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180130.1
 
 # Set game-specific variables
 
@@ -51,8 +51,8 @@ ARCHIVE_HUMBLE_SIZE='980000'
 ARCHIVE_HUMBLE_VERSION='1.24-humble140404'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_ICONS='the-swapper_icons.tar.gz'
-ARCHIVE_ICONS_MD5='cddcf271fb6eb10fba870aa91c30c410'
+ARCHIVE_ICONS_PACK='the-swapper_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='cddcf271fb6eb10fba870aa91c30c410'
 
 ARCHIVE_DOC_PATH='data/noarch'
 ARCHIVE_DOC_FILES='./README* ./Licences'
@@ -88,7 +88,7 @@ PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu sdl2 sdl2_image"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -107,16 +107,16 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ICONS_PACK' 'ARCHIVE_ICONS'
+set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 (
-	if [ "$ICONS_PACK" ]; then
-		ARCHIVE='ICONS_PACK'
-		extract_data_from "$ICONS_PACK"
+	if [ "$ARCHIVE_ICONS" ]; then
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
 	fi
 )
 
@@ -131,7 +131,9 @@ organize_data 'GAME_BIN64' "$PATH_GAME"
 PKG='PKG_DATA'
 organize_data 'DOC'       "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
-if [ "$ICONS_PACK" ]; then
+
+PKG='PKG_DATA'
+if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 fi
 
