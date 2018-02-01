@@ -6,6 +6,9 @@
 
   * New function prepare_package_layout providing a wrapper for organize_data
 
+  * Improve sort_icons so it can be used on single .png file produced by
+    convert
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list

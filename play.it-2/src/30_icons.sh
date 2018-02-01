@@ -35,28 +35,36 @@ extract_icon_from() {
 # USAGE: sort_icons $app[…]
 # NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
+	local app
+	local app_id
+	local icon_res
+	local path_icon
+	local pkg_path
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local icon_res
 		icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
-		local pkg_path
 		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
-		for res in $icon_res; do
-			path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+		if [ -n "${icon_res##* *}" ]; then
+			path_icon="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 			mkdir --parents "${pkg_path}${path_icon}"
-			for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
-				mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+			mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+		else
+			for res in $icon_res; do
+				path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+				mkdir --parents "${pkg_path}${path_icon}"
+				for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
+					mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+				done
 			done
-		done
+		fi
 	done
 }
 
