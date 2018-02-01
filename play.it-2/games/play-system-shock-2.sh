@@ -34,19 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180114.2
+script_version=20180201.1
 
 # Set game-specific variables
 
 GAME_ID='system-shock-2'
 GAME_NAME='System Shock 2'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='setup_system_shock_2_2.46_nd_(11004).exe'
-ARCHIVE_GOG_MD5='98c3d01d53bb2b0dc25d7ed7093a67d3'
-ARCHIVE_GOG_SIZE='680000'
-ARCHIVE_GOG_VERSION='2.46-gog11004'
+ARCHIVE_GOG='setup_system_shock_2_2.46_update_(18248).exe'
+ARCHIVE_GOG_MD5='b76803e4a632b58527eada8993999143'
+ARCHIVE_GOG_SIZE='690000'
+ARCHIVE_GOG_VERSION='2.46-gog18248'
+
+ARCHIVE_GOG_OLD='setup_system_shock_2_2.46_nd_(11004).exe'
+ARCHIVE_GOG_OLD_MD5='98c3d01d53bb2b0dc25d7ed7093a67d3'
+ARCHIVE_GOG_OLD_SIZE='680000'
+ARCHIVE_GOG_OLD_VERSION='2.46-gog11004'
 
 ARCHIVE_DOC_DATA_PATH='app'
 ARCHIVE_DOC_DATA_FILES='./*.pdf ./*.txt ./*.wri ./doc ./editor/*.txt'
@@ -77,13 +82,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
-PKG_BIN_DEPS_DEB='x11-xserver-utils:amd64 | x11-xserver-utils'
-PKG_BIN_DEPS_ARCH='xorg-xrandr'
+PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks xrandr"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
