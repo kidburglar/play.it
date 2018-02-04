@@ -9,6 +9,9 @@
 
   * Display an error when using an invalid value for PKG
 
+  * Fix error displayed if calling extract_icon_from on an unsupported file
+    type
+
 2.5.0
 
   * Add support for games requiring wine-staging patches

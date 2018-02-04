@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.1~dev
-library_revision=20180117.13
+library_revision=20180211.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1061,7 +1061,7 @@ extract_icon_from() {
 				convert "$file" "$destination/${filename%.bmp}.png"
 			;;
 			(*)
-				liberror 'file extension' 'extract_icon_from'
+				liberror '{file##*.}' 'extract_icon_from'
 			;;
 		esac
 	done

@@ -22,7 +22,7 @@ extract_icon_from() {
 				convert "$file" "$destination/${filename%.bmp}.png"
 			;;
 			(*)
-				liberror 'file extension' 'extract_icon_from'
+				liberror '{file##*.}' 'extract_icon_from'
 			;;
 		esac
 	done
