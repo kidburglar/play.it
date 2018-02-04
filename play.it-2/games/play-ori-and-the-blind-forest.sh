@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.2
+script_version=20180119.1
 
 # Set game-specific variables
 
@@ -106,8 +106,8 @@ ARCHIVE='ARCHIVE_GOG'
 
 # Extract game data
 
-ln --symbolic "$(readlink --canonicalize $SOURCE_ARCHIVE)" "$PLAYIT_WORKDIR/$GAME_ID.r00"
-ln --symbolic "$(readlink --canonicalize $ARCHIVE_PART2)"  "$PLAYIT_WORKDIR/$GAME_ID.r01"
+ln --symbolic "$(readlink --canonicalize "$SOURCE_ARCHIVE")" "$PLAYIT_WORKDIR/$GAME_ID.r00"
+ln --symbolic "$(readlink --canonicalize "$ARCHIVE_PART2")"  "$PLAYIT_WORKDIR/$GAME_ID.r01"
 extract_data_from "$PLAYIT_WORKDIR/$GAME_ID.r00"
 tolower "$PLAYIT_WORKDIR/gamedata"
 
