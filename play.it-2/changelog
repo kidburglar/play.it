@@ -5,6 +5,8 @@
     not use $PATH, so custom values for installation prefix can be used
     without further tweaking)
 
+  * Improve patches syntax following ShellCheck feedback
+
 2.5.0
 
   * Add support for games requiring wine-staging patches
