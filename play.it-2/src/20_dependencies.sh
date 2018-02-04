@@ -59,7 +59,7 @@ check_deps() {
 				check_deps_7z
 			;;
 			(*)
-				if ! which $dep >/dev/null 2>&1; then
+				if ! which "$dep" >/dev/null 2>&1; then
 					check_deps_error_not_found "$dep"
 				fi
 			;;

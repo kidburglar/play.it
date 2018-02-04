@@ -4,12 +4,14 @@
 # CALLS: liberror
 extract_icon_from() {
 	for file in "$@"; do
-		local destination="$PLAYIT_WORKDIR/icons"
+		local destination
+		destination="$PLAYIT_WORKDIR/icons"
 		mkdir --parents "$destination"
 		case "${file##*.}" in
 			('exe')
 				if [ "$WRESTOOL_NAME" ]; then
-					local wrestool_options="--name=$WRESTOOL_NAME"
+					local wrestool_options
+					wrestool_options="--name=$WRESTOOL_NAME"
 				fi
 				wrestool --extract --type=14 $wrestool_options --output="$destination" "$file"
 				unset wrestool_options
@@ -18,7 +20,8 @@ extract_icon_from() {
 				icotool --extract --output="$destination" "$file" 2>/dev/null
 			;;
 			('bmp')
-				local filename="${file##*/}"
+				local filename
+				filename="${file##*/}"
 				convert "$file" "$destination/${filename%.bmp}.png"
 			;;
 			(*)
@@ -32,27 +35,29 @@ extract_icon_from() {
 # USAGE: sort_icons $app[…]
 # NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
-for app in $@; do
-	testvar "$app" 'APP' || liberror 'app' 'sort_icons'
+	for app in "$@"; do
+		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 
-	local app_id
-	if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
-		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
-	else
-		app_id="$GAME_ID"
-	fi
+		local app_id
+		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
+			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
+		else
+			app_id="$GAME_ID"
+		fi
 
-	local icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
-	for res in $icon_res; do
-		path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
-		mkdir --parents "${pkg_path}${path_icon}"
-		for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
-			mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+		local icon_res
+		icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
+		local pkg_path
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
+		for res in $icon_res; do
+			path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+			mkdir --parents "${pkg_path}${path_icon}"
+			for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
+				mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+			done
 		done
 	done
-done
 }
 
 # extract and sort icons from given .ico or .exe file
@@ -61,12 +66,14 @@ done
 # CALLS: extract_icon_from liberror sort_icons
 extract_and_sort_icons_from() {
 	local app_icon
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
-	for app in $@; do
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
-		local app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
+		local app_icon
+		app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 
 		if [ ! "$WRESTOOL_NAME" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_ID\")" ]; then
 			WRESTOOL_NAME="$(eval printf -- '%b' \"\$${app}_ICON_ID\")"
@@ -88,9 +95,11 @@ extract_and_sort_icons_from() {
 # USAGE: move_icons_to $pkg
 # NEEDED VARS: PATH_ICON_BASE PKG (PKG_PATH)
 move_icons_to() {
-	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local source_path
+	source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$source_path" ] || missing_pkg_error 'move_icons_to' "$PKG"
-	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
+	local destination_path
+	destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
 	(
 		cd "$source_path"
@@ -106,7 +115,8 @@ move_icons_to() {
 postinst_icons_linking() {
 	for app in "$@"; do
 		# get icons list associated with current application
-		local app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
+		local app_icons_list
+		app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
 
 		# get current application id (falls back on $GAME_ID if it is not set)
 		local app_id
@@ -116,9 +126,11 @@ postinst_icons_linking() {
 			app_id="$GAME_ID"
 		fi
 
+		local icon_file
+		local icon_res
 		for icon in $app_icons_list; do
-			local icon_file="$(eval printf -- '%b' \"\$$icon\")"
-			local icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
+			icon_file="$(eval printf -- '%b' \"\$$icon\")"
+			icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
 			PATH_ICON="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 
 			cat >> "$postinst" <<- EOF
@@ -147,9 +159,11 @@ get_icon_from_temp_dir() {
 	local app_icon_name
 	local app_icon_res
 	local app_id
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local icon_path
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
-	for app in $@; do
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
 		if [ "$ARCHIVE" ]; then
@@ -165,7 +179,7 @@ get_icon_from_temp_dir() {
 		if [ "$app_icon" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 			[ "$app_id" ] || app_id="$GAME_ID"
-			local icon_path="$PATH_ICON_BASE/${app_icon_res}x${app_icon_res}/apps"
+			icon_path="$PATH_ICON_BASE/${app_icon_res}x${app_icon_res}/apps"
 			mkdir --parents "${pkg_path}${icon_path}"
 			mv "$PLAYIT_WORKDIR/gamedata/$app_icon" "${pkg_path}${icon_path}/$app_id.png"
 		fi

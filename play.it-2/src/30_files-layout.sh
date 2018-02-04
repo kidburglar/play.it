@@ -7,11 +7,14 @@ organize_data() {
 	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"
-	local archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
-	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
+	local archive_path
+	archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
+	local archive_files
+	archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
-		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		local pkg_path
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 		pkg_path="${pkg_path}$2"
 		mkdir --parents "$pkg_path"

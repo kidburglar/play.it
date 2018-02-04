@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.1~dev
-library_revision=20180211.2
+library_revision=20180211.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -42,7 +42,8 @@ library_revision=20180211.2
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
 	use_archive_specific_value "${1}_ARCH"
-	local architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
+	local architecture
+	architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
 	case $OPTION_PACKAGE in
 		('arch')
 			set_architecture_arch "$architecture"
@@ -116,8 +117,8 @@ print_warning() {
 tolower() {
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
-		find "$dir" -depth -mindepth 1 | while read file; do
-			newfile="${file%/*}/$(printf '%s' "${file##*/}" | tr [:upper:] [:lower:])"
+		find "$dir" -depth -mindepth 1 | while read -r file; do
+			newfile="${file%/*}/$(printf '%s' "${file##*/}" | tr '[:upper:]' '[:lower:]')"
 			[ -e "$newfile" ] || mv "$file" "$newfile"
 		done
 	done
@@ -127,9 +128,12 @@ tolower() {
 # USAGE: liberror $var_name $calling_function
 # NEEDED VARS: (LANG)
 liberror() {
-	local var="$1"
-	local value="$(eval printf -- '%b' \"\$$var\")"
-	local func="$2"
+	local var
+	var="$1"
+	local value
+	value="$(eval printf -- '%b' \"\$$var\")"
+	local func
+	func="$2"
 	print_error
 	case "${LANG%_*}" in
 		('fr')
@@ -148,12 +152,16 @@ liberror() {
 use_archive_specific_value() {
 	[ -n "$ARCHIVE" ] || return 0
 	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
-	local name_real="$1"
-	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	local name_real
+	name_real="$1"
+	local name
+	name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	local value
 	while [ "$name" != "$name_real" ]; do
-		local value="$(eval printf -- '%b' \"\$$name\")"
+		value="$(eval printf -- '%b' \"\$$name\")"
 		if [ -n "$value" ]; then
-			export $name_real="$value"
+			eval $name_real=\"$value\"
+			export $name_real
 			return 0
 		fi
 		name="${name%_*}"
@@ -165,12 +173,16 @@ use_archive_specific_value() {
 use_package_specific_value() {
 	[ -n "$PKG" ] || return 0
 	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
-	local name_real="$1"
-	local name="${name_real}_${PKG#PKG_}"
+	local name_real
+	name_real="$1"
+	local name
+	name="${name_real}_${PKG#PKG_}"
+	local value
 	while [ "$name" != "$name_real" ]; do
-		local value="$(eval printf -- '%b' \"\$$name\")"
+		value="$(eval printf -- '%b' \"\$$name\")"
 		if [ -n "$value" ]; then
-			export $name_real="$value"
+			eval $name_real=\"$value\"
+			export $name_real
 			return 0
 		fi
 		name="${name%_*}"
@@ -276,11 +288,13 @@ set_archive_error_not_found() {
 # NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
 # CALLS: set_archive_vars
 set_archive() {
-	local name=$1
+	local name
+	name=$1
 	shift 1
+	local file
 	if [ -n "$(eval printf -- '%b' \"\$$name\")" ]; then
 		for archive in "$@"; do
-			local file="$(eval printf -- '%b' \"\$$archive\")"
+			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ "$(basename "$(eval printf -- '%b' \"\$$name\")")" = "$file" ]; then
 				set_archive_vars "$archive" "$name" "$(eval printf -- '%b' \"\$$name\")"
 				return 0
@@ -288,7 +302,7 @@ set_archive() {
 		done
 	else
 		for archive in "$@"; do
-			local file="$(eval printf -- '%b' \"\$$archive\")"
+			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ -f "$file" ]; then
 				set_archive_vars "$archive" "$name" "$file"
 				return 0
@@ -308,27 +322,35 @@ set_archive() {
 # NEEDED_VARS: (LANG)
 # CALLED BY: set_archive
 set_archive_vars() {
-	export ARCHIVE="$1"
+	ARCHIVE="$1"
+	export ARCHIVE
 
-	local name="$2"
-	local file="$3"
+	local name
+	name="$2"
+	local file
+	file="$3"
 
 	set_archive_print "$file"
 
 	# set target file
-	export $name="$file"
+	eval $name=\"$file\"
+	export $name
 
 	# set archive type + check dependencies
 	if [ -z "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" ]; then
 		archive_guess_type "$file"
 	fi
-	export ${name}_TYPE="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+	eval ${name}_TYPE=\"$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")\"
+	export ${name}_TYPE
 	check_deps
 
 	# compute total size of all archives
 	if [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")" ]; then
-		[ "$ARCHIVE_SIZE" ] || export ARCHIVE_SIZE='0'
-		export ARCHIVE_SIZE="$(($ARCHIVE_SIZE + $(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")))"
+		if [ -z "$ARCHIVE_SIZE" ]; then
+			ARCHIVE_SIZE='0'
+		fi
+		ARCHIVE_SIZE="$((ARCHIVE_SIZE + $(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")))"
+		export ARCHIVE_SIZE
 	fi
 
 	# set package version
@@ -350,36 +372,37 @@ set_archive_vars() {
 archive_guess_type() {
 	case "${1##*/}" in
 		(*.cab)
-			export ${ARCHIVE}_TYPE='cabinet'
+			eval ${ARCHIVE}_TYPE=\'cabinet\'
 		;;
 		(*.deb)
-			export ${ARCHIVE}_TYPE='debian'
+			eval ${ARCHIVE}_TYPE=\'debian\'
 		;;
 		(setup_*.exe|patch_*.exe)
-			export ${ARCHIVE}_TYPE='innosetup'
+			eval ${ARCHIVE}_TYPE=\'innosetup\'
 		;;
 		(gog_*.sh)
-			export ${ARCHIVE}_TYPE='mojosetup'
+			eval ${ARCHIVE}_TYPE=\'mojosetup\'
 		;;
 		(*.msi)
-			export ${ARCHIVE}_TYPE='msi'
+			eval ${ARCHIVE}_TYPE=\'msi\'
 		;;
 		(*.rar)
-			export ${ARCHIVE}_TYPE='rar'
+			eval ${ARCHIVE}_TYPE=\'rar\'
 		;;
 		(*.tar)
-			export ${ARCHIVE}_TYPE='tar'
+			eval ${ARCHIVE}_TYPE=\'tar\'
 		;;
 		(*.tar.gz|*.tgz)
-			export ${ARCHIVE}_TYPE='tar.gz'
+			eval ${ARCHIVE}_TYPE=\'tar.gz\'
 		;;
 		(*.zip)
-			export ${ARCHIVE}_TYPE='zip'
+			eval ${ARCHIVE}_TYPE=\'zip\'
 		;;
 		(*)
 			archive_guess_type_error
 		;;
 	esac
+	export ${ARCHIVE}_TYPE
 }
 
 # display an error message telling the type of the target archive is not set
@@ -553,7 +576,7 @@ check_deps() {
 				check_deps_7z
 			;;
 			(*)
-				if ! which $dep >/dev/null 2>&1; then
+				if ! which "$dep" >/dev/null 2>&1; then
 					check_deps_error_not_found "$dep"
 				fi
 			;;
@@ -629,7 +652,7 @@ help() {
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
-	if [ ${ARCHIVE_LISTS##* *} ]; then
+	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"
@@ -770,35 +793,42 @@ set_temp_directories() {
 	[ $# = 1 ] && PKG="$1"
 
 	# Generate an unique name for the current instance
-	local name="play.it/$(mktemp --dry-run ${GAME_ID}.XXXXX)"
+	local name
+	name="play.it/$(mktemp --dry-run "${GAME_ID}.XXXXX")"
 
 	# Look for a directory with enough free space to work in
 	if [ "$ARCHIVE_SIZE" ]; then
-		local needed_space=$(($ARCHIVE_SIZE * 2))
+		local needed_space
+		needed_space=$((ARCHIVE_SIZE * 2))
 	else
 		set_temp_directories_error_no_size
 	fi
 	[ "$XDG_RUNTIME_DIR" ] || XDG_RUNTIME_DIR="/run/user/$(id -u)"
 	[ "$XDG_CACHE_HOME" ]  || XDG_CACHE_HOME="$HOME/.cache"
-	local free_space_run=$(df --output=avail "$XDG_RUNTIME_DIR" 2>/dev/null | tail --lines=1)
-	local free_space_tmp=$(df --output=avail /tmp 2>/dev/null | tail --lines=1)
-	local free_space_cache=$(df --output=avail "$XDG_CACHE_HOME" 2>/dev/null | tail --lines=1)
-	local free_space_pwd=$(df --output=avail "$PWD" 2>/dev/null | tail --lines=1)
+	local free_space_run
+	free_space_run=$(df --output=avail "$XDG_RUNTIME_DIR" 2>/dev/null | tail --lines=1)
+	local free_space_tmp
+	free_space_tmp=$(df --output=avail /tmp 2>/dev/null | tail --lines=1)
+	local free_space_cache
+	free_space_cache=$(df --output=avail "$XDG_CACHE_HOME" 2>/dev/null | tail --lines=1)
+	local free_space_pwd
+	free_space_pwd=$(df --output=avail "$PWD" 2>/dev/null | tail --lines=1)
 	if [ -w "$XDG_RUNTIME_DIR" ] && [ $free_space_run -ge $needed_space ]; then
-		export PLAYIT_WORKDIR="$XDG_RUNTIME_DIR/$name"
+		PLAYIT_WORKDIR="$XDG_RUNTIME_DIR/$name"
 	elif [ -w '/tmp' ] && [ $free_space_tmp -ge $needed_space ]; then
-		export PLAYIT_WORKDIR="/tmp/$name"
+		PLAYIT_WORKDIR="/tmp/$name"
 		if [ ! -e "${PLAYIT_WORKDIR%/*}" ]; then
 			mkdir --parents "${PLAYIT_WORKDIR%/*}"
 			chmod 777 "${PLAYIT_WORKDIR%/*}"
 		fi
 	elif [ -w "$XDG_CACHE_HOME" ] && [ $free_space_cache -ge $needed_space ]; then
-		export PLAYIT_WORKDIR="$XDG_CACHE_HOME/$name"
+		PLAYIT_WORKDIR="$XDG_CACHE_HOME/$name"
 	elif [ -w "$PWD" ] && [ $free_space_pwd -ge $needed_space ]; then
-		export PLAYIT_WORKDIR="$PWD/$name"
+		PLAYIT_WORKDIR="$PWD/$name"
 	else
 		set_temp_directories_error_not_enough_space
 	fi
+	export PLAYIT_WORKDIR
 
 	# If $PLAYIT_WORKDIR is an already existing directory, set a new one
 	if [ -e "$PLAYIT_WORKDIR" ]; then
@@ -808,8 +838,10 @@ set_temp_directories() {
 
 	# Set $postinst and $prerm
 	mkdir --parents "$PLAYIT_WORKDIR/scripts"
-	export postinst="$PLAYIT_WORKDIR/scripts/postinst"
-	export prerm="$PLAYIT_WORKDIR/scripts/prerm"
+	postinst="$PLAYIT_WORKDIR/scripts/postinst"
+	export postinst
+	prerm="$PLAYIT_WORKDIR/scripts/prerm"
+	export prerm
 
 	# Set temporary directories for each package to build
 	for pkg in "$@"; do
@@ -826,9 +858,11 @@ set_temp_directories_pkg() {
 
 	# Get package ID
 	use_archive_specific_value "${1}_ID"
-	local pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	local pkg_id
+	pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
 	if [ -z "$pkg_id" ]; then
-		export ${1}_ID="$GAME_ID"
+		eval ${1}_ID=\"$GAME_ID\"
+		export ${1}_ID
 		pkg_id="$GAME_ID"
 	fi
 
@@ -850,7 +884,8 @@ set_temp_directories_pkg() {
 	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${1}_ARCH\")" = '32' ]; then
 		pkg_id="lib32-$pkg_id"
 	fi
-	export ${1}_PATH="$PLAYIT_WORKDIR/${pkg_id}_${pkg_version}_${pkg_architecture}"
+	eval ${1}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${pkg_version}_${pkg_architecture}\"
+	export ${1}_PATH
 }
 
 # display an error if set_temp_directories() is called before setting $ARCHIVE_SIZE
@@ -899,15 +934,17 @@ set_temp_directories_error_not_enough_space() {
 # NEEDED_VARS: (ARCHIVE) (ARCHIVE_PASSWD) (ARCHIVE_TYPE) (LANG) (PLAYIT_WORKDIR)
 # CALLS: liberror extract_7z extract_data_from_print
 extract_data_from() {
-	[ "$PLAYIT_WORKDIR" ] || return 1
+	[ "$PLAYIT_WORKDIR" ] || return 1
 	[ "$ARCHIVE" ] || return 1
 
 	for file in "$@"; do
 		extract_data_from_print "$(basename "$file")"
 
-		local destination="$PLAYIT_WORKDIR/gamedata"
+		local destination
+		destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
-		local archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+		local archive_type
+		archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 		case "$archive_type" in
 			('7z')
 				extract_7z "$file" "$destination"
@@ -936,7 +973,8 @@ extract_data_from() {
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')
-				local input_blocksize=$(head --lines=514 "$file" | wc --bytes | tr --delete ' ')
+				local input_blocksize
+				input_blocksize=$(head --lines=514 "$file" | wc --bytes | tr --delete ' ')
 				dd if="$file" ibs=$input_blocksize skip=1 obs=1024 conv=sync 2>/dev/null | gunzip --stdout | tar --extract --file - --directory "$destination"
 			;;
 			('nix_stage2')
@@ -1000,11 +1038,14 @@ organize_data() {
 	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"
-	local archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
-	local archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
+	local archive_path
+	archive_path="$(eval printf -- '%b' \"\$ARCHIVE_${1}_PATH\")"
+	local archive_files
+	archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
-		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		local pkg_path
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 		pkg_path="${pkg_path}$2"
 		mkdir --parents "$pkg_path"
@@ -1043,12 +1084,14 @@ organize_data_error_missing_pkg() {
 # CALLS: liberror
 extract_icon_from() {
 	for file in "$@"; do
-		local destination="$PLAYIT_WORKDIR/icons"
+		local destination
+		destination="$PLAYIT_WORKDIR/icons"
 		mkdir --parents "$destination"
 		case "${file##*.}" in
 			('exe')
 				if [ "$WRESTOOL_NAME" ]; then
-					local wrestool_options="--name=$WRESTOOL_NAME"
+					local wrestool_options
+					wrestool_options="--name=$WRESTOOL_NAME"
 				fi
 				wrestool --extract --type=14 $wrestool_options --output="$destination" "$file"
 				unset wrestool_options
@@ -1057,7 +1100,8 @@ extract_icon_from() {
 				icotool --extract --output="$destination" "$file" 2>/dev/null
 			;;
 			('bmp')
-				local filename="${file##*/}"
+				local filename
+				filename="${file##*/}"
 				convert "$file" "$destination/${filename%.bmp}.png"
 			;;
 			(*)
@@ -1071,27 +1115,29 @@ extract_icon_from() {
 # USAGE: sort_icons $app[…]
 # NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
-for app in $@; do
-	testvar "$app" 'APP' || liberror 'app' 'sort_icons'
+	for app in "$@"; do
+		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 
-	local app_id
-	if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
-		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
-	else
-		app_id="$GAME_ID"
-	fi
+		local app_id
+		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
+			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
+		else
+			app_id="$GAME_ID"
+		fi
 
-	local icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
-	for res in $icon_res; do
-		path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
-		mkdir --parents "${pkg_path}${path_icon}"
-		for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
-			mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+		local icon_res
+		icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
+		local pkg_path
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
+		for res in $icon_res; do
+			path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+			mkdir --parents "${pkg_path}${path_icon}"
+			for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
+				mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+			done
 		done
 	done
-done
 }
 
 # extract and sort icons from given .ico or .exe file
@@ -1100,12 +1146,14 @@ done
 # CALLS: extract_icon_from liberror sort_icons
 extract_and_sort_icons_from() {
 	local app_icon
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
-	for app in $@; do
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
-		local app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
+		local app_icon
+		app_icon="$(eval printf -- '%b' \"\$${app}_ICON\")"
 
 		if [ ! "$WRESTOOL_NAME" ] && [ -n "$(eval printf -- '%b' \"\$${app}_ICON_ID\")" ]; then
 			WRESTOOL_NAME="$(eval printf -- '%b' \"\$${app}_ICON_ID\")"
@@ -1127,9 +1175,11 @@ extract_and_sort_icons_from() {
 # USAGE: move_icons_to $pkg
 # NEEDED VARS: PATH_ICON_BASE PKG (PKG_PATH)
 move_icons_to() {
-	local source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local source_path
+	source_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$source_path" ] || missing_pkg_error 'move_icons_to' "$PKG"
-	local destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
+	local destination_path
+	destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
 	(
 		cd "$source_path"
@@ -1145,7 +1195,8 @@ move_icons_to() {
 postinst_icons_linking() {
 	for app in "$@"; do
 		# get icons list associated with current application
-		local app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
+		local app_icons_list
+		app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
 
 		# get current application id (falls back on $GAME_ID if it is not set)
 		local app_id
@@ -1155,9 +1206,11 @@ postinst_icons_linking() {
 			app_id="$GAME_ID"
 		fi
 
+		local icon_file
+		local icon_res
 		for icon in $app_icons_list; do
-			local icon_file="$(eval printf -- '%b' \"\$$icon\")"
-			local icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
+			icon_file="$(eval printf -- '%b' \"\$$icon\")"
+			icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
 			PATH_ICON="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 
 			cat >> "$postinst" <<- EOF
@@ -1186,9 +1239,11 @@ get_icon_from_temp_dir() {
 	local app_icon_name
 	local app_icon_res
 	local app_id
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local icon_path
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
-	for app in $@; do
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
 		if [ "$ARCHIVE" ]; then
@@ -1204,7 +1259,7 @@ get_icon_from_temp_dir() {
 		if [ "$app_icon" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 			[ "$app_id" ] || app_id="$GAME_ID"
-			local icon_path="$PATH_ICON_BASE/${app_icon_res}x${app_icon_res}/apps"
+			icon_path="$PATH_ICON_BASE/${app_icon_res}x${app_icon_res}/apps"
 			mkdir --parents "${pkg_path}${icon_path}"
 			mv "$PLAYIT_WORKDIR/gamedata/$app_icon" "${pkg_path}${icon_path}/$app_id.png"
 		fi
@@ -1249,9 +1304,9 @@ print_instructions_arch() {
 	local pkg_path
 	local str_format
 	printf 'pacman -U'
-	for pkg in $@; do
+	for pkg in "$@"; do
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
-		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
 		else
 			str_format=' %s'
@@ -1287,7 +1342,7 @@ print_instructions_deb() {
 # CALLED BY: print_instructions_deb
 print_instructions_deb_apt() {
 	printf 'apt install'
-	print_instructions_deb_common $@
+	print_instructions_deb_common "$@"
 }
 
 # print installation instructions for Debian with dpkg + apt-get
@@ -1296,7 +1351,7 @@ print_instructions_deb_apt() {
 # CALLED BY: print_instructions_deb
 print_instructions_deb_dpkg() {
 	printf 'dpkg -i'
-	print_instructions_deb_common $@
+	print_instructions_deb_common "$@"
 	printf 'apt-get install -f\n'
 }
 
@@ -1306,9 +1361,9 @@ print_instructions_deb_dpkg() {
 print_instructions_deb_common() {
 	local pkg_path
 	local str_format
-	for pkg in $@; do
+	for pkg in "$@"; do
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
-		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
 		else
 			str_format=' %s'
@@ -1323,8 +1378,8 @@ print_instructions_deb_common() {
 # NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
-	write_bin $@
-	write_desktop $@
+	write_bin "$@"
+	write_desktop "$@"
 }
 
 # write launcher script
@@ -1333,32 +1388,40 @@ write_launcher() {
 # CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
-	for app in $@; do
+	local app_id
+	local app_exe
+	local app_libs
+	local app_options
+	local app_postrun
+	local app_prerun
+	local app_type
+	local file
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
 
 		# Get app-specific variables
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
+		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
 			use_package_specific_value "${app}_EXE"
 			use_package_specific_value "${app}_LIBS"
 			use_package_specific_value "${app}_OPTIONS"
 			use_package_specific_value "${app}_POSTRUN"
 			use_package_specific_value "${app}_PRERUN"
-			local app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
-			local app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
-			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
-			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
+			app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
+			app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
+			app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
 			if [ "$app_type" = 'native' ] ||\
 			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
@@ -1376,7 +1439,7 @@ write_bin() {
 			write_bin_winecfg
 		fi
 
-		local file="${pkg_path}${PATH_BIN}/$app_id"
+		file="${pkg_path}${PATH_BIN}/$app_id"
 		mkdir --parents "${file%/*}"
 
 		# Write launcher headers
@@ -1400,7 +1463,8 @@ write_bin() {
 
 				APP_EXE='$app_exe'
 				APP_OPTIONS="$app_options"
-				export LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+				LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+				export LD_LIBRARY_PATH
 
 				EOF
 			fi
@@ -1481,10 +1545,12 @@ write_bin() {
 
 			init_prefix_files() {
 			  (
+			    local file_prefix
+			    local file_real
 			    cd "$1"
-			    find . -type f | while read file; do
-			      local file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
-			      local file_real="$(readlink -e "$file")"
+			    find . -type f | while read -r file; do
+			      file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
+			      file_real="$(readlink -e "$file")"
 			      if [ "$file_real" != "$file_prefix" ]; then
 			        rm --force "$PATH_PREFIX/$file"
 			        mkdir --parents "$PATH_PREFIX/${file%/*}"
@@ -1585,10 +1651,16 @@ write_bin() {
 # CALLED BY: write_launcher
 write_desktop() {
 	local app
-	for app in $@; do
+	local app_cat
+	local app_id
+	local app_name
+	local app_type
+	local pkg_path
+	local target
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
-		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
+		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
 		   ( [ "$app_type" = 'wine' ] || \
 		     [ "$app_type" = 'wine32' ] || \
@@ -1601,30 +1673,27 @@ write_desktop() {
 			write_desktop_winecfg
 		fi
 
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local app_name
 		if [ -n "$(eval printf -- '%b' \"\$${app}_NAME\")" ]; then
 			app_name="$(eval printf -- '%b' \"\$${app}_NAME\")"
 		else
 			app_name="$GAME_NAME"
 		fi
 
-		local app_cat
 		if [ -n "$(eval printf -- '%b' \"\$${app}_CAT\")" ]; then
 			app_cat="$(eval printf -- '%b' \"\$${app}_CAT\")"
 		else
 			app_cat='Game'
 		fi
 
-		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop' "$PKG"
-		local target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
+		target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
 		mkdir --parents "${target%/*}"
 		cat > "$target" <<- EOF
 		[Desktop Entry]
@@ -1695,7 +1764,8 @@ write_bin_set_native_noprefix() {
 
 	APP_EXE='$app_exe'
 	APP_OPTIONS="$app_options"
-	export LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
 
 	# Set game-specific variables
 
@@ -1805,7 +1875,8 @@ write_bin_winecfg() {
 		APP_WINECFG_TYPE='wine'
 		APP_WINECFG_EXE='winecfg'
 		write_bin 'APP_WINECFG'
-		local target="${pkg_path}${PATH_BIN}/$APP_WINECFG_ID"
+		local target
+		target="${pkg_path}${PATH_BIN}/$APP_WINECFG_ID"
 		sed --in-place 's/# Run the game/# Run WINE configuration/' "$target"
 		sed --in-place 's/cd "$PATH_PREFIX"//'                      "$target"
 		sed --in-place 's/wine "$APP_EXE" $APP_OPTIONS $@/winecfg/' "$target"
@@ -1816,10 +1887,12 @@ write_bin_winecfg() {
 # USAGE: write_bin_set_wine
 # CALLED BY: write_bin
 write_bin_set_wine() {
+	local winearch
 	case "$app_type" in
 		('wine'|'wine-staging')
 			use_archive_specific_value "${PKG}_ARCH"
-			local architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
+			local architecture
+			architecture="$(eval printf -- '%b' \"\$${PKG}_ARCH\")"
 			case "$architecture" in
 				('32') winearch='win32' ;;
 				('64') winearch='win64' ;;
@@ -1829,14 +1902,19 @@ write_bin_set_wine() {
 		('wine64'|'wine64-staging') winearch='win64' ;;
 	esac
 	cat >> "$file" <<- EOF
-	export WINEARCH='$winearch'
+	WINEARCH='$winearch'
+	export WINEARCH
 	EOF
 	cat >> "$file" <<- 'EOF'
-	export WINEDEBUG='-all'
-	export WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
-	export WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
+	WINEDEBUG='-all'
+	export WINEDEBUG
+	WINEDLLOVERRIDES='winemenubuilder.exe,mscoree,mshtml=d'
+	export WINEDLLOVERRIDES
+	WINEPREFIX="$XDG_DATA_HOME/play.it/prefixes/$PREFIX_ID"
+	export WINEPREFIX
 	# Work around WINE bug 41639
-	export FREETYPE_PROPERTIES="truetype:interpreter-version=35"
+	FREETYPE_PROPERTIES="truetype:interpreter-version=35"
+	export FREETYPE_PROPERTIES
 
 	PATH_PREFIX="$WINEPREFIX/drive_c/$GAME_ID"
 
@@ -1905,7 +1983,8 @@ write_bin_run_wine() {
 # CALLS: write_desktop
 # CALLED BY: write_desktop
 write_desktop_winecfg() {
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop_winecfg' "$PKG"
 	APP_WINECFG_ID="${GAME_ID}_winecfg"
 	APP_WINECFG_NAME="$GAME_NAME - WINE configuration"
@@ -1923,20 +2002,25 @@ write_metadata() {
 		write_metadata $PACKAGES_LIST
 		return 0
 	fi
-	for pkg in $@; do
+	local pkg_architecture
+	local pkg_description
+	local pkg_id
+	local pkg_maint
+	local pkg_path
+	local pkg_provide
+	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'write_metadata'
 
 		# Set package-specific variables
-		local pkg_architecture
 		set_architecture "$pkg"
-		local pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\")"
-		local pkg_maint="$(whoami)@$(hostname)"
-		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+		pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\")"
+		pkg_maint="$(whoami)@$(hostname)"
+		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
-		local pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
+		pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
-		local pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
+		pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
 
 		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
 			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
@@ -1968,9 +2052,10 @@ build_pkg() {
 		build_pkg $PACKAGES_LIST
 		return 0
 	fi
-	for pkg in $@; do
+	local pkg_path
+	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'build_pkg'
-		local pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
+		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
 			('arch')
@@ -2033,8 +2118,10 @@ pkg_write_arch() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
 		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
-	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
-	local target="$pkg_path/.PKGINFO"
+	local pkg_size
+	pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
+	local target
+	target="$pkg_path/.PKGINFO"
 
 	mkdir --parents "${target%/*}"
 
@@ -2047,7 +2134,7 @@ pkg_write_arch() {
 	arch = $pkg_architecture
 	EOF
 
-	if [ "$pkg_description" ]; then
+	if [ -n "$pkg_description" ]; then
 		cat >> "$target" <<- EOF
 		pkgdesc = $GAME_NAME - $pkg_description - ./play.it script version $script_version
 		EOF
@@ -2063,7 +2150,7 @@ pkg_write_arch() {
 		EOF
 	done
 
-	if [ $pkg_provide ]; then
+	if [ -n "$pkg_provide" ]; then
 		cat >> "$target" <<- EOF
 		conflict = $pkg_provide
 		provides = $pkg_provide
@@ -2103,13 +2190,14 @@ pkg_write_arch() {
 # CALLED BY: pkg_write_arch
 pkg_set_deps_arch() {
 	use_archive_specific_value "${pkg}_ARCH"
-	local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+	local architecture
+	architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 	case $architecture in
 		('32')
-			pkg_set_deps_arch32 $@
+			pkg_set_deps_arch32 "$@"
 		;;
 		('64')
-			pkg_set_deps_arch64 $@
+			pkg_set_deps_arch64 "$@"
 		;;
 	esac
 }
@@ -2118,7 +2206,7 @@ pkg_set_deps_arch() {
 # USAGE: pkg_set_deps_arch32 $dep[…]
 # CALLED BY: pkg_set_deps_arch
 pkg_set_deps_arch32() {
-	for dep in $@; do
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
@@ -2219,7 +2307,7 @@ pkg_set_deps_arch32() {
 # USAGE: pkg_set_deps_arch64 $dep[…]
 # CALLED BY: pkg_set_deps_arch
 pkg_set_deps_arch64() {
-	for dep in $@; do
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='alsa-lib alsa-plugins'
@@ -2319,15 +2407,18 @@ pkg_set_deps_arch64() {
 # CALLS: pkg_print
 # CALLED BY: build_pkg
 pkg_build_arch() {
-	local pkg_filename="$PWD/${1##*/}.pkg.tar"
+	local pkg_filename
+	pkg_filename="$PWD/${1##*/}.pkg.tar"
 
 	if [ -e "$pkg_filename" ]; then
 		pkg_build_print_already_exists "${pkg_filename##*/}"
-		export ${pkg}_PKG="$pkg_filename"
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
 		return 0
 	fi
 
-	local tar_options='--create --group=root --owner=root'
+	local tar_options
+	tar_options='--create --group=root --owner=root'
 
 	case $OPTION_COMPRESSION in
 		('gzip')
@@ -2348,14 +2439,16 @@ pkg_build_arch() {
 
 	(
 		cd "$1"
-		local files='.PKGINFO *'
+		local files
+		files='.PKGINFO *'
 		if [ -e '.INSTALL' ]; then
 			files=".INSTALL $files"
 		fi
 		tar $tar_options --file "$pkg_filename" $files
 	)
 
-	export ${pkg}_PKG="$pkg_filename"
+	eval ${pkg}_PKG=\"$pkg_filename\"
+	export ${pkg}_PKG
 
 	print_ok
 }
@@ -2377,8 +2470,10 @@ pkg_write_deb() {
 			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		fi
 	fi
-	local pkg_size=$(du --total --block-size=1K --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
-	local target="$pkg_path/DEBIAN/control"
+	local pkg_size
+	pkg_size=$(du --total --block-size=1K --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
+	local target
+	target="$pkg_path/DEBIAN/control"
 
 	mkdir --parents "${target%/*}"
 
@@ -2391,7 +2486,7 @@ pkg_write_deb() {
 	Section: non-free/games
 	EOF
 
-	if [ "$pkg_provide" ]; then
+	if [ -n "$pkg_provide" ]; then
 		cat >> "$target" <<- EOF
 		Conflicts: $pkg_provide
 		Provides: $pkg_provide
@@ -2399,13 +2494,13 @@ pkg_write_deb() {
 		EOF
 	fi
 
-	if [ "$pkg_deps" ]; then
+	if [ -n "$pkg_deps" ]; then
 		cat >> "$target" <<- EOF
 		Depends: $pkg_deps
 		EOF
 	fi
 
-	if [ "$pkg_description" ]; then
+	if [ -n "$pkg_description" ]; then
 		cat >> "$target" <<- EOF
 		Description: $GAME_NAME - $pkg_description
 		 ./play.it script version $script_version
@@ -2450,7 +2545,8 @@ pkg_write_deb() {
 # USAGE: pkg_set_deps_deb $dep[…]
 # CALLED BY: pkg_write_deb
 pkg_set_deps_deb() {
-	for dep in $@; do
+	local architecture
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='libasound2-plugins'
@@ -2520,7 +2616,7 @@ pkg_set_deps_deb() {
 			;;
 			('wine')
 				use_archive_specific_value "${pkg}_ARCH"
-				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 				case "$architecture" in
 					('32') pkg_set_deps_deb 'wine32' ;;
 					('64') pkg_set_deps_deb 'wine64' ;;
@@ -2534,7 +2630,7 @@ pkg_set_deps_deb() {
 			;;
 			('wine-staging')
 				use_archive_specific_value "${pkg}_ARCH"
-				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 				case "$architecture" in
 					('32') pkg_set_deps_deb 'wine32-staging' ;;
 					('64') pkg_set_deps_deb 'wine64-staging' ;;
@@ -2576,10 +2672,12 @@ pkg_set_deps_deb() {
 # CALLS: pkg_print
 # CALLED BY: build_pkg
 pkg_build_deb() {
-	local pkg_filename="$PWD/${1##*/}.deb"
+	local pkg_filename
+	pkg_filename="$PWD/${1##*/}.deb"
 	if [ -e "$pkg_filename" ]; then
 		pkg_build_print_already_exists "${pkg_filename##*/}"
-		export ${pkg}_PKG="$pkg_filename"
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
 		return 0
 	fi
 
@@ -2595,7 +2693,8 @@ pkg_build_deb() {
 
 	pkg_print "${pkg_filename##*/}"
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
-	export ${pkg}_PKG="$pkg_filename"
+	eval ${pkg}_PKG=\"$pkg_filename\"
+	export ${pkg}_PKG
 
 	print_ok
 }
@@ -2604,11 +2703,11 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Check library version against script target version
 
-	version_major_library=${library_version%%.*}
-	version_major_target=${target_version%%.*}
+	version_major_library="${library_version%%.*}"
+	version_major_target="${target_version%%.*}"
 
-	version_minor_library=$(printf '%s' $library_version | cut --delimiter='.' --fields=2)
-	version_minor_target=$(printf '%s' $target_version | cut --delimiter='.' --fields=2)
+	version_minor_library=$(printf '%s' "$library_version" | cut --delimiter='.' --fields=2)
+	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 
 	if [ $version_major_library -ne $version_major_target ] || [ $version_minor_library -lt $version_minor_target ]; then
 		print_error
@@ -2676,7 +2775,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 					eval help_$option
 					exit 0
 				else
-					export OPTION_$(printf '%s' $option | tr [:lower:] [:upper:])="$value"
+					eval OPTION_$(printf '%s' "$option" | tr '[:lower:]' '[:upper:]')=\"$value\"
+					export OPTION_$(printf '%s' "$option" | tr '[:lower:]' '[:upper:]')
 				fi
 				unset option
 				unset value
@@ -2695,7 +2795,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				return 1
 			;;
 			(*)
-				export SOURCE_ARCHIVE="$1"
+				SOURCE_ARCHIVE="$1"
+				export SOURCE_ARCHIVE
 			;;
 		esac
 		shift 1
@@ -2708,7 +2809,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		if [ -e '/etc/os-release' ]; then
 			GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
 		elif which lsb_release >/dev/null 2>&1; then
-			GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
+			GUESSED_HOST_OS="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
 		fi
 		case "$GUESSED_HOST_OS" in
 			('debian'|\
@@ -2744,16 +2845,20 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
 		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
-			export OPTION_$option="$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")"
+			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
+			export OPTION_$option
 		fi
 	done
 
 	# Check options values validity
 
 	check_option_validity() {
-		local name="$1"
-		local value="$(eval printf -- '%b' \"\$OPTION_$option\")"
-		local allowed_values="$(eval printf -- '%b' \"\$ALLOWED_VALUES_$option\")"
+		local name
+		name="$1"
+		local value
+		value="$(eval printf -- '%b' \"\$OPTION_$option\")"
+		local allowed_values
+		allowed_values="$(eval printf -- '%b' \"\$ALLOWED_VALUES_$option\")"
 		for allowed_value in $allowed_values; do
 			if [ "$value" = "$allowed_value" ]; then
 				return 0
@@ -2772,8 +2877,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				string2='Run the script with the option --%s=help to get a list of supported values.\n'
 			;;
 		esac
-		printf "$string1" "$value" "$(printf '%s' $option | tr [:upper:] [:lower:])"
-		printf "$string2" "$(printf '%s' $option | tr [:upper:] [:lower:])"
+		printf "$string1" "$value" "$(printf '%s' $option | tr '[:upper:]' '[:lower:]')"
+		printf "$string2" "$(printf '%s' $option | tr '[:upper:]' '[:lower:]')"
 		printf '\n'
 		exit 1
 	}

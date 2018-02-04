@@ -5,7 +5,8 @@
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
 	use_archive_specific_value "${1}_ARCH"
-	local architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
+	local architecture
+	architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
 	case $OPTION_PACKAGE in
 		('arch')
 			set_architecture_arch "$architecture"
@@ -79,8 +80,8 @@ print_warning() {
 tolower() {
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
-		find "$dir" -depth -mindepth 1 | while read file; do
-			newfile="${file%/*}/$(printf '%s' "${file##*/}" | tr [:upper:] [:lower:])"
+		find "$dir" -depth -mindepth 1 | while read -r file; do
+			newfile="${file%/*}/$(printf '%s' "${file##*/}" | tr '[:upper:]' '[:lower:]')"
 			[ -e "$newfile" ] || mv "$file" "$newfile"
 		done
 	done
@@ -90,9 +91,12 @@ tolower() {
 # USAGE: liberror $var_name $calling_function
 # NEEDED VARS: (LANG)
 liberror() {
-	local var="$1"
-	local value="$(eval printf -- '%b' \"\$$var\")"
-	local func="$2"
+	local var
+	var="$1"
+	local value
+	value="$(eval printf -- '%b' \"\$$var\")"
+	local func
+	func="$2"
 	print_error
 	case "${LANG%_*}" in
 		('fr')
@@ -111,12 +115,16 @@ liberror() {
 use_archive_specific_value() {
 	[ -n "$ARCHIVE" ] || return 0
 	testvar "$ARCHIVE" 'ARCHIVE' || liberror 'ARCHIVE' 'use_archive_specific_value'
-	local name_real="$1"
-	local name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	local name_real
+	name_real="$1"
+	local name
+	name="${name_real}_${ARCHIVE#ARCHIVE_}"
+	local value
 	while [ "$name" != "$name_real" ]; do
-		local value="$(eval printf -- '%b' \"\$$name\")"
+		value="$(eval printf -- '%b' \"\$$name\")"
 		if [ -n "$value" ]; then
-			export $name_real="$value"
+			eval $name_real=\"$value\"
+			export $name_real
 			return 0
 		fi
 		name="${name%_*}"
@@ -128,12 +136,16 @@ use_archive_specific_value() {
 use_package_specific_value() {
 	[ -n "$PKG" ] || return 0
 	testvar "$PKG" 'PKG' || liberror 'PKG' 'use_package_specific_value'
-	local name_real="$1"
-	local name="${name_real}_${PKG#PKG_}"
+	local name_real
+	name_real="$1"
+	local name
+	name="${name_real}_${PKG#PKG_}"
+	local value
 	while [ "$name" != "$name_real" ]; do
-		local value="$(eval printf -- '%b' \"\$$name\")"
+		value="$(eval printf -- '%b' \"\$$name\")"
 		if [ -n "$value" ]; then
-			export $name_real="$value"
+			eval $name_real=\"$value\"
+			export $name_real
 			return 0
 		fi
 		name="${name%_*}"

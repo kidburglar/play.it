@@ -4,9 +4,9 @@ print_instructions_arch() {
 	local pkg_path
 	local str_format
 	printf 'pacman -U'
-	for pkg in $@; do
+	for pkg in "$@"; do
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
-		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
 		else
 			str_format=' %s'

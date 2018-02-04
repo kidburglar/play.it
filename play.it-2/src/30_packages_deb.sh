@@ -15,8 +15,10 @@ pkg_write_deb() {
 			pkg_deps="$(eval printf -- '%b' \"\$${pkg}_DEPS_DEB\")"
 		fi
 	fi
-	local pkg_size=$(du --total --block-size=1K --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
-	local target="$pkg_path/DEBIAN/control"
+	local pkg_size
+	pkg_size=$(du --total --block-size=1K --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
+	local target
+	target="$pkg_path/DEBIAN/control"
 
 	mkdir --parents "${target%/*}"
 
@@ -29,7 +31,7 @@ pkg_write_deb() {
 	Section: non-free/games
 	EOF
 
-	if [ "$pkg_provide" ]; then
+	if [ -n "$pkg_provide" ]; then
 		cat >> "$target" <<- EOF
 		Conflicts: $pkg_provide
 		Provides: $pkg_provide
@@ -37,13 +39,13 @@ pkg_write_deb() {
 		EOF
 	fi
 
-	if [ "$pkg_deps" ]; then
+	if [ -n "$pkg_deps" ]; then
 		cat >> "$target" <<- EOF
 		Depends: $pkg_deps
 		EOF
 	fi
 
-	if [ "$pkg_description" ]; then
+	if [ -n "$pkg_description" ]; then
 		cat >> "$target" <<- EOF
 		Description: $GAME_NAME - $pkg_description
 		 ./play.it script version $script_version
@@ -88,7 +90,8 @@ pkg_write_deb() {
 # USAGE: pkg_set_deps_deb $dep[…]
 # CALLED BY: pkg_write_deb
 pkg_set_deps_deb() {
-	for dep in $@; do
+	local architecture
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='libasound2-plugins'
@@ -158,7 +161,7 @@ pkg_set_deps_deb() {
 			;;
 			('wine')
 				use_archive_specific_value "${pkg}_ARCH"
-				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 				case "$architecture" in
 					('32') pkg_set_deps_deb 'wine32' ;;
 					('64') pkg_set_deps_deb 'wine64' ;;
@@ -172,7 +175,7 @@ pkg_set_deps_deb() {
 			;;
 			('wine-staging')
 				use_archive_specific_value "${pkg}_ARCH"
-				local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 				case "$architecture" in
 					('32') pkg_set_deps_deb 'wine32-staging' ;;
 					('64') pkg_set_deps_deb 'wine64-staging' ;;
@@ -214,10 +217,12 @@ pkg_set_deps_deb() {
 # CALLS: pkg_print
 # CALLED BY: build_pkg
 pkg_build_deb() {
-	local pkg_filename="$PWD/${1##*/}.deb"
+	local pkg_filename
+	pkg_filename="$PWD/${1##*/}.deb"
 	if [ -e "$pkg_filename" ]; then
 		pkg_build_print_already_exists "${pkg_filename##*/}"
-		export ${pkg}_PKG="$pkg_filename"
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
 		return 0
 	fi
 
@@ -233,7 +238,8 @@ pkg_build_deb() {
 
 	pkg_print "${pkg_filename##*/}"
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
-	export ${pkg}_PKG="$pkg_filename"
+	eval ${pkg}_PKG=\"$pkg_filename\"
+	export ${pkg}_PKG
 
 	print_ok
 }

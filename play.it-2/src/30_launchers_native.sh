@@ -7,7 +7,8 @@ write_bin_set_native_noprefix() {
 
 	APP_EXE='$app_exe'
 	APP_OPTIONS="$app_options"
-	export LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+	export LD_LIBRARY_PATH
 
 	# Set game-specific variables
 

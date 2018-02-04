@@ -3,8 +3,8 @@
 # NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
-	write_bin $@
-	write_desktop $@
+	write_bin "$@"
+	write_desktop "$@"
 }
 
 # write launcher script
@@ -13,32 +13,40 @@ write_launcher() {
 # CALLS: liberror testvar write_bin_build_wine write_bin_run_dosbox write_bin_run_native write_bin_run_native_noprefix write_bin_run_scummvm write_bin_run_wine write_bin_set_native_noprefix write_bin_set_scummvm write_bin_set_wine write_bin_winecfg
 # CALLED BY: write_launcher
 write_bin() {
-	local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+	local pkg_path
+	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
-	for app in $@; do
+	local app_id
+	local app_exe
+	local app_libs
+	local app_options
+	local app_postrun
+	local app_prerun
+	local app_type
+	local file
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
 
 		# Get app-specific variables
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
+		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$app_type" != 'scummvm' ]; then
 			use_package_specific_value "${app}_EXE"
 			use_package_specific_value "${app}_LIBS"
 			use_package_specific_value "${app}_OPTIONS"
 			use_package_specific_value "${app}_POSTRUN"
 			use_package_specific_value "${app}_PRERUN"
-			local app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
-			local app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
-			local app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
-			local app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
-			local app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
+			app_exe="$(eval printf -- '%b' \"\$${app}_EXE\")"
+			app_libs="$(eval printf -- '%b' \"\$${app}_LIBS\")"
+			app_options="$(eval printf -- '%b' \"\$${app}_OPTIONS\")"
+			app_postrun="$(eval printf -- '%b' \"\$${app}_POSTRUN\")"
+			app_prerun="$(eval printf -- '%b' \"\$${app}_PRERUN\")"
 			if [ "$app_type" = 'native' ] ||\
 			   [ "$app_type" = 'native_no-prefix' ]; then
 				chmod +x "${pkg_path}${PATH_GAME}/$app_exe"
@@ -56,7 +64,7 @@ write_bin() {
 			write_bin_winecfg
 		fi
 
-		local file="${pkg_path}${PATH_BIN}/$app_id"
+		file="${pkg_path}${PATH_BIN}/$app_id"
 		mkdir --parents "${file%/*}"
 
 		# Write launcher headers
@@ -80,7 +88,8 @@ write_bin() {
 
 				APP_EXE='$app_exe'
 				APP_OPTIONS="$app_options"
-				export LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+				LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+				export LD_LIBRARY_PATH
 
 				EOF
 			fi
@@ -161,10 +170,12 @@ write_bin() {
 
 			init_prefix_files() {
 			  (
+			    local file_prefix
+			    local file_real
 			    cd "$1"
-			    find . -type f | while read file; do
-			      local file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
-			      local file_real="$(readlink -e "$file")"
+			    find . -type f | while read -r file; do
+			      file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
+			      file_real="$(readlink -e "$file")"
 			      if [ "$file_real" != "$file_prefix" ]; then
 			        rm --force "$PATH_PREFIX/$file"
 			        mkdir --parents "$PATH_PREFIX/${file%/*}"
@@ -265,10 +276,16 @@ write_bin() {
 # CALLED BY: write_launcher
 write_desktop() {
 	local app
-	for app in $@; do
+	local app_cat
+	local app_id
+	local app_name
+	local app_type
+	local pkg_path
+	local target
+	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
 
-		local app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
+		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
 		   ( [ "$app_type" = 'wine' ] || \
 		     [ "$app_type" = 'wine32' ] || \
@@ -281,30 +298,27 @@ write_desktop() {
 			write_desktop_winecfg
 		fi
 
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local app_name
 		if [ -n "$(eval printf -- '%b' \"\$${app}_NAME\")" ]; then
 			app_name="$(eval printf -- '%b' \"\$${app}_NAME\")"
 		else
 			app_name="$GAME_NAME"
 		fi
 
-		local app_cat
 		if [ -n "$(eval printf -- '%b' \"\$${app}_CAT\")" ]; then
 			app_cat="$(eval printf -- '%b' \"\$${app}_CAT\")"
 		else
 			app_cat='Game'
 		fi
 
-		local pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_desktop' "$PKG"
-		local target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
+		target="${pkg_path}${PATH_DESK}/${app_id}.desktop"
 		mkdir --parents "${target%/*}"
 		cat > "$target" <<- EOF
 		[Desktop Entry]

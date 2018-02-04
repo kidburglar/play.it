@@ -11,8 +11,10 @@ pkg_write_arch() {
 	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")" ]; then
 		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_ARCH\")"
 	fi
-	local pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
-	local target="$pkg_path/.PKGINFO"
+	local pkg_size
+	pkg_size=$(du --total --block-size=1 --summarize "$pkg_path" | tail --lines=1 | cut --fields=1)
+	local target
+	target="$pkg_path/.PKGINFO"
 
 	mkdir --parents "${target%/*}"
 
@@ -25,7 +27,7 @@ pkg_write_arch() {
 	arch = $pkg_architecture
 	EOF
 
-	if [ "$pkg_description" ]; then
+	if [ -n "$pkg_description" ]; then
 		cat >> "$target" <<- EOF
 		pkgdesc = $GAME_NAME - $pkg_description - ./play.it script version $script_version
 		EOF
@@ -41,7 +43,7 @@ pkg_write_arch() {
 		EOF
 	done
 
-	if [ $pkg_provide ]; then
+	if [ -n "$pkg_provide" ]; then
 		cat >> "$target" <<- EOF
 		conflict = $pkg_provide
 		provides = $pkg_provide
@@ -81,13 +83,14 @@ pkg_write_arch() {
 # CALLED BY: pkg_write_arch
 pkg_set_deps_arch() {
 	use_archive_specific_value "${pkg}_ARCH"
-	local architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+	local architecture
+	architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
 	case $architecture in
 		('32')
-			pkg_set_deps_arch32 $@
+			pkg_set_deps_arch32 "$@"
 		;;
 		('64')
-			pkg_set_deps_arch64 $@
+			pkg_set_deps_arch64 "$@"
 		;;
 	esac
 }
@@ -96,7 +99,7 @@ pkg_set_deps_arch() {
 # USAGE: pkg_set_deps_arch32 $dep[…]
 # CALLED BY: pkg_set_deps_arch
 pkg_set_deps_arch32() {
-	for dep in $@; do
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='lib32-alsa-lib lib32-alsa-plugins'
@@ -197,7 +200,7 @@ pkg_set_deps_arch32() {
 # USAGE: pkg_set_deps_arch64 $dep[…]
 # CALLED BY: pkg_set_deps_arch
 pkg_set_deps_arch64() {
-	for dep in $@; do
+	for dep in "$@"; do
 		case $dep in
 			('alsa')
 				pkg_dep='alsa-lib alsa-plugins'
@@ -297,15 +300,18 @@ pkg_set_deps_arch64() {
 # CALLS: pkg_print
 # CALLED BY: build_pkg
 pkg_build_arch() {
-	local pkg_filename="$PWD/${1##*/}.pkg.tar"
+	local pkg_filename
+	pkg_filename="$PWD/${1##*/}.pkg.tar"
 
 	if [ -e "$pkg_filename" ]; then
 		pkg_build_print_already_exists "${pkg_filename##*/}"
-		export ${pkg}_PKG="$pkg_filename"
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
 		return 0
 	fi
 
-	local tar_options='--create --group=root --owner=root'
+	local tar_options
+	tar_options='--create --group=root --owner=root'
 
 	case $OPTION_COMPRESSION in
 		('gzip')
@@ -326,14 +332,16 @@ pkg_build_arch() {
 
 	(
 		cd "$1"
-		local files='.PKGINFO *'
+		local files
+		files='.PKGINFO *'
 		if [ -e '.INSTALL' ]; then
 			files=".INSTALL $files"
 		fi
 		tar $tar_options --file "$pkg_filename" $files
 	)
 
-	export ${pkg}_PKG="$pkg_filename"
+	eval ${pkg}_PKG=\"$pkg_filename\"
+	export ${pkg}_PKG
 
 	print_ok
 }
