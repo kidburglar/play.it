@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180205.1
 
 # Set game-specific variables
 
@@ -118,10 +118,10 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libSSL into the game directory
 
-if [ "$LIBSSL" ]; then
+if [ "$ARCHIVE_LIBSSL" ]; then
 	(
-		ARCHIVE='LIBSSL'
-		extract_data_from "$LIBSSL"
+		ARCHIVE='ARCHIVE_LIBSSL'
+		extract_data_from "$ARCHIVE_LIBSSL"
 	)
 	dir='libs'
 	mkdir --parents "${PKG_BIN_PATH}${PATH_GAME}/$dir"
