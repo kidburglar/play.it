@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180204.2
 
 # Set game-specific variables
 
@@ -50,12 +50,12 @@ ARCHIVE_GOG_1_SIZE='500000'
 
 ARCHIVE_GOG_2='setup_heroes_chronicles_chapter2_2.1.0.43.exe'
 ARCHIVE_GOG_2_MD5='0d240bc0309814ba251c2d9b557cf69f'
-ARCHIVE_GOG_2_VERSION='1.0-gog2.1.0.42'
+ARCHIVE_GOG_2_VERSION='1.0-gog2.1.0.43'
 ARCHIVE_GOG_2_SIZE='510000'
 
 ARCHIVE_GOG_3='setup_heroes_chronicles_chapter3_2.1.0.41.exe'
 ARCHIVE_GOG_3_MD5='cb21751572960d47a259efc17b92c88c'
-ARCHIVE_GOG_3_VERSION='1.0-gog2.1.0.42'
+ARCHIVE_GOG_3_VERSION='1.0-gog2.1.0.41'
 ARCHIVE_GOG_3_SIZE='490000'
 
 ARCHIVE_GOG_4='setup_heroes_chronicles_chapter4_2.1.0.42.exe'
@@ -138,17 +138,16 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_COMMON_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine, winetricks"
-PKG_BIN_DEPS_ARCH="$PKG_COMMON_ID, $PKG_DATA_ID wine winetricks"
+PKG_BIN_DEPS="$PKG_COMMON_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -163,50 +162,50 @@ fi
 
 GAME_ID_COMMON="$GAME_ID"
 GAME_NAME_COMMON="$GAME_NAME"
-case "${SOURCE_ARCHIVE##*/}" in
-	($ARCHIVE_GOG_1)
+case "$ARCHIVE" in
+	('ARCHIVE_GOG_1')
 		GAME_ID="${GAME_ID}-1"
 		GAME_NAME="$GAME_NAME 1 - Warlords of the Wasteland"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_1"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_1"
 	;;
-	($ARCHIVE_GOG_2)
+	('ARCHIVE_GOG_2')
 		GAME_ID="${GAME_ID}-2"
 		GAME_NAME="$GAME_NAME 2 - Conquest of the Underworld"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_2"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_2"
 	;;
-	($ARCHIVE_GOG_3)
+	('ARCHIVE_GOG_3')
 		GAME_ID="${GAME_ID}-3"
 		GAME_NAME="$GAME_NAME 3 - Masters of the Elements"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_3"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_3"
 	;;
-	($ARCHIVE_GOG_4)
+	('ARCHIVE_GOG_4')
 		GAME_ID="${GAME_ID}-4"
 		GAME_NAME="$GAME_NAME 4 - Clash of the Dragons"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_4"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_4"
 	;;
-	($ARCHIVE_GOG_5)
+	('ARCHIVE_GOG_5')
 		GAME_ID="${GAME_ID}-5"
 		GAME_NAME="$GAME_NAME 5 - The World Tree"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_5"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_5"
 	;;
-	($ARCHIVE_GOG_6)
+	('ARCHIVE_GOG_6')
 		GAME_ID="${GAME_ID}-6"
 		GAME_NAME="$GAME_NAME 6 - The Fiery Moon"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_6"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_6"
 	;;
-	($ARCHIVE_GOG_7)
+	('ARCHIVE_GOG_7')
 		GAME_ID="${GAME_ID}-7"
 		GAME_NAME="$GAME_NAME 7 - Revolt of the Beastmasters"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_7"
 		APP_MAIN_ICON="$APP_MAIN_ICON_GOG_7"
 	;;
-	($ARCHIVE_GOG_8)
+	('ARCHIVE_GOG_8')
 		GAME_ID="${GAME_ID}-8"
 		GAME_NAME="$GAME_NAME 8 - The Sword of Frost"
 		APP_MAIN_EXE="$APP_MAIN_EXE_GOG_8"
@@ -218,19 +217,22 @@ esac
 
 PKG_BIN_ID="$GAME_ID"
 PKG_DATA_ID="${GAME_ID}-data"
-PKG_BIN_DEPS_DEB="$PKG_COMMON_ID, $PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine, winetricks"
-PKG_BIN_DEPS_ARCH="$PKG_COMMON_ID $PKG_DATA_ID wine winetricks"
+PKG_BIN_DEPS="$PKG_COMMON_ID $PKG_DATA_ID wine winetricks"
 
 # Update PATH_DOC and PATH_GAME based on new GAME_ID value
 
-case $OPTION_PACKAGE in
+case "$OPTION_PACKAGE" in
 	('arch')
 		PATH_DOC="$OPTION_PREFIX/share/doc/$GAME_ID"
+		PATH_DOC_COMMON="$OPTION_PREFIX/share/doc/$GAME_ID_COMMON"
 		PATH_GAME="$OPTION_PREFIX/share/$GAME_ID"
+		PATH_GAME_COMMON="$OPTION_PREFIX/share/$GAME_ID_COMMON"
 	;;
 	('deb')
 		PATH_DOC="$OPTION_PREFIX/share/doc/$GAME_ID"
+		PATH_DOC_COMMON="$OPTION_PREFIX/share/doc/$GAME_ID_COMMON"
 		PATH_GAME="$OPTION_PREFIX/share/games/$GAME_ID"
+		PATH_GAME_COMMON="$OPTION_PREFIX/share/games/$GAME_ID_COMMON"
 	;;
 	(*)
 		liberror 'OPTION_PACKAGE' "$0"
@@ -248,8 +250,8 @@ for PKG in 'PKG_DATA' 'PKG_BIN'; do
 done
 
 PKG='PKG_COMMON'
-organize_data 'DOC_COMMON'  "$(printf "$PATH_DOC"  | sed "s,/$GAME_ID$,/$GAME_ID_COMMON,")"
-organize_data 'GAME_COMMON' "$(printf "$PATH_GAME" | sed "s,/$GAME_ID$,/$GAME_ID_COMMON,")"
+organize_data 'DOC_COMMON'  "$PATH_DOC_COMMON"
+organize_data 'GAME_COMMON' "$PATH_GAME_COMMON"
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
@@ -266,16 +268,21 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
 file="${PKG_BIN_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's,cd "$PATH_PREFIX",cd "$PATH_PREFIX/${APP_EXE%/*}",'                     "$file"
-sed --in-place 's,wine "$APP_EXE" $APP_OPTIONS $@,wine "${APP_EXE##*/}" $APP_OPTIONS $@,' "$file"
+for pattern in \
+'s,^cd "$PATH_PREFIX",cd "$PATH_PREFIX/${APP_EXE%/*}",' \
+'s,^wine "$APP_EXE" $APP_OPTIONS $@,wine "${APP_EXE##*/}" $APP_OPTIONS $@,'
+do
+	sed --in-place "$pattern" "$file"
+done
 
 # Build package
 
 cat > "$postinst" << EOF
 for dir in 'data' 'mp3'; do
 	if [ ! -e "$PATH_GAME/\$dir" ]; then
-		cp --force --recursive --symbolic-link --update "$(printf "$PATH_GAME" | sed "s,/$GAME_ID$,/$GAME_ID_COMMON,")/\$dir" "$PATH_GAME"
+		cp --force --recursive --symbolic-link --update "$PATH_GAME_COMMON/\$dir" "$PATH_GAME"
 	fi
 done
 EOF
