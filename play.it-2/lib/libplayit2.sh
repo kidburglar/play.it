@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.1~dev
-library_revision=20180211.1
+library_revision=20180211.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1516,26 +1516,10 @@ write_bin() {
 			}
 			EOF
 
-			# Build user-specific directories
-			cat >> "$file" <<- 'EOF'
-
-			# Build user-writable directories
-
-			if [ ! -e "$PATH_CONFIG" ]; then
-			  mkdir --parents "$PATH_CONFIG"
-			  init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
-			fi
-
-			if [ ! -e "$PATH_DATA" ]; then
-			  mkdir --parents "$PATH_DATA"
-			  init_userdir_files "$PATH_DATA" "$DATA_FILES"
-			fi
-
-			# Build prefix
-
-			EOF
-
 			# Build game prefix
+			cat >> "$file" <<- 'EOF'
+			# Build prefix
+			EOF
 			if [ "$app_type" = 'wine' ] || \
 			   [ "$app_type" = 'wine32' ] || \
 			   [ "$app_type" = 'wine64' ] || \
@@ -1549,6 +1533,14 @@ write_bin() {
 			if [ ! -e "$PATH_PREFIX" ]; then
 			  mkdir --parents "$PATH_PREFIX"
 			  cp --force --recursive --symbolic-link --update "$PATH_GAME"/* "$PATH_PREFIX"
+			fi
+			if [ ! -e "$PATH_CONFIG" ]; then
+			  mkdir --parents "$PATH_CONFIG"
+			  init_userdir_files "$PATH_CONFIG" "$CONFIG_FILES"
+			fi
+			if [ ! -e "$PATH_DATA" ]; then
+			  mkdir --parents "$PATH_DATA"
+			  init_userdir_files "$PATH_DATA" "$DATA_FILES"
 			fi
 			init_prefix_files "$PATH_CONFIG" "$CONFIG_FILES"
 			init_prefix_files "$PATH_DATA" "$DATA_FILES"

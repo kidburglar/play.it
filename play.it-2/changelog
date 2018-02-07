@@ -12,6 +12,8 @@
   * Fix error displayed if calling extract_icon_from on an unsupported file
     type
 
+  * Improve user prefix generation
+
 2.5.0
 
   * Add support for games requiring wine-staging patches
