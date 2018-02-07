@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180202.2
+script_version=20180207.1
 
 # Set game-specific variables
 
@@ -61,10 +61,12 @@ ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./Data ./*_Data/*.assets ./*_Data/*.resource ./*_Data/level* ./*_Data/mainData ./*_Data/Managed ./*_Data/Mono/etc ./*_Data/Resources'
 
-DATA_DIRS='./logs'
+DATA_DIRS='./logs ./Documents'
+CONFIG_DIRS='./.config'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_PRERUN='pulseaudio --start'
+APP_MAIN_PRERUN='pulseaudio --start
+export HOME="$PATH_PREFIX"'
 APP_MAIN_EXE_BIN32='HardWest.x86'
 APP_MAIN_EXE_BIN64='HardWest.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
