@@ -34,30 +34,41 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180107.2
+script_version=20180110.1
 
 # Set game-specific variables
 
 GAME_ID='kyn'
 GAME_NAME='Kyn'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='setup_kyn_2.1.0.4.exe'
-ARCHIVE_GOG_MD5='a40cb85cdd40b7464eec92b2b9166f84'
+ARCHIVE_GOG='setup_kyn_update_4_(17655).exe'
+ARCHIVE_GOG_MD5='ca2a665c27ef02f0bfa4e72dc368952c'
 ARCHIVE_GOG_SIZE='7900000'
-ARCHIVE_GOG_VERSION='1.0-gog2.1.0.4'
-ARCHIVE_GOG_TYPE='rar'
-ARCHIVE_GOG_PART1='setup_kyn_2.1.0.4-1.bin'
-ARCHIVE_GOG_PART1_MD5='4cfdca351969f2570a3657c772fd492e'
-ARCHIVE_GOG_PART1_TYPE='rar'
+ARCHIVE_GOG_VERSION='1.0.4-gog17655'
+ARCHIVE_GOG_TYPE='innosetup'
+ARCHIVE_GOG_PART1='setup_kyn_update_4_(17655)-1.bin'
+ARCHIVE_GOG_PART1_MD5='8c6c13b15a4d39ac9389c7c4f9ce6760'
+ARCHIVE_GOG_PART1_TYPE='innosetup'
+
+ARCHIVE_GOG_OLD='setup_kyn_2.1.0.4.exe'
+ARCHIVE_GOG_OLD_MD5='a40cb85cdd40b7464eec92b2b9166f84'
+ARCHIVE_GOG_OLD_SIZE='7900000'
+ARCHIVE_GOG_OLD_VERSION='1.0-gog2.1.0.4'
+ARCHIVE_GOG_OLD_TYPE='rar'
+ARCHIVE_GOG_OLD_PART1='setup_kyn_2.1.0.4-1.bin'
+ARCHIVE_GOG_OLD_PART1_MD5='4cfdca351969f2570a3657c772fd492e'
+ARCHIVE_GOG_OLD_PART1_TYPE='rar'
 
 DATA_DIRS='./logs'
 
-ARCHIVE_GAME_BIN_PATH='game'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_PATH_GOG_OLD='game'
 ARCHIVE_GAME_BIN_FILES='./kyn.exe kyn_data/mono kyn_data/plugins kyn_data/managed'
 
-ARCHIVE_GAME_DATA_PATH='game'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_PATH_GOG_OLD='game'
 ARCHIVE_GAME_DATA_FILES='kyn_data/resources kyn_data/level* kyn_data/maindata kyn_data/playerconnectionconfigfile kyn_data/resources.assets kyn_data/sharedassets*'
 
 APP_MAIN_TYPE='wine'
@@ -76,7 +87,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -95,14 +106,21 @@ fi
 # Check that all parts of the installer are present
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_PART1' 'ARCHIVE_GOG_PART1'
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART1'
+set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
 ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
-extract_data_from "$ARCHIVE_PART1"
-tolower "$PLAYIT_WORKDIR/gamedata"
+case "$ARCHIVE" in
+	('ARCHIVE_GOG')
+		extract_data_from "$SOURCE_ARCHIVE"
+	;;
+	('ARCHIVE_GOG_OLD')
+		extract_data_from "$ARCHIVE_PART1"
+		tolower "$PLAYIT_WORKDIR/gamedata"
+	;;
+esac
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
