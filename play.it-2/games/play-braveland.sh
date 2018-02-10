@@ -34,22 +34,28 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180206.1
 
 # Set game-specific variables
 
 GAME_ID='braveland'
 GAME_NAME='Braveland'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_braveland_2.1.0.8.sh'
-ARCHIVE_GOG_MD5='c60ac5170e53a7ed22fda6a3e6ce690e'
+ARCHIVE_GOG='braveland_en_1_4_0_19_18418.sh'
+ARCHIVE_GOG_MD5='7ceac41f0486310c04ec60fcdf7e2b46'
 ARCHIVE_GOG_SIZE='320000'
-ARCHIVE_GOG_VERSION='1.3.2.18-gog2.1.0.8'
+ARCHIVE_GOG_VERSION='1.4.0.19-gog18418'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GOG_OLD='gog_braveland_2.1.0.8.sh'
+ARCHIVE_GOG_OLD_MD5='c60ac5170e53a7ed22fda6a3e6ce690e'
+ARCHIVE_GOG_OLD_SIZE='320000'
+ARCHIVE_GOG_OLD_VERSION='1.3.2.18-gog2.1.0.8'
+
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
@@ -70,22 +76,20 @@ APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glu"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -105,25 +109,18 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_BIN32'
-write_launcher 'APP_MAIN'
-
-PKG='PKG_BIN64'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
@@ -134,7 +131,7 @@ build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

@@ -29,63 +29,50 @@ set -o errexit
 ###
 
 ###
-# Braveland Wizard
+# Unmechanical
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180208.1
+script_version=20180210.2
 
 # Set game-specific variables
 
-GAME_ID='braveland-wizard'
-GAME_NAME='Braveland Wizard'
+GAME_ID='unmechanical'
+GAME_NAME='Unmechanical'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='braveland_wizard_en_1_1_3_13_18418.sh'
-ARCHIVE_GOG_MD5='7153da6ceb0deda556ebdb7cfa4b9203'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.1.3.13-gog18418'
+ARCHIVE_GOG='gog_unmechanical_2.1.0.4.sh'
+ARCHIVE_GOG_MD5='44453abb32e21b94e9731938486c71f7'
+ARCHIVE_GOG_SIZE='1600000'
+ARCHIVE_GOG_VERSION='2.0-gog2.1.0.4'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_braveland_wizard_2.1.0.4.sh'
-ARCHIVE_GOG_OLD_MD5='14346dc8d6e7ad410dd1b179763aa94e'
-ARCHIVE_GOG_OLD_SIZE='450000'
-ARCHIVE_GOG_OLD_VERSION='1.1.1.11-gog2.1.0.4'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
-
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
-
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./Binaries ./Engine'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
-
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_FILES='./UDKGame ./UnmechanicalIcon.bmp'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Braveland Wizard.x86'
-APP_MAIN_EXE_BIN64='./Braveland Wizard.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_PRERUN='pulseaudio --start'
+APP_MAIN_EXE='Binaries/Linux/UDKGame-Linux'
+APP_MAIN_LIBS='lib'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='UnmechanicalIcon.bmp'
+APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glu"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor openal sdl2 pulseaudio"
 
 # Load common functions
 
@@ -110,23 +97,36 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
+
+PKG='PKG_DATA'
+res="$APP_MAIN_ICON_RES"
+PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
+extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
+mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
+mv "$PLAYIT_WORKDIR/icons/$(basename ${APP_MAIN_ICON%.bmp}.png)" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
+
+# Set working directory to the directory containing the game binary before running it
+
+pattern1='s|^cd "$PATH_PREFIX"$|cd "$PATH_PREFIX/${APP_EXE%/*}"|'
+pattern2='s|^"\./$APP_EXE"|"./${APP_EXE##*/}"|'
+file="${PKG_BIN_PATH}${PATH_BIN}/$GAME_ID"
+sed --in-place "$pattern1;$pattern2" "$file"
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
@@ -135,10 +135,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

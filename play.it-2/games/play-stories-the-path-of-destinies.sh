@@ -29,63 +29,54 @@ set -o errexit
 ###
 
 ###
-# Braveland Wizard
+# Stories: The Path of Destinies
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180208.1
+script_version=20180209.1
 
 # Set game-specific variables
 
-GAME_ID='braveland-wizard'
-GAME_NAME='Braveland Wizard'
+GAME_ID='stories-the-path-of-destinies'
+GAME_NAME='Stories: The Path of Destinies'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='braveland_wizard_en_1_1_3_13_18418.sh'
-ARCHIVE_GOG_MD5='7153da6ceb0deda556ebdb7cfa4b9203'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.1.3.13-gog18418'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='setup_stories_-_the_path_of_destinies_0.0.13825_(16929).exe'
+ARCHIVE_GOG_MD5='6f81dbadddbb4b30b4edda9ced9ddef8'
+ARCHIVE_GOG_VERSION='0.0.13825-gog16929'
+ARCHIVE_GOG_SIZE='1700000'
 
-ARCHIVE_GOG_OLD='gog_braveland_wizard_2.1.0.4.sh'
-ARCHIVE_GOG_OLD_MD5='14346dc8d6e7ad410dd1b179763aa94e'
-ARCHIVE_GOG_OLD_SIZE='450000'
-ARCHIVE_GOG_OLD_VERSION='1.1.1.11-gog2.1.0.4'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./engine ./language_setup.exe ./language_setup.ini ./storiesstart.exe ./stories/binaries'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./language_setup.png ./stories/content'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+APP_WINETRICKS='csmt=on'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
-
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
-
-DATA_DIRS='./logs'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Braveland Wizard.x86'
-APP_MAIN_EXE_BIN64='./Braveland Wizard.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='stories/binaries/win64/stories.exe'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='stories/binaries/win64/stories.exe'
+APP_MAIN_ICON_RES='16 24 32 48'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+APP_LANGUAGE_ID="${GAME_ID}_language"
+APP_LANGUAGE_NAME="$GAME_NAME - Language"
+APP_LANGUAGE_TYPE='wine'
+APP_LANGUAGE_EXE='language_setup.exe'
+APP_LANGUAGE_ICONS_LIST='APP_LANGUAGE_ICON'
+APP_LANGUAGE_ICON='language_setup.png'
+APP_LANGUAGE_ICON_RES='256'
+
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glu"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='64'
+PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
@@ -111,22 +102,44 @@ extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 done
+
+PKG='PKG_BIN'
+extract_and_sort_icons_from 'APP_MAIN'
+move_icons_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN' 'APP_LANGUAGE'
+
+# Store saved games and settings outside of WINE prefix
+
+save_path='$WINEPREFIX/drive_c/users/$(whoami)/Local Settings/Application Data/Stories/Saved/SaveGames'
+pattern='s|cp --force --recursive --symbolic-link --update "$PATH_GAME"/\* "$PATH_PREFIX"|&\n'
+pattern="$pattern\tmkdir --parents \"${save_path%/*}\"\n"
+pattern="$pattern\tmkdir --parents \"\$PATH_DATA/saves\"\n"
+pattern="$pattern\tln --symbolic \"\$PATH_DATA/saves\" \"$save_path\"|"
+for file in "${PKG_BIN_PATH}${PATH_BIN}"/*; do
+	sed --in-place "$pattern" "$file"
+done
+
+config_path='$WINEPREFIX/drive_c/users/$(whoami)/Local Settings/Application Data/Stories/Saved/Config'
+pattern='s|cp --force --recursive --symbolic-link --update "$PATH_GAME"/\* "$PATH_PREFIX"|&\n'
+pattern="$pattern\tmkdir --parents \"${config_path%/*}\"\n"
+pattern="$pattern\tmkdir --parents \"\$PATH_CONFIG/config\"\n"
+pattern="$pattern\tln --symbolic \"\$PATH_CONFIG/config\" \"$config_path\"|"
+for file in "${PKG_BIN_PATH}${PATH_BIN}"/*; do
+	sed --in-place "$pattern" "$file"
 done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+postinst_icons_linking 'APP_LANGUAGE'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
@@ -135,10 +148,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

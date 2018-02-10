@@ -29,60 +29,50 @@ set -o errexit
 ###
 
 ###
-# Braveland Wizard
+# Stardew Valley
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180208.1
+script_version=20180204.2
 
 # Set game-specific variables
 
-GAME_ID='braveland-wizard'
-GAME_NAME='Braveland Wizard'
+GAME_ID='stardew-valley'
+GAME_NAME='Stardew Valley'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='braveland_wizard_en_1_1_3_13_18418.sh'
-ARCHIVE_GOG_MD5='7153da6ceb0deda556ebdb7cfa4b9203'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.1.3.13-gog18418'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='gog_stardew_valley_2.8.0.10.sh'
+ARCHIVE_GOG_MD5='27c84537bee1baae4e3c2f034cb0ff2d'
+ARCHIVE_GOG_SIZE='490000'
+ARCHIVE_GOG_VERSION='1.2.33-gog2.8.0.10'
 
-ARCHIVE_GOG_OLD='gog_braveland_wizard_2.1.0.4.sh'
-ARCHIVE_GOG_OLD_MD5='14346dc8d6e7ad410dd1b179763aa94e'
-ARCHIVE_GOG_OLD_SIZE='450000'
-ARCHIVE_GOG_OLD_VERSION='1.1.1.11-gog2.1.0.4'
-
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='./lib ./mcs.bin.x86 ./StardewValley.bin.x86'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='./lib64 ./mcs.bin.x86_64 ./StardewValley.bin.x86_64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./*_Data'
-
-DATA_DIRS='./logs'
+ARCHIVE_GAME_DATA_FILES='./Content ./BmFont.dll ./Lidgren.Network.dll ./mono ./monoconfig ./MonoGame.Framework.dll ./MonoGame.Framework.dll.config ./Mono.Posix.dll ./Mono.Security.dll ./mscorlib.dll ./StardewValley ./StardewValley.exe ./mcs ./GalaxyCSharp.dll ./GalaxyCSharp.dll.config ./System.Configuration.dll ./System.Core.dll ./System.Data.dll ./System.dll ./System.Drawing.dll ./System.Runtime.Serialization.dll ./System.Security.dll ./System.Xml.dll ./System.Xml.Linq.dll ./WindowsBase.dll ./xTile.dll'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Braveland Wizard.x86'
-APP_MAIN_EXE_BIN64='./Braveland Wizard.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE_BIN32='StardewValley.bin.x86'
+APP_MAIN_EXE_BIN64='StardewValley.bin.x86_64'
+APP_MAIN_ICON='data/noarch/support/icon.png'
+APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glu"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ openal sdl2"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
@@ -110,11 +100,19 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+PKG='PKG_DATA'
+get_icon_from_temp_dir 'APP_MAIN'
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Make save game manager binaries executable
+
+chmod +x "${PKG_BIN32_PATH}${PATH_GAME}/mcs.bin.x86"
+chmod +x "${PKG_BIN64_PATH}${PATH_GAME}/mcs.bin.x86_64"
 
 # Write launchers
 
@@ -124,9 +122,7 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
