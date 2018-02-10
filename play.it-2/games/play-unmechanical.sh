@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180210.1
+script_version=20180210.2
 
 # Set game-specific variables
 
 GAME_ID='unmechanical'
-GAME_NAME='Unmachanical'
+GAME_NAME='Unmechanical'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
