@@ -24,7 +24,7 @@ print_instructions_deb() {
 # CALLED BY: print_instructions_deb
 print_instructions_deb_apt() {
 	printf 'apt install'
-	print_instructions_deb_common $@
+	print_instructions_deb_common "$@"
 }
 
 # print installation instructions for Debian with dpkg + apt-get
@@ -33,7 +33,7 @@ print_instructions_deb_apt() {
 # CALLED BY: print_instructions_deb
 print_instructions_deb_dpkg() {
 	printf 'dpkg -i'
-	print_instructions_deb_common $@
+	print_instructions_deb_common "$@"
 	printf 'apt-get install -f\n'
 }
 
@@ -43,9 +43,9 @@ print_instructions_deb_dpkg() {
 print_instructions_deb_common() {
 	local pkg_path
 	local str_format
-	for pkg in $@; do
+	for pkg in "$@"; do
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
-		if [ -n "$(printf '%s' "$pkg_path" | grep ' ')" ]; then
+		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
 		else
 			str_format=' %s'

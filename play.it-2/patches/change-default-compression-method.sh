@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-SRC_PATH="$(dirname $0)/../src"
+SRC_PATH="$(dirname "$0")/../src"
 
 if [ -n "$1" ]; then
 	compression_method="$1"
@@ -34,7 +34,9 @@ case "$compression_method" in
 	;;
 esac
 
-sed --in-place "s/\(DEFAULT_OPTION_COMPRESSION\)='.\+'/\1='$compression_method'/" "$SRC_PATH/99_init.sh"
+pattern="s/\\(DEFAULT_OPTION_COMPRESSION\)='.\\+'/\\1='$compression_method'/"
+file="$SRC_PATH/99_init.sh"
+sed --in-place "$pattern" "$file"
 
 case "${LANG%_*}" in
 	('fr')

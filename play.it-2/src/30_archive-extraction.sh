@@ -3,15 +3,17 @@
 # NEEDED_VARS: (ARCHIVE) (ARCHIVE_PASSWD) (ARCHIVE_TYPE) (LANG) (PLAYIT_WORKDIR)
 # CALLS: liberror extract_7z extract_data_from_print
 extract_data_from() {
-	[ "$PLAYIT_WORKDIR" ] || return 1
+	[ "$PLAYIT_WORKDIR" ] || return 1
 	[ "$ARCHIVE" ] || return 1
 
 	for file in "$@"; do
 		extract_data_from_print "$(basename "$file")"
 
-		local destination="$PLAYIT_WORKDIR/gamedata"
+		local destination
+		destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
-		local archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+		local archive_type
+		archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 		case "$archive_type" in
 			('7z')
 				extract_7z "$file" "$destination"
@@ -40,7 +42,8 @@ extract_data_from() {
 				set_standard_permissions "$destination"
 			;;
 			('nix_stage1')
-				local input_blocksize=$(head --lines=514 "$file" | wc --bytes | tr --delete ' ')
+				local input_blocksize
+				input_blocksize=$(head --lines=514 "$file" | wc --bytes | tr --delete ' ')
 				dd if="$file" ibs=$input_blocksize skip=1 obs=1024 conv=sync 2>/dev/null | gunzip --stdout | tar --extract --file - --directory "$destination"
 			;;
 			('nix_stage2')

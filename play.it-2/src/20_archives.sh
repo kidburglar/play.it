@@ -49,11 +49,13 @@ set_archive_error_not_found() {
 # NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
 # CALLS: set_archive_vars
 set_archive() {
-	local name=$1
+	local name
+	name=$1
 	shift 1
+	local file
 	if [ -n "$(eval printf -- '%b' \"\$$name\")" ]; then
 		for archive in "$@"; do
-			local file="$(eval printf -- '%b' \"\$$archive\")"
+			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ "$(basename "$(eval printf -- '%b' \"\$$name\")")" = "$file" ]; then
 				set_archive_vars "$archive" "$name" "$(eval printf -- '%b' \"\$$name\")"
 				return 0
@@ -61,7 +63,7 @@ set_archive() {
 		done
 	else
 		for archive in "$@"; do
-			local file="$(eval printf -- '%b' \"\$$archive\")"
+			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ -f "$file" ]; then
 				set_archive_vars "$archive" "$name" "$file"
 				return 0
@@ -81,27 +83,35 @@ set_archive() {
 # NEEDED_VARS: (LANG)
 # CALLED BY: set_archive
 set_archive_vars() {
-	export ARCHIVE="$1"
+	ARCHIVE="$1"
+	export ARCHIVE
 
-	local name="$2"
-	local file="$3"
+	local name
+	name="$2"
+	local file
+	file="$3"
 
 	set_archive_print "$file"
 
 	# set target file
-	export $name="$file"
+	eval $name=\"$file\"
+	export $name
 
 	# set archive type + check dependencies
 	if [ -z "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" ]; then
 		archive_guess_type "$file"
 	fi
-	export ${name}_TYPE="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+	eval ${name}_TYPE=\"$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")\"
+	export ${name}_TYPE
 	check_deps
 
 	# compute total size of all archives
 	if [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")" ]; then
-		[ "$ARCHIVE_SIZE" ] || export ARCHIVE_SIZE='0'
-		export ARCHIVE_SIZE="$(($ARCHIVE_SIZE + $(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")))"
+		if [ -z "$ARCHIVE_SIZE" ]; then
+			ARCHIVE_SIZE='0'
+		fi
+		ARCHIVE_SIZE="$((ARCHIVE_SIZE + $(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")))"
+		export ARCHIVE_SIZE
 	fi
 
 	# set package version
@@ -123,36 +133,37 @@ set_archive_vars() {
 archive_guess_type() {
 	case "${1##*/}" in
 		(*.cab)
-			export ${ARCHIVE}_TYPE='cabinet'
+			eval ${ARCHIVE}_TYPE=\'cabinet\'
 		;;
 		(*.deb)
-			export ${ARCHIVE}_TYPE='debian'
+			eval ${ARCHIVE}_TYPE=\'debian\'
 		;;
 		(setup_*.exe|patch_*.exe)
-			export ${ARCHIVE}_TYPE='innosetup'
+			eval ${ARCHIVE}_TYPE=\'innosetup\'
 		;;
 		(gog_*.sh)
-			export ${ARCHIVE}_TYPE='mojosetup'
+			eval ${ARCHIVE}_TYPE=\'mojosetup\'
 		;;
 		(*.msi)
-			export ${ARCHIVE}_TYPE='msi'
+			eval ${ARCHIVE}_TYPE=\'msi\'
 		;;
 		(*.rar)
-			export ${ARCHIVE}_TYPE='rar'
+			eval ${ARCHIVE}_TYPE=\'rar\'
 		;;
 		(*.tar)
-			export ${ARCHIVE}_TYPE='tar'
+			eval ${ARCHIVE}_TYPE=\'tar\'
 		;;
 		(*.tar.gz|*.tgz)
-			export ${ARCHIVE}_TYPE='tar.gz'
+			eval ${ARCHIVE}_TYPE=\'tar.gz\'
 		;;
 		(*.zip)
-			export ${ARCHIVE}_TYPE='zip'
+			eval ${ARCHIVE}_TYPE=\'zip\'
 		;;
 		(*)
 			archive_guess_type_error
 		;;
 	esac
+	export ${ARCHIVE}_TYPE
 }
 
 # display an error message telling the type of the target archive is not set

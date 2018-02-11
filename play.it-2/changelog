@@ -1,3 +1,21 @@
+2.5.1
+
+  * Add a patch allowing to chose wether or not the desktop files should
+    include the full path to the launcher script (default includes it and does
+    not use $PATH, so custom values for installation prefix can be used
+    without further tweaking)
+
+  * Improve patches syntax following ShellCheck feedback
+
+  * Display an error when using an invalid value for PKG
+
+  * Fix error displayed if calling extract_icon_from on an unsupported file
+    type
+
+  * Improve user prefix generation
+
+  * Improve library syntax following ShellCheck feedback
+
 2.5.0
 
   * Add support for games requiring wine-staging patches

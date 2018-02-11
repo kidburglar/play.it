@@ -31,7 +31,7 @@ help() {
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
-	if [ ${ARCHIVE_LISTS##* *} ]; then
+	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"

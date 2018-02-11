@@ -2,11 +2,11 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Check library version against script target version
 
-	version_major_library=${library_version%%.*}
-	version_major_target=${target_version%%.*}
+	version_major_library="${library_version%%.*}"
+	version_major_target="${target_version%%.*}"
 
-	version_minor_library=$(printf '%s' $library_version | cut --delimiter='.' --fields=2)
-	version_minor_target=$(printf '%s' $target_version | cut --delimiter='.' --fields=2)
+	version_minor_library=$(printf '%s' "$library_version" | cut --delimiter='.' --fields=2)
+	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 
 	if [ $version_major_library -ne $version_major_target ] || [ $version_minor_library -lt $version_minor_target ]; then
 		print_error
@@ -74,7 +74,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 					eval help_$option
 					exit 0
 				else
-					export OPTION_$(printf '%s' $option | tr [:lower:] [:upper:])="$value"
+					eval OPTION_$(printf '%s' "$option" | tr '[:lower:]' '[:upper:]')=\"$value\"
+					export OPTION_$(printf '%s' "$option" | tr '[:lower:]' '[:upper:]')
 				fi
 				unset option
 				unset value
@@ -93,7 +94,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				return 1
 			;;
 			(*)
-				export SOURCE_ARCHIVE="$1"
+				SOURCE_ARCHIVE="$1"
+				export SOURCE_ARCHIVE
 			;;
 		esac
 		shift 1
@@ -106,7 +108,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		if [ -e '/etc/os-release' ]; then
 			GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
 		elif which lsb_release >/dev/null 2>&1; then
-			GUESSED_HOST_OS="$(lsb_release --id --short | tr [:upper:] [:lower:])"
+			GUESSED_HOST_OS="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
 		fi
 		case "$GUESSED_HOST_OS" in
 			('debian'|\
@@ -142,16 +144,20 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
 		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
-			export OPTION_$option="$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")"
+			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
+			export OPTION_$option
 		fi
 	done
 
 	# Check options values validity
 
 	check_option_validity() {
-		local name="$1"
-		local value="$(eval printf -- '%b' \"\$OPTION_$option\")"
-		local allowed_values="$(eval printf -- '%b' \"\$ALLOWED_VALUES_$option\")"
+		local name
+		name="$1"
+		local value
+		value="$(eval printf -- '%b' \"\$OPTION_$option\")"
+		local allowed_values
+		allowed_values="$(eval printf -- '%b' \"\$ALLOWED_VALUES_$option\")"
 		for allowed_value in $allowed_values; do
 			if [ "$value" = "$allowed_value" ]; then
 				return 0
@@ -170,8 +176,8 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				string2='Run the script with the option --%s=help to get a list of supported values.\n'
 			;;
 		esac
-		printf "$string1" "$value" "$(printf '%s' $option | tr [:upper:] [:lower:])"
-		printf "$string2" "$(printf '%s' $option | tr [:upper:] [:lower:])"
+		printf "$string1" "$value" "$(printf '%s' $option | tr '[:upper:]' '[:lower:]')"
+		printf "$string2" "$(printf '%s' $option | tr '[:upper:]' '[:lower:]')"
 		printf '\n'
 		exit 1
 	}
