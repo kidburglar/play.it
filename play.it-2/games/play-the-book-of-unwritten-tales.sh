@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20180213.1
 
 # Set game-specific variables
 
@@ -64,17 +64,19 @@ ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./bout.exe ./alut.dll ./cg.dll ./libogg.dll ./libtheora.dll ./libtheoraplayer.dll ./libvorbis.dll ./libvorbisfile.dll ./lua5.1.dll ./lua51.dll ./ogremain.dll ./ois.dll ./particleuniverse.dll ./plugin_cgprogrammanager.dll ./rendersystem_direct3d9.dll ./plugins.cfg ./resources.cfg'
 
 ARCHIVE_GAME_L10N_PATH='app'
-ARCHIVE_GAME_L10N_FILES='./kagedata/lang/en'
+ARCHIVE_GAME_L10N_FILES='./kagedata/lang'
 
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='./data ./kagedata ./kapedata ./config.xml ./exportedfunctions.lua'
 
+APP_WINETRICKS='directx9'
+
 APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='./bout.exe'
-APP_MAIN_ICON='./bout.exe'
+APP_MAIN_EXE='bout.exe'
+APP_MAIN_ICON='bout.exe'
 APP_MAIN_ICON_RES='16 32 48 64'
 
-PACKAGES_LIST='PKG_L10N PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
 PKG_L10N_ID="${GAME_ID}-l10n-en"
 PKG_L10N_DESCRIPTION='English localization'
@@ -83,17 +85,16 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID wine"
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -106,28 +107,23 @@ fi
 
 # Check that all parts of the installer are present
 
-set_archive 'ARCHIVE_PART1' 'ARCHIVE_GOG_PART1'
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART1'
-set_archive 'ARCHIVE_PART2' 'ARCHIVE_GOG_PART2'
-[ "$ARCHIVE_PART2" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART2'
-set_archive 'ARCHIVE_PART3' 'ARCHIVE_GOG_PART3'
-[ "$ARCHIVE_PART3" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART3'
-ARCHIVE='ARCHIVE_GOG'
+ARCHIVE_MAIN="$ARCHIVE"
+set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
+set_archive 'ARCHIVE_PART2' "${ARCHIVE_MAIN}_PART2"
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART2"
+set_archive 'ARCHIVE_PART3' "${ARCHIVE_MAIN}_PART3"
+[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART3"
+ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_L10N'
-organize_data 'GAME_L10N' "$PATH_GAME"
-rmdir "$PLAYIT_WORKDIR/gamedata/app/kagedata/lang"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+done
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
