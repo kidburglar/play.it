@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180205.1
+script_version=20180214.1
 
 # Set game-specific variables
 
@@ -73,7 +73,7 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
 PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libglu1-mesa | libglu1, libopenal1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-openal lib32-libxrandr"
+PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-openal lib32-libxrandr lib32-openssl-1.0"
 
 # Load common functions
 
@@ -95,9 +95,11 @@ fi
 
 # Use libSSL 1.0.0 32-bit archive
 
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
-ARCHIVE="$ARCHIVE_MAIN"
+if [ "$OPTION_PACKAGE" != 'arch' ]; then
+	ARCHIVE_MAIN="$ARCHIVE"
+	set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
+	ARCHIVE="$ARCHIVE_MAIN"
+fi
 
 # Extract game data
 
