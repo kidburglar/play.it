@@ -34,22 +34,27 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180210.1
 
 # Set game-specific variables
 
 GAME_ID='huniepop'
 GAME_NAME='HuniePop'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_huniepop_2.0.0.2.sh'
-ARCHIVE_GOG_MD5='020cd6a015bd79a907f6c607102d797a'
+ARCHIVE_GOG='gog_huniepop_2.0.0.3.sh'
+ARCHIVE_GOG_MD5='d229aea2b601137537f7be46c7327660'
 ARCHIVE_GOG_SIZE='940000'
-ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.2'
+ARCHIVE_GOG_VERSION='1.2.0-gog2.0.0.3'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GOG_OLD='gog_huniepop_2.0.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='020cd6a015bd79a907f6c607102d797a'
+ARCHIVE_GOG_OLD_SIZE='940000'
+ARCHIVE_GOG_OLD_VERSION='1.2.0-gog2.0.0.2'
+
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono ./*_Data/Plugins'
@@ -66,18 +71,18 @@ APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lsb-release lib32-libxcursor"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glu xcursor"
+PKG_BIN_DEPS_ARCH='lsb-release'
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -97,12 +102,10 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+for PKG in $PACKAGES_LIST; do
+	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+done
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
