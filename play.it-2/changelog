@@ -1,3 +1,8 @@
+2.5.2
+
+  * Fix init_prefix_files crashing when some files exist in PATH_DATA or
+    PATH_CONFIG with no equivalent in PATH_PREFIX
+
 2.5.1
 
   * Add a patch allowing to chose wether or not the desktop files should

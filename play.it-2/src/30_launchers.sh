@@ -174,10 +174,16 @@ write_bin() {
 			    local file_real
 			    cd "$1"
 			    find . -type f | while read -r file; do
-			      file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
+			      if [ -e "$PATH_PREFIX/$file" ]; then
+			        file_prefix="$(readlink -e "$PATH_PREFIX/$file")"
+			      else
+			        unset file_prefix
+			      fi
 			      file_real="$(readlink -e "$file")"
 			      if [ "$file_real" != "$file_prefix" ]; then
-			        rm --force "$PATH_PREFIX/$file"
+			        if [ "$file_prefix" ]; then
+			          rm --force "$PATH_PREFIX/$file"
+			        fi
 			        mkdir --parents "$PATH_PREFIX/${file%/*}"
 			        ln --symbolic "$file_real" "$PATH_PREFIX/$file"
 			      fi
