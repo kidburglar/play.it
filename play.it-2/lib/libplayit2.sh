@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.5.2~dev
-library_revision=20180219.1
+library_version=2.5.2
+library_revision=20180219.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
