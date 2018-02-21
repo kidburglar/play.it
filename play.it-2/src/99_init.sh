@@ -111,49 +111,15 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		shift 1
 	done
 
-	# Try to detect the host distribution through lsb_release
+	# Try to detect the host distribution if no package format has been explicitely set
 
-	if [ ! "$OPTION_PACKAGE" ]; then
-		unset GUESSED_HOST_OS
-		if [ -e '/etc/os-release' ]; then
-			GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-		elif which lsb_release >/dev/null 2>&1; then
-			GUESSED_HOST_OS="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
-		fi
-		case "$GUESSED_HOST_OS" in
-			('debian'|\
-			 'ubuntu'|\
-			 'linuxmint'|\
-			 'handylinux')
-				DEFAULT_OPTION_PACKAGE='deb'
-			;;
-			('arch'|\
-			 'manjaro'|'manjarolinux')
-				DEFAULT_OPTION_PACKAGE='arch'
-			;;
-			(*)
-				print_warning
-				case "${LANG%_*}" in
-					('fr')
-						string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
-						string2='Le format de paquet %s sera utilisé par défaut.\n'
-					;;
-					('en'|*)
-						string1='Most pertinent package format auto-detection failed.\n'
-						string2='%s package format will be used by default.\n'
-					;;
-				esac
-				printf "$string1"
-				printf "$string2" "$DEFAULT_OPTION_PACKAGE"
-				printf '\n'
-			;;
-		esac
-	fi
+	[ "$OPTION_PACKAGE" ] || packages_guess_format 'OPTION_PACKAGE'
 
 	# Set options not already set by script arguments to default values
 
-	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
-		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
+	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX'; do
+		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ]\
+		&& [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
 			export OPTION_$option
 		fi

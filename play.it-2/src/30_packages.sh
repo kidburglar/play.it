@@ -119,3 +119,46 @@ pkg_build_print_already_exists() {
 	printf "$string" "$1"
 }
 
+# guess package format to build from host OS
+# USAGE: packages_guess_format $variable_name
+# NEEDED VARS: (LANG) DEFAULT_OPTION_PACKAGE
+packages_guess_format() {
+	local guessed_host_os
+	local variable_name
+	eval variable_name=\"$1\"
+	if [ -e '/etc/os-release' ]; then
+		guessed_host_os="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
+	elif which lsb_release >/dev/null 2>&1; then
+		guessed_host_os="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
+	fi
+	case "$guessed_host_os" in
+		('debian'|\
+		 'ubuntu'|\
+		 'linuxmint'|\
+		 'handylinux')
+			eval $variable_name=\'deb\'
+		;;
+		('arch'|\
+		 'manjaro'|'manjarolinux')
+			eval $variable_name=\'arch\'
+		;;
+		(*)
+			print_warning
+			case "${LANG%_*}" in
+				('fr')
+					string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
+					string2='Le format de paquet %s sera utilisé par défaut.\n'
+				;;
+				('en'|*)
+					string1='Most pertinent package format auto-detection failed.\n'
+					string2='%s package format will be used by default.\n'
+				;;
+			esac
+			printf "$string1"
+			printf "$string2" "$DEFAULT_OPTION_PACKAGE"
+			printf '\n'
+		;;
+	esac
+	export $variable_name
+}
+

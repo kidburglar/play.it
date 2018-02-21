@@ -12,6 +12,8 @@
   * Add --dry-run switch, running tests but not extracting data nor building
     packages
 
+  * Use a dedicated function to guess package format to build from host OS
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list
