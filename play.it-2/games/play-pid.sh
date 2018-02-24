@@ -31,22 +31,29 @@ set -o errexit
 ###
 # Pid
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20171207.1
+script_version=20180218.1
 
 # Set game-specific variables
 
 GAME_ID='pid'
 GAME_NAME='Pid'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='setup_pid_2.2.0.8.exe'
-ARCHIVE_GOG_MD5='02ebb3db7572b1e6c28dce439a76df9a'
-ARCHIVE_GOG_VERSION='1.0-gog2.2.0.8'
+ARCHIVE_GOG='setup_pid_gog-1_(18421).exe'
+ARCHIVE_GOG_MD5='d6cd6899df3b2ad13071f58d0362ab3a'
+ARCHIVE_GOG_VERSION='1.0-gog18421'
 ARCHIVE_GOG_SIZE='1300000'
+
+ARCHIVE_GOG_OLD='setup_pid_2.2.0.8.exe'
+ARCHIVE_GOG_OLD_MD5='02ebb3db7572b1e6c28dce439a76df9a'
+ARCHIVE_GOG_OLD_VERSION='1.0-gog2.2.0.8'
+ARCHIVE_GOG_OLD_SIZE='1300000'
+
+DATA_DIRS='./saves'
 
 ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./pid.exe ./pid_data/mono ./pid_data/managed'
@@ -69,7 +76,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -88,7 +95,6 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"

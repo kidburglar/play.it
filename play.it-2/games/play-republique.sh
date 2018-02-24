@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180222.1
 
 # Set game-specific variables
 
@@ -56,7 +56,7 @@ ARCHIVE_GOG_PART2_MD5='604d6b34fa4b2cc24f79659922f188e2'
 ARCHIVE_GOG_PART2_TYPE='rar'
 
 ARCHIVE_GAME_BIN_PATH='game'
-ARCHIVE_GAME_BIN_FILES='./republique.exe'
+ARCHIVE_GAME_BIN_FILES='./republique.exe ./republique_data/managed ./republique_data/mono ./republique_data/plugins'
 
 ARCHIVE_GAME_DATA_PATH='game'
 ARCHIVE_GAME_DATA_FILES='./republique_data'
@@ -103,8 +103,8 @@ ARCHIVE="$ARCHIVE_MAIN"
 
 # Extract game data
 
-ln --symbolic "$(readlink --canonicalize $ARCHIVE_PART1)" "$PLAYIT_WORKDIR/$GAME_ID.r00"
-ln --symbolic "$(readlink --canonicalize $ARCHIVE_PART2)" "$PLAYIT_WORKDIR/$GAME_ID.r01"
+ln --symbolic "$(readlink --canonicalize "$ARCHIVE_PART1")" "$PLAYIT_WORKDIR/$GAME_ID.r00"
+ln --symbolic "$(readlink --canonicalize "$ARCHIVE_PART2")" "$PLAYIT_WORKDIR/$GAME_ID.r01"
 extract_data_from "$PLAYIT_WORKDIR/$GAME_ID.r00"
 tolower "$PLAYIT_WORKDIR/gamedata"
 
@@ -122,6 +122,17 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
+# Store saved games outside of WINE prefix
+
+save_path='$WINEPREFIX/drive_c/users/$(whoami)/AppData/LocalLow/Camouflaj/R__publique/Save'
+pattern='s#cp --force --recursive --symbolic-link --update "$PATH_GAME"/\* "$PATH_PREFIX"#&\n'
+pattern="$pattern\tmkdir --parents \"${save_path%/*}\"\n"
+pattern="$pattern\tmkdir --parents \"\$PATH_DATA/saves\"\n"
+pattern="$pattern\tln --symbolic \"\$PATH_DATA/saves\" \"$save_path\"#"
+for file in "${PKG_BIN_PATH}${PATH_BIN}"/*; do
+	sed --in-place "$pattern" "$file"
+done
 
 # Build package
 
