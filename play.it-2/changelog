@@ -2,6 +2,8 @@
 
   * Add ability to build only packages for a given architecture
 
+  * Add automatic architecture handling to print_instructions
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list
