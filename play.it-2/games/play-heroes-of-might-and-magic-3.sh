@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Heroes of Might and Magic III'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR_OLD'
 
 ARCHIVE_GOG_EN='setup_homm_3_complete_4.0_(10665).exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/heroes_of_might_and_magic_3_complete_edition'
 ARCHIVE_GOG_EN_MD5='0c97452fc4da4e8811173f21df873fab'
 ARCHIVE_GOG_EN_VERSION='4.0-gog10665'
 ARCHIVE_GOG_EN_SIZE='1100000'
 
 ARCHIVE_GOG_FR='setup_homm_3_complete_french_4.0_(10665).exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/heroes_of_might_and_magic_3_complete_edition'
 ARCHIVE_GOG_FR_MD5='6c3ee33a531bd0604679581ab267d8a3'
 ARCHIVE_GOG_FR_VERSION='4.0-gog10665'
 ARCHIVE_GOG_FR_SIZE='1100000'

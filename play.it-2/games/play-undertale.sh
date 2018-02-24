@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180214.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Undertale'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
 ARCHIVE_GOG='undertale_en_1_08_18328.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/undertale'
 ARCHIVE_GOG_MD5='b134d85dd8bf723a74498336894ca723'
 ARCHIVE_GOG_SIZE='160000'
 ARCHIVE_GOG_VERSION='1.08-gog18328'

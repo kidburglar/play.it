@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180128.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Caravan'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='caravan_linux_v1.1.17513.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/caravan'
 ARCHIVE_HUMBLE_MD5='286f762190d74e27c353b5616b9e6dee'
 ARCHIVE_HUMBLE_SIZE='600000'
 ARCHIVE_HUMBLE_VERSION='1.1.17513-humble1'

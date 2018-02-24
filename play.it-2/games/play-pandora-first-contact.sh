@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pandora: First Contact'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='pandora_first_contact_en_1_6_7_16815.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pandora'
 ARCHIVE_GOG_MD5='0d9343d1693fc561823811a0cd3e279c'
 ARCHIVE_GOG_VERSION='1.6.7-gog16815'
 ARCHIVE_GOG_SIZE='720000'

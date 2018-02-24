@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Crypt of the NecroDancer'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
 ARCHIVE_GOG='crypt_of_the_necrodancer_en_1_29_14917.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/crypt_of_the_necrodancer'
 ARCHIVE_GOG_MD5='70d3e29a2a48901d02541d8b1c6326ba'
 ARCHIVE_GOG_SIZE='1600000'
 ARCHIVE_GOG_VERSION='1.29-gog14917'

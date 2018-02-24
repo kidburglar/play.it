@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Torin’s Passage'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_torins_passage_2.0.0.7.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/torins_passage'
 ARCHIVE_GOG_MD5='a7398abdb6964bf6a6446248f138d05e'
 ARCHIVE_GOG_SIZE='348952'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.7'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pan-Pan'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_pan_pan_2.1.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/panpan'
 ARCHIVE_GOG_MD5='a258086331e913f8cf8110983da234d1'
 ARCHIVE_GOG_SIZE='120000'
 ARCHIVE_GOG_VERSION='1.0.3-gog2.1.0.2'

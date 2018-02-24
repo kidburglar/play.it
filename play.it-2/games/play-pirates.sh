@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pirates!'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_pirates_2.0.0.8.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pirates_gold_plus'
 ARCHIVE_GOG_MD5='885cdb8f2119a278fb15a32cafad64a8'
 ARCHIVE_GOG_SIZE='12000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.8'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Beatbuddy: Tale of the Guardians'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='BeatbuddyLinux1439603370.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/beatbuddy'
 ARCHIVE_HUMBLE_MD5='156d19b327a02ac4a277f6f6ad4e188e'
 ARCHIVE_HUMBLE_SIZE='1100000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble150815'

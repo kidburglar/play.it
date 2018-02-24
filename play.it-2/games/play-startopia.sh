@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170810.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Startopia'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_startopia_2.0.0.17.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/startopia'
 ARCHIVE_GOG_MD5='4fe8d194afc1012e136ed3e82f1de171'
 ARCHIVE_GOG_VERSION='1.01b-gog2.0.0.17'
 ARCHIVE_GOG_SIZE='600000'

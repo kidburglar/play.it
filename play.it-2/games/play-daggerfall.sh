@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Elder Scrolls II: Daggerfall'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_tes_daggerfall_2.0.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_elder_scrolls_iii_morrowind_goty_edition'
 ARCHIVE_GOG_MD5='68f1eb4f257d8da4c4eab2104770c49b'
 ARCHIVE_GOG_SIZE='580000'
 ARCHIVE_GOG_VERSION='1.07.213-gog2.0.0.4'

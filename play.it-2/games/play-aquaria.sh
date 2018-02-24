@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171210.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Aquaria'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='gog_aquaria_2.0.0.5.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/aquaria'
 ARCHIVE_GOG_MD5='4235398debdf268f233881fade9e0530'
 ARCHIVE_GOG_SIZE='240000'
 ARCHIVE_GOG_VERSION='1.1.3-gog2.0.0.5'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171021.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Teenagent'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_teenagent_1.0_(15595).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/teenagent'
 ARCHIVE_GOG_MD5='95126a8eba61b60e12535ebaa020c01b'
 ARCHIVE_GOG_SIZE='32000'
 ARCHIVE_GOG_VERSION='1.0-gog15595'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='J.U.L.I.A Among the Stars'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_j_u_l_i_a_among_the_stars_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/julia_among_the_stars'
 ARCHIVE_GOG_MD5='58becebfaf5a3705fe3f34d5531298d3'
 ARCHIVE_GOG_SIZE='3100000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='A Good Snowman is Hard to Build'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='snowman-linux-1.0.8.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/a-good-snowman-is-hard-to-build'
 ARCHIVE_HUMBLE_MD5='4461dfdcaba9e8793e3044b458b0e301'
 ARCHIVE_HUMBLE_SIZE='120000'
 ARCHIVE_HUMBLE_VERSION='1.0.8-humble160421'

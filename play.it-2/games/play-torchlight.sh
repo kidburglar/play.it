@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170902.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Torchlight'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_torchlight_2.0.0.12.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/torchlight'
 ARCHIVE_GOG_MD5='4b721e1b3da90f170d66f42e60a3fece'
 ARCHIVE_GOG_VERSION='1.15-gog2.0.0.12'
 ARCHIVE_GOG_SIZE='460000'

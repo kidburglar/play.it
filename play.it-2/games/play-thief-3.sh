@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171129.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Thief 3: Deadly Shadows'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_thief3_2.0.0.6.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/thief_3'
 ARCHIVE_GOG_MD5='e5b84de58a1037f3e8aa3a1bb2a982be'
 ARCHIVE_GOG_VERSION='1.1-gog2.0.0.6'
 ARCHIVE_GOG_SIZE='2300000'

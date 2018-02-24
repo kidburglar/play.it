@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171210.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Stanley Parable'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='The_Stanley_Parable_Setup.tar'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/the-stanley-parable'
 ARCHIVE_HUMBLE_MD5='10a98d7fb93017eb666281bf2d3da28d'
 ARCHIVE_HUMBLE_SIZE='2100000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble161007'

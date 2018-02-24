@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Shadowrun Returns'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_shadowrun_returns_2.0.0.7.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/shadowrun_returns'
 ARCHIVE_GOG_MD5='61c12b14c7e6040cb1465390320a61da'
 ARCHIVE_GOG_SIZE='3000000'
 ARCHIVE_GOG_VERSION='1.2.7-gog2.0.0.7'
@@ -54,6 +55,7 @@ ARCHIVE_GOG_OLD_SIZE='3000000'
 ARCHIVE_GOG_OLD_VERSION='1.2.7-gog2.0.0.5'
 
 ARCHIVE_HUMBLE='shadowrun-returns-linux127.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/shadowrun-returns'
 ARCHIVE_HUMBLE_MD5='ff3146b1ad046f81bf8f3deba277e472'
 ARCHIVE_HUMBLE_SIZE='3000000'
 ARCHIVE_HUMBLE_VERSION='1.2.7-humble140311'

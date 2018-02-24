@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180216.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Sexy Brutale'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_sexy_brutale_gog-1_(11101).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_sexy_brutale'
 ARCHIVE_GOG_MD5='6d94492d797e199c1e67b05dabbc52e5'
 ARCHIVE_GOG_SIZE='3400000'
 ARCHIVE_GOG_VERSION='1.0-gog11101'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180211.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Robin Hood: The Legend of Sherwood'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
 ARCHIVE_GOG_EN='setup_robin_hood_-_the_legend_of_sherwood_1.1_(17797).exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/robin_hood'
 ARCHIVE_GOG_EN_MD5='e8808cdafc7ea75cbcfaa850275b3dd6'
 ARCHIVE_GOG_EN_VERSION='1.1-gog17797'
 ARCHIVE_GOG_EN_SIZE='1200000'
@@ -54,6 +55,7 @@ ARCHIVE_GOG_EN_OLD_VERSION='1.1-gog2.0.0.12'
 ARCHIVE_GOG_EN_OLD_SIZE='1100000'
 
 ARCHIVE_GOG_FR='setup_robin_hood_-_the_legend_of_sherwood_french_1.1_(17797).exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/robin_hood'
 ARCHIVE_GOG_FR_MD5='8b19812fb424651fc482cb7a9c5ed665'
 ARCHIVE_GOG_FR_VERSION='1.1-gog17797'
 ARCHIVE_GOG_FR_SIZE='1200000'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Fire!'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='LIN_ESD_1.0.6756_REL.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/fire'
 ARCHIVE_HUMBLE_MD5='eb990e8465afbca210009b1fca76adcb'
 ARCHIVE_HUMBLE_SIZE='4200000'
 ARCHIVE_HUMBLE_VERSION='1.0.6756-humble1'

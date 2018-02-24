@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170728.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Indiana Jones and the Fate of Atlantis'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='gog_indiana_jones_and_the_fate_of_atlantis_2.2.0.27.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/indiana_jones_and_the_fate_of_atlantis'
 ARCHIVE_GOG_EN_MD5='d56a5850b9d1d4f82eebc282ef7fb52b'
 ARCHIVE_GOG_EN_SIZE='250000'
 ARCHIVE_GOG_EN_VERSION='1.0-gog2.2.0.27'
 
 ARCHIVE_GOG_FR='gog_indiana_jones_and_the_fate_of_atlantis_french_2.2.0.27.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/indiana_jones_and_the_fate_of_atlantis'
 ARCHIVE_GOG_FR_MD5='0da3a8b3d0505c86a9f863c27debbca7'
 ARCHIVE_GOG_FR_SIZE='99000'
 ARCHIVE_GOG_FR_VERSION='1.0-gog2.2.0.27'

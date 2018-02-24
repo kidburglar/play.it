@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Deponia'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_deponia_2.1.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/deponia'
 ARCHIVE_GOG_MD5='a3a21ba1c1ee68c9be2c755bd79e1b30'
 ARCHIVE_GOG_SIZE='1800000'
 ARCHIVE_GOG_VERSION='3.3.1357-gog2.1.0.3'

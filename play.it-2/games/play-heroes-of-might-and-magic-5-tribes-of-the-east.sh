@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170910.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,12 +44,14 @@ GAME_NAME='Heroes of Might and Magic V - Tribes of the East'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_homm5_tote_2.1.0.24.bin'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/heroes_of_might_and_magic_5_bundle'
 ARCHIVE_GOG_EN_MD5='48a783c1f6d3e15a0439fc58d85c5b28'
 ARCHIVE_GOG_EN_TYPE='rar'
 ARCHIVE_GOG_EN_SIZE='2300000'
 ARCHIVE_GOG_EN_VERSION='3.1-gog2.1.0.24'
 
 ARCHIVE_GOG_FR='setup_homm5_tote_french_2.1.0.24-1.bin'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/heroes_of_might_and_magic_5_bundle'
 ARCHIVE_GOG_FR_MD5='bfb583edb64c548cf60f074e4abc2043'
 ARCHIVE_GOG_FR_TYPE='rar'
 ARCHIVE_GOG_FR_SIZE='2300000'

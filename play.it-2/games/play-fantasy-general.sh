@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Fantasy General'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='gog_fantasy_general_2.0.0.8.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/fantasy_general'
 ARCHIVE_GOG_EN_MD5='59b86b9115ae013d2e23a8b4b7b771fd'
 ARCHIVE_GOG_EN_VERSION='1.0-gog2.0.0.8'
 ARCHIVE_GOG_EN_SIZE='260000'
 
 ARCHIVE_GOG_FR='gog_fantasy_general_french_2.0.0.8.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/fantasy_general'
 ARCHIVE_GOG_FR_MD5='1b188304b4cca838e6918ca6e2d9fe2b'
 ARCHIVE_GOG_FR_VERSION='1.0-gog2.0.0.8'
 ARCHIVE_GOG_FR_SIZE='240000'

@@ -33,7 +33,7 @@ set -o errexit
 # build native Linux packages from the original installers
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -43,6 +43,7 @@ GAME_NAME='Airline Tycoon Deluxe'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_airline_tycoon_deluxe_2.0.0.9.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/airline_tycoon_deluxe'
 ARCHIVE_GOG_MD5='dc8b78da150bd3b2089120cc2d24353c'
 ARCHIVE_GOG_SIZE='1200000'
 ARCHIVE_GOG_VERSION='1.08-gog2.0.0.9'

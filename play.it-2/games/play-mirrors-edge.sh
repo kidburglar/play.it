@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180203.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Mirror’s Edge'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_mirrors_edge_2.0.0.3.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/mirrors_edge'
 ARCHIVE_GOG_MD5='89381d67169f5c6f8f300e172a64f99c'
 ARCHIVE_GOG_SIZE='7700000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'

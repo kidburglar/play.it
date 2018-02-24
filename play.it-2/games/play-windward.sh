@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Windward'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
 ARCHIVE_GOG='gog_windward_2.36.0.40.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/windward'
 ARCHIVE_GOG_MD5='6afbdcfda32a6315139080822c30396a'
 ARCHIVE_GOG_SIZE='130000'
 ARCHIVE_GOG_VERSION='20170617.0-gog2.36.0.40'

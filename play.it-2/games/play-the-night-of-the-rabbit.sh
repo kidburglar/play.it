@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180119.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Night of the Rabbit'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_night_of_the_rabbit_2.1.0.5-1.bin'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_night_of_the_rabbit'
 ARCHIVE_GOG_MD5='565c8c59266eced8483ad579ecf3c454'
 ARCHIVE_GOG_VERSION='1.2.3.0389-gog2.1.0.5'
 ARCHIVE_GOG_SIZE='6200000'

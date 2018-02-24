@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Runner2: Future Legend of Rhythm Alien'
 ARCHIVES_LIST='ARCHIVE_HUMBLE_32 ARCHIVE_HUMBLE_64'
 
 ARCHIVE_HUMBLE_32='runner2_i386_1388171186.tar.gz'
+ARCHIVE_HUMBLE_32_URL='https://www.humblebundle.com/store/bittrip-presents-runner2-future-legend-of-rhythm-alien'
 ARCHIVE_HUMBLE_32_MD5='ea105bdcd486879fb99889b87e90eed5'
 ARCHIVE_HUMBLE_32_SIZE='770000'
 ARCHIVE_HUMBLE_32_VERSION='1.0-humble1388171186'
 
 ARCHIVE_HUMBLE_64='runner2_amd64_1388171186.tar.gz'
+ARCHIVE_HUMBLE_64_URL='https://www.humblebundle.com/store/bittrip-presents-runner2-future-legend-of-rhythm-alien'
 ARCHIVE_HUMBLE_64_MD5='2f7ccdb675a63a5fc152514682e97480'
 ARCHIVE_HUMBLE_64_SIZE='770000'
 ARCHIVE_HUMBLE_64_VERSION='1.0-humble1388171186'

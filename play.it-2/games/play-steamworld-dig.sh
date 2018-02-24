@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='SteamWorld Dig'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_steamworld_dig_2.0.0.7.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/steamworld_dig'
 ARCHIVE_GOG_MD5='2f2ed68e00f151ff3c4d0092d8d6b15b'
 ARCHIVE_GOG_SIZE='79000'
 ARCHIVE_GOG_VERSION='1.10-gog2.0.0.7'
 
 ARCHIVE_HUMBLE='SteamWorldDig_linux_1393468453.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/steamworld-dig'
 ARCHIVE_HUMBLE_MD5='de6ff6273c4e397413d852472d51e788'
 ARCHIVE_HUMBLE_SIZE='77000'
 ARCHIVE_HUMBLE_VERSION='1.10-humble140220'

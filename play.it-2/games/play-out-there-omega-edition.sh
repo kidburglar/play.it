@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Out There: Ω Edition'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='OutThere2-4-2Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/out-there-edition'
 ARCHIVE_HUMBLE_MD5='8ea51a42c9ad221e3d258e404c7106b0'
 ARCHIVE_HUMBLE_SIZE='340000'
 ARCHIVE_HUMBLE_VERSION='2.4.2-humble170213'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Knights of Pen and Paper'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_knights_of_pen_and_paper_1_edition_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/knights_of_pen_and_paper_1_deluxier_edition'
 ARCHIVE_GOG_MD5='1f387b78bfe426b9396715fbfe3499b9'
 ARCHIVE_GOG_VERSION='2.34c-gog2.0.0.1'
 ARCHIVE_GOG_SIZE='120000'

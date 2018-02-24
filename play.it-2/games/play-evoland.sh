@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180117.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Evoland'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Evoland.exe'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/evoland'
 ARCHIVE_HUMBLE_MD5='9585142f38d769d4ac9125f587d0c891'
 ARCHIVE_HUMBLE_SIZE='110000'
 ARCHIVE_HUMBLE_VERSION='1.1.2490-humble1'

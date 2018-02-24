@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180226.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Shadowrun: Hong Kong'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_shadowrun_hong_kong_extended_edition_2.8.0.11.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/shadowrun_hong_kong_extended_edition'
 ARCHIVE_GOG_MD5='643ba68e47c309d391a6482f838e46af'
 ARCHIVE_GOG_SIZE='12000000'
 ARCHIVE_GOG_VERSION='3.1.2-gog2.8.0.11'

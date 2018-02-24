@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Goetia'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='goetia_en_gog_1_18328.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/goetia'
 ARCHIVE_GOG_MD5='13d620c4b7426cb755cba43d68cbbb1e'
 ARCHIVE_GOG_SIZE='7000000'
 ARCHIVE_GOG_VERSION='1.0-gog18328'

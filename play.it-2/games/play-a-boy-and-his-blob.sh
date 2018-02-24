@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='A Boy and His Blob'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_a_boy_and_his_blob_2.1.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/a_boy_and_his_blob'
 ARCHIVE_GOG_MD5='7025963a3a26f838877374f72ce3760d'
 ARCHIVE_GOG_SIZE='1300000'
 ARCHIVE_GOG_VERSION='20160421-gog2.1.0.2'

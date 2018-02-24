@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180204.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,41 +44,49 @@ GAME_NAME='Heroes Chronicles'
 ARCHIVES_LIST='ARCHIVE_GOG_1 ARCHIVE_GOG_2 ARCHIVE_GOG_3 ARCHIVE_GOG_4 ARCHIVE_GOG_5 ARCHIVE_GOG_6 ARCHIVE_GOG_7 ARCHIVE_GOG_8'
 
 ARCHIVE_GOG_1='setup_heroes_chronicles_chapter1_2.1.0.42.exe'
+ARCHIVE_GOG_1_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_1_MD5='f584d6e11ed47d1d40e973a691adca5d'
 ARCHIVE_GOG_1_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_1_SIZE='500000'
 
 ARCHIVE_GOG_2='setup_heroes_chronicles_chapter2_2.1.0.43.exe'
+ARCHIVE_GOG_2_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_2_MD5='0d240bc0309814ba251c2d9b557cf69f'
 ARCHIVE_GOG_2_VERSION='1.0-gog2.1.0.43'
 ARCHIVE_GOG_2_SIZE='510000'
 
 ARCHIVE_GOG_3='setup_heroes_chronicles_chapter3_2.1.0.41.exe'
+ARCHIVE_GOG_3_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_3_MD5='cb21751572960d47a259efc17b92c88c'
 ARCHIVE_GOG_3_VERSION='1.0-gog2.1.0.41'
 ARCHIVE_GOG_3_SIZE='490000'
 
 ARCHIVE_GOG_4='setup_heroes_chronicles_chapter4_2.1.0.42.exe'
+ARCHIVE_GOG_4_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_4_MD5='922291e16176cb4bd37ca88eb5f3a19e'
 ARCHIVE_GOG_4_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_4_SIZE='490000'
 
 ARCHIVE_GOG_5='setup_heroes_chronicles_chapter5_2.1.0.42.exe'
+ARCHIVE_GOG_5_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_5_MD5='57b3ec588e627a2da30d3bc80ede5b1d'
 ARCHIVE_GOG_5_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_5_SIZE='470000'
 
 ARCHIVE_GOG_6='setup_heroes_chronicles_chapter6_2.1.0.42.exe'
+ARCHIVE_GOG_6_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_6_MD5='64becfde1882eecd93fb02bf215eff11'
 ARCHIVE_GOG_6_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_6_SIZE='470000'
 
 ARCHIVE_GOG_7='setup_heroes_chronicles_chapter7_2.1.0.42.exe'
+ARCHIVE_GOG_7_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_7_MD5='07c189a731886b2d3891ac1c65581d40'
 ARCHIVE_GOG_7_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_7_SIZE='500000'
 
 ARCHIVE_GOG_8='setup_heroes_chronicles_chapter8_2.1.0.42.exe'
+ARCHIVE_GOG_8_URL='https://www.gog.com/game/heroes_chronicles_all_chapters'
 ARCHIVE_GOG_8_MD5='2b3e4c366db0f7e3e8b15b0935aad528'
 ARCHIVE_GOG_8_VERSION='1.0-gog2.1.0.42'
 ARCHIVE_GOG_8_SIZE='480000'

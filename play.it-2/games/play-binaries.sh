@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180221.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Binaries'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Binaries_Linux_v1.1.0.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/binaries'
 ARCHIVE_HUMBLE_MD5='ed3756af1ebe72560d6e52ab67013f4c'
 ARCHIVE_HUMBLE_SIZE='470000'
 ARCHIVE_HUMBLE_VERSION='1.1.0-humble1'

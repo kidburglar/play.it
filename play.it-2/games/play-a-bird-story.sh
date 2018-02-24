@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180102.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='A Bird Story'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='gog_a_bird_story_2.0.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/a_bird_story'
 ARCHIVE_GOG_MD5='6f334da4493e8c050a16d4b66987d3ff'
 ARCHIVE_GOG_SIZE='180000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'

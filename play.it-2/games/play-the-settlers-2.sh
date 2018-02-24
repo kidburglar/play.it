@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,16 +44,19 @@ GAME_NAME='The Settlers II'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR ARCHIVE_GOG_DE'
 
 ARCHIVE_GOG_EN='setup_settlers2_gold_2.0.0.14.exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/the_settlers_2_gold_edition'
 ARCHIVE_GOG_EN_MD5='6f64b47b15f6ba5d43670504dd0bb229'
 ARCHIVE_GOG_EN_VERSION='1.51-gog2.0.0.14'
 ARCHIVE_GOG_EN_SIZE='370000'
 
 ARCHIVE_GOG_FR='setup_settlers2_gold_french_2.1.0.16.exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/the_settlers_2_gold_edition'
 ARCHIVE_GOG_FR_MD5='1eca72ca45d63e4390590d495657d213'
 ARCHIVE_GOG_FR_VERSION='1.51-gog2.1.0.16'
 ARCHIVE_GOG_FR_SIZE='410000'
 
 ARCHIVE_GOG_DE='setup_settlers2_gold_german_2.1.0.17.exe'
+ARCHIVE_GOG_DE_URL='https://www.gog.com/game/the_settlers_2_gold_edition'
 ARCHIVE_GOG_DE_MD5='f87a8fded6de455af4e6a284b3c4ed5e'
 ARCHIVE_GOG_DE_VERSION='1.51-gog2.1.0.17'
 ARCHIVE_GOG_DE_SIZE='370000'

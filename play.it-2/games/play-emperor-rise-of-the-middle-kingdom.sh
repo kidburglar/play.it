@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Emperor: Rise of the Middle Kingdom'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_emperor_rise_of_the_middle_kingdom_2.0.0.2.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/emperor_rise_of_the_middle_kingdom'
 ARCHIVE_GOG_MD5='5e50e84c028a85eafe5dd5f2aa277fea'
 ARCHIVE_GOG_SIZE='820000'
 ARCHIVE_GOG_VERSION='1.0.1.0-gog2.0.0.2'

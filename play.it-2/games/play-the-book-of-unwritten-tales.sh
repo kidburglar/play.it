@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180213.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Book of Unwritten Tales'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_book_of_unwritten_tales_2.0.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_book_of_unwritten_tales'
 ARCHIVE_GOG_MD5='984e8f16cc04a2a27aea8b0d7ada1c1e'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.4'
 ARCHIVE_GOG_SIZE='5900000'

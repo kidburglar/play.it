@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Spellforce'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_spellforce_-_platinum_edition_1.54.75000_(17748).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/spellforce_platinum'
 ARCHIVE_GOG_MD5='ed34fb43d8042ff61a889865148b8dd2'
 ARCHIVE_GOG_SIZE='3900000'
 ARCHIVE_GOG_VERSION='1.54.7500-gog17748'

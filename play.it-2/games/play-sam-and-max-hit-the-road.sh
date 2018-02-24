@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170806.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Sam & Max Hit the Road'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='gog_sam_max_hit_the_road_2.0.0.8.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/sam_max_hit_the_road'
 ARCHIVE_GOG_EN_MD5='00e6de62115b581f01f49354212ce545'
 ARCHIVE_GOG_EN_SIZE='270000'
 ARCHIVE_GOG_EN_VERSION='1.0-gog2.0.0.1'
 
 ARCHIVE_GOG_FR='gog_sam_max_hit_the_road_french_2.0.0.8.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/sam_max_hit_the_road'
 ARCHIVE_GOG_FR_MD5='127be643ebaa9af24ddd9f2618e4433e'
 ARCHIVE_GOG_FR_SIZE='160000'
 ARCHIVE_GOG_FR_VERSION='1.0-gog2.0.0.1'

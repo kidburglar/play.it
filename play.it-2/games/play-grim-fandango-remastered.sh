@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Grim Fandango Remastered'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_grim_fandango_remastered_2.3.0.7.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/grim_fandango_remastered'
 ARCHIVE_GOG_MD5='9c5d124c89521d254b0dc259635b2abe'
 ARCHIVE_GOG_SIZE='6100000'
 ARCHIVE_GOG_VERSION='1.4-gog2.3.0.7'

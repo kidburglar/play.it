@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180218.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pid'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='setup_pid_gog-1_(18421).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pid'
 ARCHIVE_GOG_MD5='d6cd6899df3b2ad13071f58d0362ab3a'
 ARCHIVE_GOG_VERSION='1.0-gog18421'
 ARCHIVE_GOG_SIZE='1300000'

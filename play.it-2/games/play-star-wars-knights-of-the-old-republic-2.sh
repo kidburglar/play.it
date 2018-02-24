@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171112.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Star Wars: Knights of the Old Republic II'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_sw_kotor2_2.0.0.3.exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/star_wars_knights_of_the_old_republic_ii_the_sith_lords'
 ARCHIVE_GOG_EN_MD5='0163b31f8763b77f567f5646d2586b61'
 ARCHIVE_GOG_EN_TYPE='rar'
 ARCHIVE_GOG_EN_VERSION='1.0b-gog2.0.0.3'
@@ -53,6 +54,7 @@ ARCHIVE_GOG_EN_PART1_MD5='bbedad0d349a653a1502f2b9f4c207fc'
 ARCHIVE_GOG_EN_PART1_TYPE='rar'
 
 ARCHIVE_GOG_FR='setup_sw_kotor2_french_2.0.0.3.exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/star_wars_knights_of_the_old_republic_ii_the_sith_lords'
 ARCHIVE_GOG_FR_MD5='81eae2db19c61a25111f2e6e5960a751'
 ARCHIVE_GOG_FR_TYPE='rar'
 ARCHIVE_GOG_FR_VERSION='1.0b-gog2.0.0.3'

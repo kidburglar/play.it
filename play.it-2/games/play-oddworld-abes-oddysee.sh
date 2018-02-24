@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170925.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Oddworld: Abe’s Oddysee'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_abes_oddysee_2.0.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/oddworld_abes_oddysee'
 ARCHIVE_GOG_MD5='c22a44d208e524dc2760ea6ce57829d5'
 ARCHIVE_GOG_SIZE='660000'
 ARCHIVE_GOG_VERSION='2.1-gog2.0.0.4'

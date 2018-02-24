@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.3
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Jade Empire'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
 ARCHIVE_GOG_EN='setup_jade_empire_1.00_(15538).exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/jade_empire_special_edition'
 ARCHIVE_GOG_EN_MD5='e68f17f59bde2254ab1e9b70c078e9f1'
 ARCHIVE_GOG_EN_VERSION='1.00-gog15538'
 ARCHIVE_GOG_EN_SIZE='7600000'
@@ -75,6 +76,7 @@ ARCHIVE_GOG_EN_OLD_PART5_MD5='081042ad8561b599add7b2f366cf3da8'
 ARCHIVE_GOG_EN_OLD_PART5_TYPE='innosetup'
 
 ARCHIVE_GOG_FR='setup_jade_empire_french_1.00_(15538).exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/jade_empire_special_edition'
 ARCHIVE_GOG_FR_MD5='872f400a6af8bae9af9bf0b2025d29f4'
 ARCHIVE_GOG_FR_VERSION='1.00-gog15538'
 ARCHIVE_GOG_FR_SIZE='7700000'

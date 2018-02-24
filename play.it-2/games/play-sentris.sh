@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Sentris'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Sentris_1.02_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/sentris'
 ARCHIVE_HUMBLE_MD5='b6ca5f3447a223efba73ae9138b16a45'
 ARCHIVE_HUMBLE_SIZE='408104'
 ARCHIVE_HUMBLE_VERSION='1.02-humble170110'

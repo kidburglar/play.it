@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180123.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Warlock of Firetop Mountain'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='WARLOCK_LINUX_487088.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/the-warlock-of-firetop-mountain'
 ARCHIVE_HUMBLE_MD5='17d4e909dbed98cd420eee5bb6a828d3'
 ARCHIVE_HUMBLE_SIZE='1600000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble171022'

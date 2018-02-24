@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171207.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Renowned Explorers: More To Explore'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='renowned_explorers_more_to_explore_dlc_en_466_15616.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/renowned_explorers_more_to_explore'
 ARCHIVE_GOG_MD5='c99ca440cb312b90052939db49aeef03'
 ARCHIVE_GOG_SIZE='69000'
 ARCHIVE_GOG_VERSION='466-gog15616'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171226.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Aragami'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_aragami_2.9.0.12.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/aragami'
 ARCHIVE_GOG_MD5='42d0952de9b0373786f2902aa596b4ff'
 ARCHIVE_GOG_SIZE='6800000'
 ARCHIVE_GOG_VERSION='01.08-gog2.9.0.12'
 
 ARCHIVE_HUMBLE='aragami_01_08_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/aragami'
 ARCHIVE_HUMBLE_MD5='4be0b7f674eec62184df216fcaba77b5'
 ARCHIVE_HUMBLE_SIZE='6800000'
 ARCHIVE_HUMBLE_VERSION='01.08-humble170503'

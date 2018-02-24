@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180107.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Oxenfree'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='oxenfree_en_2_6_0_15278.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/oxenfree'
 ARCHIVE_GOG_MD5='9f9e9c4a3f4b73fa85a8d29714f5959e'
 ARCHIVE_GOG_VERSION='2.6.0f30-gog15278'
 ARCHIVE_GOG_SIZE='3000000'

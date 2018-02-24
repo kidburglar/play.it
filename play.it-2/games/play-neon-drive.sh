@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Neon Drive'
 ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
 ARCHIVE_HUMBLE='NeonDrive_V1.5_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/neon-drive'
 ARCHIVE_HUMBLE_MD5='1fcbd5dc69cc08899b792b9f4c0d7075'
 ARCHIVE_HUMBLE_SIZE='500000'
 ARCHIVE_HUMBLE_VERSION='1.5-humble170831'

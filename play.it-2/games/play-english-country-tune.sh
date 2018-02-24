@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='English Country Tune'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='EnglishCountryTune_Linux_1370040672.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/english-country-tune'
 ARCHIVE_HUMBLE_MD5='1097749402732c31348fd430b94e9350'
 ARCHIVE_HUMBLE_SIZE='330000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble'

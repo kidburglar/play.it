@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171226.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Chaos Reborn'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
 ARCHIVE_GOG='chaos_reborn_en_1_13_2_17223.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/chaos_reborn'
 ARCHIVE_GOG_MD5='edb60d98710c87c0adea06f55be99567'
 ARCHIVE_GOG_SIZE='1700000'
 ARCHIVE_GOG_TYPE='mojosetup'

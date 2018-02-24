@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180117.4
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Inner World'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_inner_world_2.0.0.2.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_inner_world'
 ARCHIVE_GOG_MD5='b5778aa9770ba7fc7d1a3884154c136b'
 ARCHIVE_GOG_SIZE='1500000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'

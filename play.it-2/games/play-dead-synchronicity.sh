@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180203.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dead Synchronicity: Tomorrow Comes Today'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Dead_Synchronicity_1.0.7_Linux_Full_EN_FR_IT_DE_ES_KO_JA_Daedalic_noDRM.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/dead-synchronicity-tomorrow-comes-today'
 ARCHIVE_HUMBLE_MD5='0aee9cc5d5c256f47ce61b313115a601'
 ARCHIVE_HUMBLE_SIZE='3200000'
 ARCHIVE_HUMBLE_VERSION='1.0.7-humble1'

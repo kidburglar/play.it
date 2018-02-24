@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180203.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Westport Independent'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_the_westport_independent_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/westport_independent_the'
 ARCHIVE_GOG_MD5='7032059f085e94f52444e9bf4ed0195c'
 ARCHIVE_GOG_SIZE='130000'
 ARCHIVE_GOG_VERSION='1.0.0-gog2.0.0.1'

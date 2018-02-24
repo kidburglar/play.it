@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Antichamber'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='antichamber_1.01_linux_1392664980.sh'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/antichamber'
 ARCHIVE_HUMBLE_MD5='37bca01c411d813c8729259b7db2dba0'
 ARCHIVE_HUMBLE_SIZE='690000'
 ARCHIVE_HUMBLE_VERSION='1.01-humble1'

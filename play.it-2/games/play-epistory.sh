@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171207.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Epistory - Typing Chronicles'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_epistory_typing_chronicles_2.2.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/epistory_typing_chronicles'
 ARCHIVE_GOG_MD5='8db1f835a9189099e57c174ba2353f53'
 ARCHIVE_GOG_SIZE='1300000'
 ARCHIVE_GOG_VERSION='1.3.5-gog2.2.0.3'

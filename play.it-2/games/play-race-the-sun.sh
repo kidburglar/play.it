@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Race The Sun'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_race_the_sun_2.4.0.8.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/race_the_sun'
 ARCHIVE_GOG_MD5='e3f4e66a5fafe966000ab4e0dcfb7aeb'
 ARCHIVE_GOG_SIZE='200000'
 ARCHIVE_GOG_VERSION='1.51-gog2.4.0.8'
 
 ARCHIVE_HUMBLE='RaceTheSunLINUX_1.50.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/race-the-sun'
 ARCHIVE_HUMBLE_MD5='e225afb660090b9aa8281574b658accf'
 ARCHIVE_HUMBLE_SIZE='190000'
 ARCHIVE_HUMBLE_VERSION='1.50-humble170131'

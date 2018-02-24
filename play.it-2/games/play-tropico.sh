@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170902.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Tropico'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_tropico_2.1.0.14.exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/tropico_reloaded'
 ARCHIVE_GOG_EN_MD5='1bd761bc4a40a42a9caeb41c70d46465'
 ARCHIVE_GOG_EN_VERSION='1.5.3-gog2.1.0.14'
 ARCHIVE_GOG_EN_SIZE='1400000'
 
 ARCHIVE_GOG_FR='setup_tropico_french_2.1.0.14.exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/tropico_reloaded'
 ARCHIVE_GOG_FR_MD5='aad4ea5a6fe2b2c2f347cfa7aae058b3'
 ARCHIVE_GOG_FR_VERSION='1.5.3-gog2.1.0.14'
 ARCHIVE_GOG_FR_SIZE='1400000'

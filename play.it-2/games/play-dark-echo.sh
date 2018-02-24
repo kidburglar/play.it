@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dark Echo'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='DarkEcho_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/dark-echo'
 ARCHIVE_HUMBLE_MD5='b629b5c47729d8213f89f92ae28d6076'
 ARCHIVE_HUMBLE_SIZE='120000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble'

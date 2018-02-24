@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180126.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Puzzle Agent'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_puzzle_agent_2.0.0.3.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/puzzle_agent'
 ARCHIVE_GOG_MD5='68155b4aff9aa9e28c107f5b2ff994b5'
 ARCHIVE_GOG_SIZE='260000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'

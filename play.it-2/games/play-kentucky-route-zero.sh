@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Kentucky Route Zero'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='KentuckyRouteZero_Linux_v17.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/kentucky-route-zero'
 ARCHIVE_HUMBLE_MD5='36c7b89c223d5c77d4d44b7ccf72f241'
 ARCHIVE_HUMBLE_SIZE='690000'
 ARCHIVE_HUMBLE_VERSION='17-humble1'

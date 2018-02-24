@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Torchlight II'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_torchlight_2_2.0.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/torchlight_ii'
 ARCHIVE_GOG_MD5='e107f6d4c6d4cecea37ade420a8d4892'
 ARCHIVE_GOG_SIZE='1700000'
 ARCHIVE_GOG_VERSION='1.25.9.7-gog2.0.0.2'
 
 ARCHIVE_HUMBLE='Torchlight2-linux-2015-04-01.sh'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/torchlight-ii'
 ARCHIVE_HUMBLE_MD5='730a5d08c8f1cd4a65afbc0ca631d85c'
 ARCHIVE_HUMBLE_SIZE='1700000'
 ARCHIVE_HUMBLE_VERSION='1.25.2.4-humble150402'

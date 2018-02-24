@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171025.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Ghost Master'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='setup_ghost_master_20171020_(15806).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/ghost_master'
 ARCHIVE_GOG_MD5='bbc7b8d6ed9b08c54cba6f2b1048a0fd'
 ARCHIVE_GOG_SIZE='680000'
 ARCHIVE_GOG_VERSION='1.1-gog15806'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Particulars'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='particulars_lin_latest1416421559.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/particulars'
 ARCHIVE_HUMBLE_MD5='b7b269b8e33d682a2fca5c548928dabf'
 ARCHIVE_HUMBLE_SIZE='1400000'
 ARCHIVE_HUMBLE_VERSION='1.0.0.2-humble141119'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180204.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Stardew Valley'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_stardew_valley_2.8.0.10.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/stardew_valley'
 ARCHIVE_GOG_MD5='27c84537bee1baae4e3c2f034cb0ff2d'
 ARCHIVE_GOG_SIZE='490000'
 ARCHIVE_GOG_VERSION='1.2.33-gog2.8.0.10'

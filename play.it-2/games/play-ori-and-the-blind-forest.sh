@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180119.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Ori and the Blind Forest'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_ori_and_the_blind_forest_de_2.0.0.2-1.bin'
+ARCHIVE_GOG_URL='https://www.gog.com/game/ori_and_the_blind_forest_definitive_edition'
 ARCHIVE_GOG_MD5='d5ec4ea264c372a4fdd52b5ecbd9efe6'
 ARCHIVE_GOG_SIZE='11000000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171210.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -46,11 +46,13 @@ GAME_NAME='Baldur’s Gate II'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='gog_baldur_s_gate_2_complete_2.1.0.7.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/baldurs_gate_2_enhanced_edition'
 ARCHIVE_GOG_EN_MD5='e92161d7fc0a2eea234b2c93760c9cdb'
 ARCHIVE_GOG_EN_VERSION='2.5.26498-gog2.1.0.7'
 ARCHIVE_GOG_EN_SIZE='3000000'
 
 ARCHIVE_GOG_FR='gog_baldur_s_gate_2_complete_french_2.1.0.7.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/baldurs_gate_2_enhanced_edition'
 ARCHIVE_GOG_FR_MD5='6551bda3d8c7330b7ad66842ac1d4ed4'
 ARCHIVE_GOG_FR_VERSION='2.5.26498-gog2.1.0.7'
 ARCHIVE_GOG_FR_SIZE='3000000'

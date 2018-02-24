@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Teslagrad'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_teslagrad_2.1.0.4.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/teslagrad'
 ARCHIVE_GOG_MD5='e9683e188615ddd341f8a95a2e8102ed'
 ARCHIVE_GOG_VERSION='1.4-gog2.1.0.4'
 ARCHIVE_GOG_SIZE='1600000'

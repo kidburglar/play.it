@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171207.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Silver Case - Demo'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_silver_case_demo_2.0.0.1.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_silver_case_demo'
 ARCHIVE_GOG_MD5='3c133cb2031160370917f120055c63b4'
 ARCHIVE_GOG_SIZE='960000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'

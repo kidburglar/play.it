@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dust: An Elysian Tale'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='dustaet_05042016-bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/dust-an-elysian-tail'
 ARCHIVE_HUMBLE_MD5='6844c82f233b47417620be0bef8b140c'
 ARCHIVE_HUMBLE_SIZE='1500000'
 ARCHIVE_HUMBLE_VERSION='1.04-humble160504'

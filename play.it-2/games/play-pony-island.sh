@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pony Island'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='ponyisland_linux_v1.20.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/pony-island'
 ARCHIVE_HUMBLE_MD5='30c4f063e360de53cdb6a945df82cca4'
 ARCHIVE_HUMBLE_SIZE='360000'
 ARCHIVE_HUMBLE_VERSION='1.20-humble1'

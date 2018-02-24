@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Zork I: The Great Underground Empire'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_zork_2.1.0.17.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_zork_anthology'
 ARCHIVE_GOG_MD5='6bd42788d696f154ce363830909259d3'
 ARCHIVE_GOG_SIZE='22000'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.17'

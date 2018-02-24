@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170616.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,12 +44,14 @@ GAME_NAME='Heroes of Might and Magic V'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_homm5_2.1.0.22.bin'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/heroes_of_might_and_magic_5_bundle'
 ARCHIVE_GOG_EN_MD5='9a31aecfcd072f1a01ab4e810f57f894'
 ARCHIVE_GOG_EN_TYPE='rar'
 ARCHIVE_GOG_EN_SIZE='2500000'
 ARCHIVE_GOG_EN_VERSION='2.1-gog2.1.0.22'
 
 ARCHIVE_GOG_FR='setup_homm5_french_2.1.0.22.bin'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/heroes_of_might_and_magic_5_bundle'
 ARCHIVE_GOG_FR_MD5='4d56a95f779c9583cdfdc451ca865927'
 ARCHIVE_GOG_FR_TYPE='rar'
 ARCHIVE_GOG_FR_SIZE='2500000'

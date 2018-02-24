@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170824.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Ascendant'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_ascendant_2.2.0.7.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/ascendant'
 ARCHIVE_GOG_MD5='8cdcd59a2f8363b7237e9cbe2675adda'
 ARCHIVE_GOG_SIZE='2400000'
 ARCHIVE_GOG_VERSION='1.2.2-gog2.2.0.7'
