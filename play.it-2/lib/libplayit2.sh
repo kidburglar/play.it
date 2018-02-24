@@ -33,7 +33,7 @@
 ###
 
 library_version=2.6.0~dev
-library_revision=20180304.2
+library_revision=20180304.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1221,6 +1221,45 @@ extract_data_from_print() {
 		;;
 	esac
 	printf "$string" "$1"
+}
+
+# prepare package layout by putting files from archive in the right packages
+# directories
+# USAGE: prepare_package_layout [$pkg…]
+# NEEDED VARS: (LANG) (PACKAGES_LIST) PLAYIT_WORKDIR (PKG_PATH)
+prepare_package_layout() {
+	if [ -z "$1" ]; then
+		[ -n "$PACKAGES_LIST" ] || prepare_package_layout_error_no_list
+		prepare_package_layout $PACKAGES_LIST
+		return 0
+	fi
+	for package in "$@"; do
+		PKG="$package"
+		organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+		organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+		for i in $(seq 0 9); do
+			organize_data "GAME${i}_${PKG#PKG_}" "$PATH_GAME"
+			organize_data "DOC${i}_${PKG#PKG_}"  "$PATH_DOC"
+		done
+	done
+}
+
+# display an error when calling prepare_package_layout() without argument while
+# $PACKAGES_LIST is unset or empty
+# USAGE: prepare_package_layout_error_no_list
+# NEEDED VARS: (LANG)
+prepare_package_layout_error_no_list() {
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='prepare_package_layout ne peut pas être appelé sans argument si $PACKAGES_LIST n’est pas défini.'
+		;;
+		('en'|*)
+			string='prepare_package_layout can not be called without argument if $PACKAGES_LIST is not set.'
+		;;
+	esac
+	printf '%s\n' "$string"
+	return 1
 }
 
 # put files from archive in the right package directories

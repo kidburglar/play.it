@@ -4,6 +4,8 @@
 
   * Add automatic architecture handling to print_instructions
 
+  * New function prepare_package_layout providing a wrapper for organize_data
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list
