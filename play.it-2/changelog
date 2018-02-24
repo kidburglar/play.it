@@ -1,3 +1,7 @@
+2.5.3
+
+  * When no supported archive is provided, add download URL to archives list
+
 2.5.2
 
   * Fix init_prefix_files crashing when some files exist in PATH_DATA or
