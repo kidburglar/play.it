@@ -23,7 +23,7 @@ write_bin() {
 		return 0
 	fi
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
 	local app_id
 	local app_exe
@@ -35,6 +35,7 @@ write_bin() {
 	local file
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		# Get app-specific variables
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
@@ -302,6 +303,7 @@ write_desktop() {
 	local target
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \

@@ -50,6 +50,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	unset OPTION_PREFIX
 	unset OPTION_PACKAGE
 	unset SOURCE_ARCHIVE
+	DRY_RUN='0'
 
 	while [ $# -gt 0 ]; do
 		case "$1" in
@@ -84,6 +85,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				fi
 				unset option
 				unset value
+			;;
+			('--dry-run')
+				DRY_RUN='1'
+				export DRY_RUN
 			;;
 			('--'*)
 				print_error

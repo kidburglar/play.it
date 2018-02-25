@@ -29,6 +29,7 @@ testvar() {
 # set defaults rights on files (755 for dirs & 644 for regular files)
 # USAGE: set_standard_permissions $dir[…]
 set_standard_permissions() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[  -d "$dir" ] || return 1
 		find "$dir" -type d -exec chmod 755 '{}' +
@@ -78,6 +79,7 @@ print_warning() {
 # convert files name to lower case
 # USAGE: tolower $dir[…]
 tolower() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
 		find "$dir" -depth -mindepth 1 | while read -r file; do

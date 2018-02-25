@@ -9,6 +9,9 @@
   * Improve sort_icons so it can be used on single .png file produced by
     convert
 
+  * Add --dry-run switch, running tests but not extracting data nor building
+    packages
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list

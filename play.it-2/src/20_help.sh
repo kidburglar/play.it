@@ -31,6 +31,8 @@ help() {
 	printf '\n'
 	help_package
 	printf '\n'
+	help_dryrun
+	printf '\n'
 
 	printf 'ARCHIVE\n\n'
 	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
@@ -194,5 +196,23 @@ help_package() {
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'deb' ] && printf ' %s\n' "$string_default" || printf '\n'
+}
+
+# display --dry-run option usage
+# USAGE: help_dryrun
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_dryrun() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='Effectue des tests de syntaxe mais n’extrait pas de données et ne construit pas de paquets.'
+		;;
+		('en'|*)
+			string='Run syntax checks but do not extract data nor build packages.'
+		;;
+	esac
+	printf -- '--dry-run\n\n'
+	printf '\t%s\n\n' "$string"
 }
 

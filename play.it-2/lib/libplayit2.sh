@@ -33,7 +33,7 @@
 ###
 
 library_version=2.6.0~dev
-library_revision=20180304.4
+library_revision=20180304.5
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -66,6 +66,7 @@ testvar() {
 # set defaults rights on files (755 for dirs & 644 for regular files)
 # USAGE: set_standard_permissions $dir[…]
 set_standard_permissions() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[  -d "$dir" ] || return 1
 		find "$dir" -type d -exec chmod 755 '{}' +
@@ -115,6 +116,7 @@ print_warning() {
 # convert files name to lower case
 # USAGE: tolower $dir[…]
 tolower() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
 		find "$dir" -depth -mindepth 1 | while read -r file; do
@@ -677,6 +679,8 @@ help() {
 	printf '\n'
 	help_package
 	printf '\n'
+	help_dryrun
+	printf '\n'
 
 	printf 'ARCHIVE\n\n'
 	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
@@ -840,6 +844,24 @@ help_package() {
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'deb' ] && printf ' %s\n' "$string_default" || printf '\n'
+}
+
+# display --dry-run option usage
+# USAGE: help_dryrun
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_dryrun() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='Effectue des tests de syntaxe mais n’extrait pas de données et ne construit pas de paquets.'
+		;;
+		('en'|*)
+			string='Run syntax checks but do not extract data nor build packages.'
+		;;
+	esac
+	printf -- '--dry-run\n\n'
+	printf '\t%s\n\n' "$string"
 }
 
 # select package architecture to build
@@ -1137,6 +1159,10 @@ extract_data_from() {
 		local destination
 		destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
+		if [ "$DRY_RUN" = '1' ]; then
+			printf '\n'
+			return 0
+		fi
 		local archive_type
 		archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 		case "$archive_type" in
@@ -1271,6 +1297,12 @@ organize_data() {
 		skipping_pkg_warning 'organize_data' "$PKG"
 		return 0
 	fi
+	local pkg_path
+	if [ "$DRY_RUN" = '1' ]; then
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
+		return 0
+	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"
 	local archive_path
@@ -1279,7 +1311,6 @@ organize_data() {
 	archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
-		local pkg_path
 		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 		pkg_path="${pkg_path}$2"
@@ -1318,6 +1349,7 @@ organize_data_error_missing_pkg() {
 # NEEDED VARS: PLAYIT_WORKDIR (WRESTOOL_NAME)
 # CALLS: liberror
 extract_icon_from() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for file in "$@"; do
 		local destination
 		destination="$PLAYIT_WORKDIR/icons"
@@ -1367,6 +1399,7 @@ sort_icons() {
 		icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
 		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
+		[ "$DRY_RUN" = '1' ] && continue
 		if [ -n "${icon_res##* *}" ]; then
 			path_icon="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 			mkdir --parents "${pkg_path}${path_icon}"
@@ -1392,6 +1425,7 @@ extract_and_sort_icons_from() {
 	local pkg_path
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
@@ -1424,6 +1458,7 @@ move_icons_to() {
 	local destination_path
 	destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
+	[ "$DRY_RUN" = '1' ] && return 0
 	(
 		cd "$source_path"
 		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
@@ -1436,6 +1471,7 @@ move_icons_to() {
 # USAGE: postinst_icons_linking $app[…]
 # NEEDED VARS: APP_ICONS_LIST APP_ID|GAME_ID APP_ICON APP_ICON_RES PATH_GAME
 postinst_icons_linking() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		# get icons list associated with current application
 		local app_icons_list
@@ -1486,6 +1522,7 @@ get_icon_from_temp_dir() {
 	local pkg_path
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
@@ -1701,7 +1738,7 @@ write_bin() {
 		return 0
 	fi
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
+	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
 	local app_id
 	local app_exe
@@ -1713,6 +1750,7 @@ write_bin() {
 	local file
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		# Get app-specific variables
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
@@ -1980,6 +2018,7 @@ write_desktop() {
 	local target
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
@@ -2342,6 +2381,7 @@ write_metadata() {
 		pkg_maint="$(whoami)@$(hostname)"
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
+		[ "$DRY_RUN" = '1' ] && continue
 		pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
@@ -2765,6 +2805,12 @@ pkg_build_arch() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 
 	(
 		cd "$1"
@@ -3021,6 +3067,12 @@ pkg_build_deb() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
 	eval ${pkg}_PKG=\"$pkg_filename\"
 	export ${pkg}_PKG
@@ -3080,6 +3132,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	unset OPTION_PREFIX
 	unset OPTION_PACKAGE
 	unset SOURCE_ARCHIVE
+	DRY_RUN='0'
 
 	while [ $# -gt 0 ]; do
 		case "$1" in
@@ -3114,6 +3167,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				fi
 				unset option
 				unset value
+			;;
+			('--dry-run')
+				DRY_RUN='1'
+				export DRY_RUN
 			;;
 			('--'*)
 				print_error

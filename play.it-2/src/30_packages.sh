@@ -26,6 +26,7 @@ write_metadata() {
 		pkg_maint="$(whoami)@$(hostname)"
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
+		[ "$DRY_RUN" = '1' ] && continue
 		pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
