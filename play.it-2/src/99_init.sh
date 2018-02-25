@@ -27,12 +27,14 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set allowed values for common options
 
+	ALLOWED_VALUES_ARCHITECTURE='all 32 64 auto'
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	ALLOWED_VALUES_COMPRESSION='none gzip xz'
 	ALLOWED_VALUES_PACKAGE='arch deb'
 
 	# Set default values for common options
 
+	DEFAULT_OPTION_ARCHITECTURE='all'
 	DEFAULT_OPTION_CHECKSUM='md5'
 	DEFAULT_OPTION_COMPRESSION='none'
 	DEFAULT_OPTION_PREFIX='/usr/local'
@@ -42,6 +44,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Parse arguments given to the script
 
+	unset OPTION_ARCHITECTURE
 	unset OPTION_CHECKSUM
 	unset OPTION_COMPRESSION
 	unset OPTION_PREFIX
@@ -54,7 +57,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				help
 				exit 0
 			;;
-			('--checksum='*|\
+			('--architecture='*|\
+			 '--architecture'|\
+			 '--checksum='*|\
 			 '--checksum'|\
 			 '--compression='*|\
 			 '--compression'|\
@@ -142,7 +147,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set options not already set by script arguments to default values
 
-	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
+	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
 		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
 			export OPTION_$option
@@ -185,6 +190,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	for option in 'CHECKSUM' 'COMPRESSION' 'PACKAGE'; do
 		check_option_validity "$option"
 	done
+
+	# Restrict packages list to target architecture
+
+	select_package_architecture
 
 	# Check script dependencies
 

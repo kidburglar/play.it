@@ -21,6 +21,8 @@ help() {
 	printf '%s %s [OPTION]… [ARCHIVE]\n\n' "$string" "${0##*/}"
 	
 	printf 'OPTIONS\n\n'
+	help_architecture
+	printf '\n'
 	help_checksum
 	printf '\n'
 	help_compression
@@ -40,6 +42,41 @@ help() {
 		printf '%s\n' "$(eval printf -- '%b' \"\$$archive\")"
 	done
 	printf '\n'
+}
+
+# display --architecture option usage
+# USAGE: help_architecture
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_architecture() {
+	local string
+	local string_all
+	local string_32
+	local string_64
+	local string_auto
+	case "${LANG%_*}" in
+		('fr')
+			string='Choix de l’architecture à construire'
+			string_all='toutes les architectures disponibles (méthode par défaut)'
+			string_32='paquets 32-bit seulement'
+			string_64='paquets 64-bit seulement'
+			string_auto='paquets pour l’architecture du système courant uniquement'
+		;;
+		('en'|*)
+			string='Target architecture choice'
+			string_all='all available architectures (default method)'
+			string_32='32-bit packages only'
+			string_64='64-bit packages only'
+			string_auto='packages for current system architecture only'
+		;;
+	esac
+	printf -- '--architecture=all|32|64|auto\n'
+	printf -- '--architecture all|32|64|auto\n\n'
+	printf '\t%s\n\n' "$string"
+	printf '\tall\t%s\n' "$string_all"
+	printf '\t32\t%s\n' "$string_32"
+	printf '\t64\t%s\n' "$string_64"
+	printf '\tauto\t%s\n' "$string_auto"
 }
 
 # display --checksum option usage

@@ -2,8 +2,10 @@
 # USAGE: organize_data $id $path
 # NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) (PKG_PATH)
 organize_data() {
-	if [ -z "$PKG" ]; then
-		organize_data_error_missing_pkg
+	[ -n "$PKG" ] || organize_data_error_missing_pkg
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'organize_data' "$PKG"
+		return 0
 	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"

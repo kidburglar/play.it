@@ -169,3 +169,20 @@ missing_pkg_error() {
 	exit 1
 }
 
+# display a warning when PKG value is not included in PACKAGES_LIST
+# USAGE: skipping_pkg_warning $function_name $PKG
+# NEEDED VARS: (LANG)
+skipping_pkg_warning() {
+	local string
+	print_warning
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s ne fait pas partie de la liste de paquets à construire : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s is not part of the list of packages to build: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
+}
+

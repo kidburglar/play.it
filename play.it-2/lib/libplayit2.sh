@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.5.3
-library_revision=20180302.3
+library_version=2.6.0~dev
+library_revision=20180304.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -204,6 +204,23 @@ missing_pkg_error() {
 	esac
 	printf "$string" "$1" "$2"
 	exit 1
+}
+
+# display a warning when PKG value is not included in PACKAGES_LIST
+# USAGE: skipping_pkg_warning $function_name $PKG
+# NEEDED VARS: (LANG)
+skipping_pkg_warning() {
+	local string
+	print_warning
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s ne fait pas partie de la liste de paquets à construire : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s is not part of the list of packages to build: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
 }
 
 # set distribution-specific package architecture for Arch Linux target
@@ -650,6 +667,8 @@ help() {
 	printf '%s %s [OPTION]… [ARCHIVE]\n\n' "$string" "${0##*/}"
 	
 	printf 'OPTIONS\n\n'
+	help_architecture
+	printf '\n'
 	help_checksum
 	printf '\n'
 	help_compression
@@ -669,6 +688,41 @@ help() {
 		printf '%s\n' "$(eval printf -- '%b' \"\$$archive\")"
 	done
 	printf '\n'
+}
+
+# display --architecture option usage
+# USAGE: help_architecture
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_architecture() {
+	local string
+	local string_all
+	local string_32
+	local string_64
+	local string_auto
+	case "${LANG%_*}" in
+		('fr')
+			string='Choix de l’architecture à construire'
+			string_all='toutes les architectures disponibles (méthode par défaut)'
+			string_32='paquets 32-bit seulement'
+			string_64='paquets 64-bit seulement'
+			string_auto='paquets pour l’architecture du système courant uniquement'
+		;;
+		('en'|*)
+			string='Target architecture choice'
+			string_all='all available architectures (default method)'
+			string_32='32-bit packages only'
+			string_64='64-bit packages only'
+			string_auto='packages for current system architecture only'
+		;;
+	esac
+	printf -- '--architecture=all|32|64|auto\n'
+	printf -- '--architecture all|32|64|auto\n\n'
+	printf '\t%s\n\n' "$string"
+	printf '\tall\t%s\n' "$string_all"
+	printf '\t32\t%s\n' "$string_32"
+	printf '\t64\t%s\n' "$string_64"
+	printf '\tauto\t%s\n' "$string_auto"
 }
 
 # display --checksum option usage
@@ -786,6 +840,138 @@ help_package() {
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'deb' ] && printf ' %s\n' "$string_default" || printf '\n'
+}
+
+# select package architecture to build
+# USAGE: select_package_architecture
+# NEEDED_VARS: OPTION_ARCHITECTURE PACKAGES_LIST
+# CALLS: select_package_architecture_warning_unavailable select_package_architecture_error_unknown select_package_architecture_warning_unsupported
+select_package_architecture() {
+	[ "$OPTION_ARCHITECTURE" = 'all' ] && return 0
+	local version_major_target
+	local version_minor_target
+	version_major_target="${target_version%%.*}"
+	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
+	if [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 6 ]; then
+		select_package_architecture_warning_unsupported
+		OPTION_ARCHITECTURE='all'
+		export OPTION_ARCHITECTURE
+		return 0
+	fi
+	if [ "$OPTION_ARCHITECTURE" = 'auto' ]; then
+		case "$(uname --machine)" in
+			('i686')
+				OPTION_ARCHITECTURE='32'
+			;;
+			('x86_64')
+				OPTION_ARCHITECTURE='64'
+			;;
+			(*)
+				select_package_architecture_warning_unknown
+				OPTION_ARCHITECTURE='all'
+				export OPTION_ARCHITECTURE
+				return 0
+			;;
+		esac
+		export OPTION_ARCHITECTURE
+		select_package_architecture
+		return 0
+	fi
+	local package_arch
+	local packages_list_32
+	local packages_list_64
+	local packages_list_all
+	for package in $PACKAGES_LIST; do
+		package_arch="$(eval printf -- '%b' \"\$${package}_ARCH\")"
+		case "$package_arch" in
+			('32')
+				packages_list_32="$packages_list_32 $package"
+			;;
+			('64')
+				packages_list_64="$packages_list_64 $package"
+			;;
+			(*)
+				packages_list_all="$packages_list_all $package"
+			;;
+		esac
+	done
+	case "$OPTION_ARCHITECTURE" in
+		('32')
+			if [ -z "$packages_list_32" ]; then
+				select_package_architecture_warning_unavailable
+				OPTION_ARCHITECTURE='all'
+				return 0
+			fi
+			PACKAGES_LIST="$packages_list_32 $packages_list_all"
+		;;
+		('64')
+			if [ -z "$packages_list_64" ]; then
+				select_package_architecture_warning_unavailable
+				OPTION_ARCHITECTURE-'all'
+				return 0
+			fi
+			PACKAGES_LIST="$packages_list_64 $packages_list_all"
+		;;
+		(*)
+			select_package_architecture_error_unknown
+		;;
+	esac
+	export PACKAGES_LIST
+}
+
+# display an error if selected architecture is not available
+# USAGE: select_package_architecture_warning_unavailable
+# NEEDED_VARS: (LANG) OPTION_ARCHITECTURE
+# CALLED_BY: select_package_architecture
+select_package_architecture_warning_unavailable() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’architecture demandée n’est pas disponible : %s\n'
+		;;
+		('en'|*)
+			string='Selected architecture is not available: %s\n'
+		;;
+	esac
+	print_warning
+	printf "$string" "$OPTION_ARCHITECTURE"
+}
+
+# display an error if selected architecture is not supported
+# USAGE: select_package_architecture_error_unknown
+# NEEDED_VARS: (LANG) OPTION_ARCHITECTURE
+# CALLED_BY: select_package_architecture
+select_package_architecture_error_unknown() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’architecture demandée n’est pas supportée : %s\n'
+		;;
+		('en'|*)
+			string='Selected architecture is not supported: %s\n'
+		;;
+	esac
+	print_error
+	printf "$string" "$OPTION_ARCHITECTURE"
+	exit 1
+}
+
+# display a warning if using --architecture on a pre-2.6 script
+# USAGE: select_package_architecture_warning_unsupported
+# NEEDED_VARS: (LANG)
+# CALLED_BY: select_package_architecture
+select_package_architecture_warning_unsupported() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’option --architecture n’est pas gérée par ce script.'
+		;;
+		('en'|*)
+			string='--architecture option is not supported by this script.'
+		;;
+	esac
+	print_warning
+	printf '%s\n\n' "$string"
 }
 
 # set temporary directories
@@ -1041,8 +1227,10 @@ extract_data_from_print() {
 # USAGE: organize_data $id $path
 # NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) (PKG_PATH)
 organize_data() {
-	if [ -z "$PKG" ]; then
-		organize_data_error_missing_pkg
+	[ -n "$PKG" ] || organize_data_error_missing_pkg
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'organize_data' "$PKG"
+		return 0
 	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"
@@ -1314,6 +1502,10 @@ print_instructions_arch() {
 	local str_format
 	printf 'pacman -U'
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_arch' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
@@ -1371,6 +1563,10 @@ print_instructions_deb_common() {
 	local pkg_path
 	local str_format
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_deb_common' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
@@ -1387,6 +1583,10 @@ print_instructions_deb_common() {
 # NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_launcher' "$PKG"
+		return 0
+	fi
 	write_bin "$@"
 	write_desktop "$@"
 }
@@ -1398,8 +1598,12 @@ write_launcher() {
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_bin' "$PKG"
+		return 0
+	fi
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
+	[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 	local app
 	local app_id
 	local app_exe
@@ -1665,6 +1869,10 @@ write_bin() {
 # CALLS: liberror testvar write_desktop_winecfg
 # CALLED BY: write_launcher
 write_desktop() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_desktop' "$PKG"
+		return 0
+	fi
 	local app
 	local app_cat
 	local app_id
@@ -2025,6 +2233,10 @@ write_metadata() {
 	local pkg_provide
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'write_metadata'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'write_metadata' "$pkg"
+			continue
+		fi
 
 		# Set package-specific variables
 		set_architecture "$pkg"
@@ -2070,6 +2282,10 @@ build_pkg() {
 	local pkg_path
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'build_pkg'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'build_pkg' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
@@ -2743,12 +2959,14 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set allowed values for common options
 
+	ALLOWED_VALUES_ARCHITECTURE='all 32 64 auto'
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	ALLOWED_VALUES_COMPRESSION='none gzip xz'
 	ALLOWED_VALUES_PACKAGE='arch deb'
 
 	# Set default values for common options
 
+	DEFAULT_OPTION_ARCHITECTURE='all'
 	DEFAULT_OPTION_CHECKSUM='md5'
 	DEFAULT_OPTION_COMPRESSION='none'
 	DEFAULT_OPTION_PREFIX='/usr/local'
@@ -2758,6 +2976,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Parse arguments given to the script
 
+	unset OPTION_ARCHITECTURE
 	unset OPTION_CHECKSUM
 	unset OPTION_COMPRESSION
 	unset OPTION_PREFIX
@@ -2770,7 +2989,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				help
 				exit 0
 			;;
-			('--checksum='*|\
+			('--architecture='*|\
+			 '--architecture'|\
+			 '--checksum='*|\
 			 '--checksum'|\
 			 '--compression='*|\
 			 '--compression'|\
@@ -2858,7 +3079,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set options not already set by script arguments to default values
 
-	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
+	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
 		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
 			export OPTION_$option
@@ -2901,6 +3122,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	for option in 'CHECKSUM' 'COMPRESSION' 'PACKAGE'; do
 		check_option_validity "$option"
 	done
+
+	# Restrict packages list to target architecture
+
+	select_package_architecture
 
 	# Check script dependencies
 

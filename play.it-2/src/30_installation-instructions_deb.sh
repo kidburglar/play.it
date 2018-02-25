@@ -44,6 +44,10 @@ print_instructions_deb_common() {
 	local pkg_path
 	local str_format
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_deb_common' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'

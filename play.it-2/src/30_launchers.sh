@@ -3,6 +3,10 @@
 # NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_launcher' "$PKG"
+		return 0
+	fi
 	write_bin "$@"
 	write_desktop "$@"
 }
@@ -14,8 +18,12 @@ write_launcher() {
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_bin' "$PKG"
+		return 0
+	fi
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
-	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
+	[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 	local app
 	local app_id
 	local app_exe
@@ -281,6 +289,10 @@ write_bin() {
 # CALLS: liberror testvar write_desktop_winecfg
 # CALLED BY: write_launcher
 write_desktop() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_desktop' "$PKG"
+		return 0
+	fi
 	local app
 	local app_cat
 	local app_id

@@ -15,6 +15,10 @@ write_metadata() {
 	local pkg_provide
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'write_metadata'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'write_metadata' "$pkg"
+			continue
+		fi
 
 		# Set package-specific variables
 		set_architecture "$pkg"
@@ -60,6 +64,10 @@ build_pkg() {
 	local pkg_path
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'build_pkg'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'build_pkg' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
