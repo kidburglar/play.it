@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180226.1
 
 # Set game-specific variables
 
@@ -90,12 +90,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_BERLIN_ID, $PKG_DATA_HONGKONG_ID, $PKG_DATA_SEATTLE_ID, $PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_BERLIN_ID $PKG_DATA_HONGKONG_ID $PKG_DATA_SEATTLE_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-libxcursor lib32-libxrandr"
+PKG_BIN_DEPS="$PKG_DATA_BERLIN $PKG_DATA_HONGKONG $PKG_DATA_SEATTLE $PKG_DATA_ID glu xcursor libxrandr alsa"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
