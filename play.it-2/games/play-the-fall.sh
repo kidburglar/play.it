@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Fall'
 ARCHIVES_LIST='ARCHIVE_HUMBLE ARCHIVE_HUMBLE_OLD'
 
 ARCHIVE_HUMBLE='TheFall_Linux_2_5.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/the-fall'
 ARCHIVE_HUMBLE_MD5='5493c159ce23d13d68b60f064ab37297'
 ARCHIVE_HUMBLE_SIZE='350000'
 ARCHIVE_HUMBLE_VERSION='2.5-humble171207'

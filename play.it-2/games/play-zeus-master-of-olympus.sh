@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170924.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Zeus: Master of Olympus'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_zeus_and_poseidon_2.1.0.10.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/zeus_poseidon'
 ARCHIVE_GOG_MD5='f26f9ed5ecaa4e58fca64acb88255107'
 ARCHIVE_GOG_SIZE='800000'
 ARCHIVE_GOG_VERSION='2.1-gog2.1.0.10'

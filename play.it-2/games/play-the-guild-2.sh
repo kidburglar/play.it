@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Guild 2'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_guild2_2.0.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_guild_2'
 ARCHIVE_GOG_MD5='2b14191f4831b3486e95d52245d6cc64'
 ARCHIVE_GOG_SIZE='2400000'
 ARCHIVE_GOG_VERSION='1.4-gog2.0.0.4'

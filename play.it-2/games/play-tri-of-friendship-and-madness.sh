@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='TRI: Of Friendship and Madness'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_tri_2.6.0.9.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/tri'
 ARCHIVE_GOG_MD5='c2bf151b58766740e52db9559d61e3d6'
 ARCHIVE_GOG_SIZE='470000'
 ARCHIVE_GOG_VERSION='1.2-gog2.6.0.9'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Guild 2 Renaissance'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_guild2_renaissance_2.2.0.5.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_guild_2_renaissance'
 ARCHIVE_GOG_MD5='86389c3154c2ea6ef3b072278f1e9c6c'
 ARCHIVE_GOG_SIZE='3800000'
 ARCHIVE_GOG_VERSION='4.21-gog2.2.0.5'

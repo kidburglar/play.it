@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180106.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Paws: A Shelter 2 Game'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_paws_a_shelter_2_game_2.1.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/paws_a_shelter_2_game'
 ARCHIVE_GOG_MD5='51423901b52f063e6b6561622a5a7bae'
 ARCHIVE_GOG_SIZE='1800000'
 ARCHIVE_GOG_VERSION='2017.05.11-gog2.1.0.3'

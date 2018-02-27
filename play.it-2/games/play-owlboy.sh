@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171209.4
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -52,6 +52,7 @@ ARCHIVE_HUMBLE_VERSION='1.3.6515.19883-humble171102'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 
 ARCHIVE_HUMBLE_OLD='owlboy-05232017-bin'
+ARCHIVE_HUMBLE_OLD_URL='https://www.humblebundle.com/store/owlboy'
 ARCHIVE_HUMBLE_OLD_MD5='f35fba69fadffbf498ca8a38dbceeac1'
 ARCHIVE_HUMBLE_OLD_SIZE='570000'
 ARCHIVE_HUMBLE_OLD_VERSION='1.2.6382.15868-humble1'

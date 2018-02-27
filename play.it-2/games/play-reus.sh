@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170810.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Reus'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_reus_2.0.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/reus'
 ARCHIVE_GOG_MD5='25fe7ec93305e804558e4ef8a31fbbf8'
 ARCHIVE_GOG_SIZE='480000'
 ARCHIVE_GOG_VERSION='1.5.1-gog2.0.0.2'
 
 ARCHIVE_HUMBLE='reus_linux_1389636757-bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/reus'
 ARCHIVE_HUMBLE_MD5='9914e7fcb5f3b761941169ae13ec205c'
 ARCHIVE_HUMBLE_SIZE='380000'
 ARCHIVE_HUMBLE_TYPE='mojosetup'

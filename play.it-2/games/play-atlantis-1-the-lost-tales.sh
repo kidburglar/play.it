@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171230.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Atlantis: The Lost Tales'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_atlantis_the_lost_tales_2.0.0.15.exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/atlantis_the_lost_tales'
 ARCHIVE_GOG_EN_MD5='287170bea9041b4e29888d97f87eb9fc'
 ARCHIVE_GOG_EN_VERSION='1.0-gog2.0.0.15'
 ARCHIVE_GOG_EN_SIZE='1900000'
 
 ARCHIVE_GOG_FR='setup_atlantis_the_lost_tales_french_2.1.0.15.exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/atlantis_the_lost_tales'
 ARCHIVE_GOG_FR_MD5='0cb6b037a457d35dacd23e1f22aea57b'
 ARCHIVE_GOG_FR_VERSION='1.0-gog2.1.0.15'
 ARCHIVE_GOG_FR_SIZE='1900000'

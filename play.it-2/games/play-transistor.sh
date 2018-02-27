@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Transistor'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_transistor_2.0.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/transistor'
 ARCHIVE_GOG_MD5='53dbaf643471f3b8494548261584dd13'
 ARCHIVE_GOG_SIZE='3200000'
 ARCHIVE_GOG_VERSION='1.20140310-gog2.0.0.3'

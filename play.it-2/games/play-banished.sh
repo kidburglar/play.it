@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180113.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Banished'
 ARCHIVES_LIST='ARCHIVE_GOG_32 ARCHIVE_GOG_64'
 
 ARCHIVE_GOG_32='setup_banished_32_1.0.7_(14938).exe'
+ARCHIVE_GOG_32_URL='https://www.gog.com/game/banished'
 ARCHIVE_GOG_32_MD5='43042701a692f186d467b97e966fb846'
 ARCHIVE_GOG_32_VERSION='1.0.7-gog14938'
 ARCHIVE_GOG_32_SIZE='190000'
 
 ARCHIVE_GOG_64='setup_banished_64_1.0.7_(14938).exe'
+ARCHIVE_GOG_64_URL='https://www.gog.com/game/banished'
 ARCHIVE_GOG_64_MD5='463b2720c5c88c28f24de9176b8b1ec4'
 ARCHIVE_GOG_64_VERSION='1.0.7-gog14938'
 ARCHIVE_GOG_64_SIZE='190000'

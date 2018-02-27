@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180128.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dex'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='dex_en_6_0_0_0_build_5553_17130.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/dex'
 ARCHIVE_GOG_MD5='3d6f8797fab72dcb867c92bf5a84b4dd'
 ARCHIVE_GOG_SIZE='6300000'
 ARCHIVE_GOG_VERSION='6.0.0.0.5553-gog17130'

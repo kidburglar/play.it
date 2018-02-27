@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180210.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Unmechanical'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_unmechanical_2.1.0.4.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/unmechanical'
 ARCHIVE_GOG_MD5='44453abb32e21b94e9731938486c71f7'
 ARCHIVE_GOG_SIZE='1600000'
 ARCHIVE_GOG_VERSION='2.0-gog2.1.0.4'

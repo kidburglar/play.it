@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Don’t Starve: Reign Of Giants'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='don_t_starve_reign_of_giants_dlc_en_20171215_17628.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/dont_starve_reign_of_giants'
 ARCHIVE_GOG_MD5='47084ab8d5b36437e1bcb899c35bfe00'
 ARCHIVE_GOG_SIZE='400000'
 ARCHIVE_GOG_TYPE='mojosetup'

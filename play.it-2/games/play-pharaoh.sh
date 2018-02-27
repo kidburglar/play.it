@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170923.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pharaoh'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_pharaoh_gold_2.1.0.15.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pharaoh_cleopatra'
 ARCHIVE_GOG_MD5='62298f00f1f2268c8d5004f5b2e9fc93'
 ARCHIVE_GOG_SIZE='810000'
 ARCHIVE_GOG_VERSION='2.1-gog2.1.0.15'

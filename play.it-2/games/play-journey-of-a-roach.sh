@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170625.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Journey of a Roach'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='JoaR_1.3_PC_Full_Multi_Daedalic_ESD.exe'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/journey-of-a-roach'
 ARCHIVE_HUMBLE_MD5='e349a84f7b8ac095b06edea521cade8f'
 ARCHIVE_HUMBLE_VERSION='1.30.011-humble160915'
 ARCHIVE_HUMBLE_SIZE='1600000'

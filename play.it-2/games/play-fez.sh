@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Fez'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='fez-11282016-bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/fez'
 ARCHIVE_HUMBLE_MD5='333d2e5f55adbd251b09e01d4da213c6'
 ARCHIVE_HUMBLE_SIZE='440000'
 ARCHIVE_HUMBLE_VERSION='1.12-humble161128'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Whispered World'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_the_whispered_world_special_edition_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_whispered_world_special_edition'
 ARCHIVE_GOG_MD5='485368f130f2d82f564a0159cd497437'
 ARCHIVE_GOG_SIZE='2200000'
 ARCHIVE_GOG_VERSION='3.2.0418-gog2.0.0.1'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180211.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Little Big Adventure 2'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_lba2_2.1.0.8.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/little_big_adventure_2'
 ARCHIVE_GOG_MD5='9909163b7285bd37417f6d3c1ccfa3ee'
 ARCHIVE_GOG_SIZE='750000'
 ARCHIVE_GOG_VERSION='1.0-gog12.1.0.8'

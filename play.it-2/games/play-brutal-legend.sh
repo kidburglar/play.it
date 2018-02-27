@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,12 +44,14 @@ GAME_NAME='Brütal Legend'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_brutal_legend_2.0.0.3.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/brutal_legend'
 ARCHIVE_GOG_MD5='f5927fb8b3959c52e2117584475ffe49'
 ARCHIVE_GOG_SIZE='8800000'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.3'
 
 ARCHIVE_HUMBLE='BrutalLegend-Linux-2013-06-15-setup.bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/brutal-legend'
 ARCHIVE_HUMBLE_MD5='cbda6ae12aafe20a76f4d45367430d32'
 ARCHIVE_HUMBLE_SIZE='8800000'
 ARCHIVE_HUMBLE_TYPE='mojosetup_unzip'

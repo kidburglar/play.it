@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171101.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -45,6 +45,7 @@ GAME_NAME='Darkest Dungeon: The Crimson Court'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
 ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21096_16065.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/darkest_dungeon_the_crimson_court'
 ARCHIVE_GOG_MD5='d4beaeb7effff0cbd2e292abf0ef5332'
 ARCHIVE_GOG_SIZE='350000'
 ARCHIVE_GOG_VERSION='21096-gog16066'

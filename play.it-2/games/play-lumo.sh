@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Lumo'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_lumo_2.3.0.4.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/lumo'
 ARCHIVE_GOG_MD5='76cf720f68446eca8d89dc58cc9c4f7b'
 ARCHIVE_GOG_SIZE='3400000'
 ARCHIVE_GOG_VERSION='1.7018-gog2.3.0.4'

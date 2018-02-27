@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Theme Hospital'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_theme_hospital_2.1.0.8.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/theme_hospital'
 ARCHIVE_GOG_MD5='c1dc6cd19a3e22f7f7b31a72957babf7'
 ARCHIVE_GOG_SIZE='210000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.7'

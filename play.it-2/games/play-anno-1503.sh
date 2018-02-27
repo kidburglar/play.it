@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Anno 1503'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_anno_1503_2.0.0.5.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/anno_1503_ad'
 ARCHIVE_GOG_MD5='a7b6aeb2c5f96e2fab12d1ef12f3b4af'
 ARCHIVE_GOG_VERSION='3.0.43-gog2.0.0.5'
 ARCHIVE_GOG_SIZE='1520000'

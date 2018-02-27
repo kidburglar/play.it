@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='To The Moon'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='ToTheMoon_linux_1389114090.sh'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/to-the-moon'
 ARCHIVE_HUMBLE_MD5='706a5c9467328438d412370ffb1454de'
 ARCHIVE_HUMBLE_SIZE='93000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble1'

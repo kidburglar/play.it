@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180101.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,12 +44,14 @@ GAME_NAME='Shelter 2'
 ARCHIVES_LIST='ARCHIVE_MOUNTAINS_GOG ARCHIVE_GOG'
 
 ARCHIVE_MOUNTAINS_GOG='gog_shelter_2_mountains_dlc_2.0.0.1.sh'
+ARCHIVE_MOUNTAINS_GOG_URL='https://www.gog.com/game/shelter_2_mountains'
 ARCHIVE_MOUNTAINS_GOG_MD5='ffe25b4ac5d75b9a30ed983634397d85'
 ARCHIVE_MOUNTAINS_GOG_SIZE='2500000'
 ARCHIVE_MOUNTAINS_GOG_VERSION='1.0-gog2.0.0.1'
 ARCHIVE_MOUNTAINS_GOG_TYPE='mojosetup'
 
 ARCHIVE_GOG='gog_shelter_2_2.5.0.10.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/shelter_2'
 ARCHIVE_GOG_MD5='f2bf2e188667133ad117b5bff846e66e'
 ARCHIVE_GOG_SIZE='2200000'
 ARCHIVE_GOG_VERSION='20150708-gog2.5.0.10'

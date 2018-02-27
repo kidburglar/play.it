@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171206.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Gomo'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_gomo_2.1.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/gomo'
 ARCHIVE_GOG_MD5='5ee422dff6f00976e170296103dd29e6'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.4'
 ARCHIVE_GOG_SIZE='560000'

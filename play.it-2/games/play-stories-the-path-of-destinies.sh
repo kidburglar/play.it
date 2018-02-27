@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180209.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Stories: The Path of Destinies'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_stories_-_the_path_of_destinies_0.0.13825_(16929).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/stories_the_path_of_destinies'
 ARCHIVE_GOG_MD5='6f81dbadddbb4b30b4edda9ced9ddef8'
 ARCHIVE_GOG_VERSION='0.0.13825-gog16929'
 ARCHIVE_GOG_SIZE='1700000'

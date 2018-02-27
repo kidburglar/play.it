@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Anomaly Defenders'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='AnomalyDefenders_Linux_1402512837.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/anomaly-defenders'
 ARCHIVE_HUMBLE_MD5='35ccd57e8650dd53a09b1f1e088307cc'
 ARCHIVE_HUMBLE_SIZE='640000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble'

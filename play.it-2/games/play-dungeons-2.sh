@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dungeons 2'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_dungeons_2_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/dungeons_2'
 ARCHIVE_GOG_MD5='990a4ded53d43f28e4e16c0885f515cd'
 ARCHIVE_GOG_SIZE='5100000'
 ARCHIVE_GOG_VERSION='1.6.1.29-gog2.0.0.1'

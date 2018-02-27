@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180114.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Deus Ex'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
 ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.3.1)_(17719).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/deus_ex'
 ARCHIVE_GOG_MD5='92e9e6a33642f9e6c41cb24055df9b3c'
 ARCHIVE_GOG_VERSION='1.112fm-gog17719'
 ARCHIVE_GOG_SIZE='750000'

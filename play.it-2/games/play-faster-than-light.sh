@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180221.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Faster Than Light'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='ftl_advanced_edition_en_1_6_7_18662.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/faster_than_light'
 ARCHIVE_GOG_MD5='2c5254547639b7718dac7a06dabd1d82'
 ARCHIVE_GOG_SIZE='210000'
 ARCHIVE_GOG_VERSION='1.6.7-gog18662'
@@ -61,6 +62,7 @@ ARCHIVE_GOG_OLDER_SIZE='220000'
 ARCHIVE_GOG_OLDER_VERSION='1.5.13-gog2.0.0.2'
 
 ARCHIVE_HUMBLE='FTL.1.5.13.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/ftl-faster-than-light'
 ARCHIVE_HUMBLE_MD5='791e0bc8de73fcdcd5f461a4548ea2d8'
 ARCHIVE_HUMBLE_SIZE='220000'
 ARCHIVE_HUMBLE_VERSION='1.5.13-humble140602'

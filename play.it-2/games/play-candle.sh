@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Candle'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_candle_2.3.0.5.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/candle'
 ARCHIVE_GOG_MD5='4d60d0a24f5932207f6406a8ad0545be'
 ARCHIVE_GOG_SIZE='11000000'
 ARCHIVE_GOG_VERSION='1.1.17-gog2.3.0.5'

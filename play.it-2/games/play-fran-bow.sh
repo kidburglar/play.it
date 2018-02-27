@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180214.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Fran Bow'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_fran_bow_2.3.0.5.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/fran_bow'
 ARCHIVE_GOG_MD5='6e3013e9c8be4d25e1815f00bc177941'
 ARCHIVE_GOG_SIZE='530000'
 ARCHIVE_GOG_VERSION='160315-gog2.3.0.5'

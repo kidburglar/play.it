@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Fotonica'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='FOTONICA_LINUX.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/fotonica'
 ARCHIVE_HUMBLE_MD5='33b8918b21c03ae0289e7050c661b534'
 ARCHIVE_HUMBLE_SIZE='300000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble'

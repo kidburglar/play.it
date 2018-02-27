@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180121.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -46,6 +46,7 @@ GAME_NAME='I Have No Mouth And I Must Scream'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
 ARCHIVE_GOG_EN='i_have_no_mouth_and_i_must_scream_en_1_0_17913.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/i_have_no_mouth_and_i_must_scream'
 ARCHIVE_GOG_EN_MD5='93640c6a4dc73f4ed2d40b210b95ba4c'
 ARCHIVE_GOG_EN_SIZE='750000'
 ARCHIVE_GOG_EN_VERSION='1.0-gog17913'
@@ -57,6 +58,7 @@ ARCHIVE_GOG_EN_OLD_SIZE='780000'
 ARCHIVE_GOG_EN_OLD_VERSION='1.0-gog2.0.0.4'
 
 ARCHIVE_GOG_FR='i_have_no_mouth_and_i_must_scream_fr_1_0_17913.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/i_have_no_mouth_and_i_must_scream'
 ARCHIVE_GOG_FR_MD5='9124d7ccef36d4bb01dfae4d97cfbdea'
 ARCHIVE_GOG_FR_SIZE='570000'
 ARCHIVE_GOG_FR_VERSION='1.0-gog17913'

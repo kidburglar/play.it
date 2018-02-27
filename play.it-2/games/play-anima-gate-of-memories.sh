@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Anima: Gate of Memories'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_anima_gate_of_memories_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/anima_gate_of_memories'
 ARCHIVE_GOG_MD5='681d05255e1a162947af69d3e7537748'
 ARCHIVE_GOG_SIZE='8900000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Elder Scrolls: Arena'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_tes_arena_2.0.0.5.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_elder_scrolls_iii_morrowind_goty_edition'
 ARCHIVE_GOG_MD5='ca5a894aa852f9dbb3ede787e51ec828'
 ARCHIVE_GOG_SIZE='130000'
 ARCHIVE_GOG_VERSION='1.07-gog2.0.0.5'

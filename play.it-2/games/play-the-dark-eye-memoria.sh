@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Dark Eye: Memoria'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_memoria_2.0.0.3.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/memoria'
 ARCHIVE_GOG_MD5='847c7b5e27a287d6e0e17e63bfb14fff'
 ARCHIVE_GOG_SIZE='9100000'
 ARCHIVE_GOG_VERSION='1.36.0053-gog2.0.0.3'

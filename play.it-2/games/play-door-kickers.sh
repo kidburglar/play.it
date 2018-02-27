@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Door Kickers'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_door_kickers_2.7.0.11.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/door_kickers'
 ARCHIVE_GOG_MD5='29efa58e4a61060b0b1211dddd2476a1'
 ARCHIVE_GOG_SIZE='1400000'
 ARCHIVE_GOG_VERSION='1.0.9-gog2.7.0.11'
 
 ARCHIVE_HUMBLE='DoorKickers1448920440.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/door-kickers'
 ARCHIVE_HUMBLE_MD5='0126db31867ae0e7a7eceee54de4a177'
 ARCHIVE_HUMBLE_SIZE='1400000'
 ARCHIVE_HUMBLE_VERSION='1.0.9-humble151130'

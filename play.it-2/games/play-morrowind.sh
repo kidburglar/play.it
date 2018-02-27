@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180114.5
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='The Elder Scrolls III: Morrowind'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_tes_morrowind_goty_2.0.0.7.exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/the_elder_scrolls_iii_morrowind_goty_edition'
 ARCHIVE_GOG_EN_MD5='3a027504a0e4599f8c6b5b5bcc87a5c6'
 ARCHIVE_GOG_EN_VERSION='1.6.1820-gog2.0.0.7'
 ARCHIVE_GOG_EN_SIZE='2300000'
 
 ARCHIVE_GOG_FR='setup_tes_morrowind_goty_french_2.0.0.7.exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/the_elder_scrolls_iii_morrowind_goty_edition'
 ARCHIVE_GOG_FR_MD5='2aee024e622786b2cb5454ff074faf9b'
 ARCHIVE_GOG_FR_VERSION='1.6.1820-gog2.0.0.7'
 ARCHIVE_GOG_FR_SIZE='2300000'

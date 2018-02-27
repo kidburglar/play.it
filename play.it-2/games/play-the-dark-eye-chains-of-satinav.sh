@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170702.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Dark Eye: Chains of Satinav'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_dark_eye_chains_of_satinav_2.0.0.4.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_dark_eye_chains_of_satinav'
 ARCHIVE_GOG_MD5='d1c375ba007b7ed6574a16cca823258a'
 ARCHIVE_GOG_SIZE='5500000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.4'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Anomaly 2'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Anomaly2_Linux_1387299615.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/anomaly-2'
 ARCHIVE_HUMBLE_MD5='46f0ecd5363106e9eae8642836c29dfc'
 ARCHIVE_HUMBLE_SIZE='2500000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble1'

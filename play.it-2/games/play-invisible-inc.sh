@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Invisible Inc.'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='invisible_inc_en_8_07_2017_15873.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/invisible_inc'
 ARCHIVE_GOG_MD5='b3acb8f72cf01f71b0ddcb4355543a16'
 ARCHIVE_GOG_SIZE='1200000'
 ARCHIVE_GOG_VERSION='2017.07.08-gog15873'

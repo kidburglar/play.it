@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180119.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Anno 1404'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='setup_anno_1404_gold_edition_2.01.5010_(13111).exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/anno_1404_gold_edition'
 ARCHIVE_GOG_MD5='b19333f57c1c15b788e29ff6751dac20'
 ARCHIVE_GOG_VERSION='2.01.5010-gog13111'
 ARCHIVE_GOG_SIZE='6200000'

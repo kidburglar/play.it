@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180124.6
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Hammerwatch'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_hammerwatch_2.1.0.7.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/hammerwatch'
 ARCHIVE_GOG_MD5='2d1f01b73f43e0b6399ab578c52c6cb6'
 ARCHIVE_GOG_SIZE='230000'
 ARCHIVE_GOG_VERSION='1.32-gog2.1.0.7'
 
 ARCHIVE_HUMBLE='hammerwatch_linux1.32.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/hammerwatch'
 ARCHIVE_HUMBLE_MD5='c31f4053bcde3dc34bc8efe5f232c26e'
 ARCHIVE_HUMBLE_SIZE='230000'
 ARCHIVE_HUMBLE_VERSION='1.32-humble160405'

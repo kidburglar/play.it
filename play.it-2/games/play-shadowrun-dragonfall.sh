@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Shadowrun: Dragonfall'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_shadowrun_dragonfall_director_s_cut_2.6.0.11.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/shadowrun_dragonfall_directors_cut'
 ARCHIVE_GOG_MD5='ee3db5bc8554852337b063b993f66012'
 ARCHIVE_GOG_SIZE='7200000'
 ARCHIVE_GOG_VERSION='2.0.9-gog2.6.0.11'
 
 ARCHIVE_HUMBLE='shadowrun-dragonfall-linux.tar.gz_2.0.9.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/shadowrun-dragonfall-directors-cut'
 ARCHIVE_HUMBLE_MD5='49e88d170e086c01c4dcb19154875cca'
 ARCHIVE_HUMBLE_VERSION='2.0.9-humble1'
 ARCHIVE_HUMBLE_SIZE='7200000'
@@ -94,12 +96,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_BERLIN_ID, $PKG_DATA_SEATTLE_ID, $PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libqtgui4, libqt4-network, libxcursor1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_BERLIN_ID $PKG_DATA_SEATTLE_ID $PKG_DATA_ID lib32-glu lib32-qt4 lib32-libxcursor lib32-libxrandr"
+PKG_BIN_DEPS="$PKG_DATA_BERLIN $PKG_DATA_SEATTLE $PKG_DATA_ID glu xcursor libxrandr alsa"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

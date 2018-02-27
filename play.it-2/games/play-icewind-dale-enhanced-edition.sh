@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180214.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Icewind Dale - Enhanced Edition'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_icewind_dale_enhanced_edition_2.1.0.5.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/icewind_dale_enhanced_edition'
 ARCHIVE_GOG_MD5='fc7244f4793eec365b8ac41d91a4edbb'
 ARCHIVE_GOG_SIZE='2900000'
 ARCHIVE_GOG_VERSION='1.4.0-gog2.1.0.5'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180208.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Braveland Pirate'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
 ARCHIVE_GOG='braveland_pirate_en_1_1_0_9_18418.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/braveland_pirate'
 ARCHIVE_GOG_MD5='445b705cc11b58fd289064aa78ef9210'
 ARCHIVE_GOG_SIZE='610000'
 ARCHIVE_GOG_VERSION='1.1.0.9-gog18418'

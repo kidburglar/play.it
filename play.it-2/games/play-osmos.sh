@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Osmos'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Osmos_1.6.1.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/osmos'
 ARCHIVE_HUMBLE_MD5='ed2cb029c20c25de719c28062e6fc9cf'
 ARCHIVE_HUMBLE_SIZE='32000'
 ARCHIVE_HUMBLE_VERSION='1.6.1-humble1'

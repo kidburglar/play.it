@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180214.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Fear Equation'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_fear_equation_2.1.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/fear_equation'
 ARCHIVE_GOG_MD5='5bf5e55b87d8a9a2256a0a56531692c7'
 ARCHIVE_GOG_SIZE='900000'
 ARCHIVE_GOG_VERSION='2.0.2-gog2.1.0.2'

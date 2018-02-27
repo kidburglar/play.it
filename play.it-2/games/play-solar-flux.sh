@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180113.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Solar Flux'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='SolarFluxLinux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/solar-flux'
 ARCHIVE_HUMBLE_MD5='9e2faa973a4affef9ddb1205f5f82019'
 ARCHIVE_HUMBLE_SIZE='220000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble1'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171231.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Little Acre'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='the_little_acre_en_gog_3_14723.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_little_acre'
 ARCHIVE_GOG_MD5='ef9dc3c9600bee4dbf64b29d46b718c6'
 ARCHIVE_GOG_SIZE='3000000'
 ARCHIVE_GOG_VERSION='3-gog14723'

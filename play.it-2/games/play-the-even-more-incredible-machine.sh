@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Even More Incredible Machine'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_even_more_incredible_machine_2.1.0.24.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_incredible_machine_mega_pack'
 ARCHIVE_GOG_MD5='0486b8d5e65ea49ebf59b62a06cb9edd'
 ARCHIVE_GOG_SIZE='21000'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.24'

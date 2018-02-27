@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='King’s Bounty: The Legend'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
 ARCHIVE_GOG_EN='setup_kings_bounty_the_legend_1.7_(15542).exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/kings_bounty_the_legend'
 ARCHIVE_GOG_EN_MD5='f7a9defe0fd96a7f8d6dff6ed7828242'
 ARCHIVE_GOG_EN_TYPE='innosetup'
 ARCHIVE_GOG_EN_VERSION='1.7-gog15542'
@@ -53,6 +54,7 @@ ARCHIVE_GOG_EN_PART1_MD5='04fb818107e4bfe7aeae449778e88dd9'
 ARCHIVE_GOG_EN_PART1_TYPE='innosetup'
 
 ARCHIVE_GOG_FR='setup_kings_bounty_the_legend_french_1.7_(15542).exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/kings_bounty_the_legend'
 ARCHIVE_GOG_FR_MD5='646fdfacadc498826be127fe6703f259'
 ARCHIVE_GOG_FR_TYPE='innosetup'
 ARCHIVE_GOG_FR_VERSION='1.7-gog15542'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170830.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Longest Journey'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_the_longest_journey_2.0.0.12.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_longest_journey'
 ARCHIVE_GOG_MD5='89b3cae144856579ed5fee10ecc76154'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.12'
 ARCHIVE_GOG_SIZE='1900000'

@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170617.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Beyond Good and Evil'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_beyond_good_and_evil_2.1.0.9.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/beyond_good_and_evil'
 ARCHIVE_GOG_MD5='fdfa4b94cf02e24523b01c9d54568482'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.9'
 ARCHIVE_GOG_SIZE='2200000'

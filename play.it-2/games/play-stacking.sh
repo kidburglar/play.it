@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Stacking'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Stacking-Linux-2013-06-04-setup.bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/stacking'
 ARCHIVE_HUMBLE_MD5='4194bb869d537d40da7ad7f65b1102ed'
 ARCHIVE_HUMBLE_SIZE='1600000'
 ARCHIVE_HUMBLE_VERSION='130604-humble160616'

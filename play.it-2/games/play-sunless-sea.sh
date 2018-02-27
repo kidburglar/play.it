@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,16 +44,19 @@ GAME_NAME='Sunless Sea'
 ARCHIVES_LIST='ARCHIVE_ZUBMARINER_GOG ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_ZUBMARINER_GOG='gog_sunless_sea_zubmariner_2.5.0.6.sh'
+ARCHIVE_ZUBMARINER_GOG_URL='https://www.gog.com/game/sunless_sea_zubmariner'
 ARCHIVE_ZUBMARINER_GOG_MD5='692cd0dac832d5254bd38d7e1a05b918'
 ARCHIVE_ZUBMARINER_GOG_VERSION='2.2.2.3130-gog2.5.0.6'
 ARCHIVE_ZUBMARINER_GOG_SIZE='870000'
 
 ARCHIVE_GOG='gog_sunless_sea_2.8.0.11.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/sunless_sea'
 ARCHIVE_GOG_MD5='1cf6bb7a440ce796abf8e7afcb6f7a54'
 ARCHIVE_GOG_VERSION='2.2.2.3129-gog2.8.0.11'
 ARCHIVE_GOG_SIZE='700000'
 
 ARCHIVE_HUMBLE='Sunless_Sea_Setup_V2.2.2.3129_LINUX.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/sunless-sea'
 ARCHIVE_HUMBLE_MD5='bdb37932e56fd0655a2e4263631e2582'
 ARCHIVE_HUMBLE_VERSION='2.2.2.3129-humble170131'
 ARCHIVE_HUMBLE_SIZE='700000'

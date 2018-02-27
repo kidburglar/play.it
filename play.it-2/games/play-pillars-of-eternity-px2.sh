@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180107.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pillars of Eternity: The White March Part II'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
 
 ARCHIVE_GOG='pillars_of_eternity_white_march_part_2_dlc_en_3_07_0_1318_17464.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pillars_of_eternity_the_white_march_part_2'
 ARCHIVE_GOG_MD5='03067ebdd878cc16c283f63ddf015e90'
 ARCHIVE_GOG_SIZE='4400000'
 ARCHIVE_GOG_VERSION='3.7.0.1318-gog17464'

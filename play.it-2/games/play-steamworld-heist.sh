@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171208.3
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Steamworld Heist'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='SteamWorldHeist.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/steamworld-heist'
 ARCHIVE_HUMBLE_MD5='79a499459c09d7881efeb95be7abc559'
 ARCHIVE_HUMBLE_VERSION='1.0-humble1'
 ARCHIVE_HUMBLE_SIZE='200000'

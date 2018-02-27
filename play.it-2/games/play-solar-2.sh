@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Solar 2'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='solar2-linux-1.10_1409159048.tar.gz'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/solar-2'
 ARCHIVE_HUMBLE_MD5='243918907eea486fdc820b7cac0c260b'
 ARCHIVE_HUMBLE_SIZE='130000'
 ARCHIVE_HUMBLE_VERSION='1.10-humble1'

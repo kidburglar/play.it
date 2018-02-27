@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Tulpa'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Tulpa_Linux_1423847478.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/tulpa'
 ARCHIVE_HUMBLE_MD5='3e01614c5c1c562aaf423689a1f51df9'
 ARCHIVE_HUMBLE_SIZE='820000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble150213'

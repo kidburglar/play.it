@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180227.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Shadowrun: Hong Kong'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_shadowrun_hong_kong_extended_edition_2.8.0.11.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/shadowrun_hong_kong_extended_edition'
 ARCHIVE_GOG_MD5='643ba68e47c309d391a6482f838e46af'
 ARCHIVE_GOG_SIZE='12000000'
 ARCHIVE_GOG_VERSION='3.1.2-gog2.8.0.11'
@@ -90,12 +91,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_BERLIN_ID, $PKG_DATA_HONGKONG_ID, $PKG_DATA_SEATTLE_ID, $PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_BERLIN_ID $PKG_DATA_HONGKONG_ID $PKG_DATA_SEATTLE_ID $PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-glu lib32-libxcursor lib32-libxrandr"
+PKG_BIN_DEPS="$PKG_DATA_BERLIN $PKG_DATA_HONGKONG $PKG_DATA_SEATTLE $PKG_DATA_ID glu xcursor libxrandr alsa"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.5'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

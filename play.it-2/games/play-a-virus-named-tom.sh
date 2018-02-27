@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='A Virus Named Tom'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='avnt-09172013-bin'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/a-virus-named-tom'
 ARCHIVE_HUMBLE_MD5='85d11d3f05ad966a06a7e2f77e2fee45'
 ARCHIVE_HUMBLE_SIZE='270000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble1'

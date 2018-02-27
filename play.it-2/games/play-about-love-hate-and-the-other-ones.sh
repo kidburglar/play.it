@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170822.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='About Love, Hate and the Other Ones'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='aboutloveandhate-1.3.1.deb'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/about-love-hate-and-the-other-ones'
 ARCHIVE_HUMBLE_MD5='65c314a2a970b5c787d4e7e2a837e211'
 ARCHIVE_HUMBLE_SIZE='570000'
 ARCHIVE_HUMBLE_VERSION='1.3.1-humble150312'

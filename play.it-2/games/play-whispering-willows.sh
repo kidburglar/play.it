@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Whispering Willows'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='LINUX_NO_STEAM.rar'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/whispering-willows'
 ARCHIVE_HUMBLE_MD5='56c078a0208769ab2222f7e1cc0e0d57'
 ARCHIVE_HUMBLE_SIZE='1900000'
 ARCHIVE_HUMBLE_VERSION='1.26-humble151125'

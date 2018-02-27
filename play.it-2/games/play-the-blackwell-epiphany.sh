@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='The Blackwell Epiphany'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_blackwell_epiphany_2.0.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/blackwell_epiphany_the'
 ARCHIVE_GOG_MD5='058091975ee359d7bc0f9d9848052296'
 ARCHIVE_GOG_SIZE='1500000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'

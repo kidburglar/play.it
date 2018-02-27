@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Haven Moon'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='HavenMoon_LINUX.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/haven-moon'
 ARCHIVE_HUMBLE_MD5='2698639eaad59d4d01c10694bf63188e'
 ARCHIVE_HUMBLE_SIZE='1200000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble161213'

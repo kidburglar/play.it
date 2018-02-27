@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171228.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Day of the Tentacle Remastered'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_day_of_the_tentacle_remastered_2.1.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/day_of_the_tentacle_remastered'
 ARCHIVE_GOG_MD5='612c59c5cbdbf4d73322b46527a2d502'
 ARCHIVE_GOG_SIZE='2700000'
 ARCHIVE_GOG_VERSION='1.4.1-gog2.1.0.2'

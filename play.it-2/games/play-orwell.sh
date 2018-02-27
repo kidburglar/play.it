@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Orwell'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_orwell_2.0.0.1.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/orwell'
 ARCHIVE_GOG_MD5='471470546952015fce024bdcb5431a07'
 ARCHIVE_GOG_SIZE='630000'
 ARCHIVE_GOG_VERSION='1.1-gog2.0.0.1'

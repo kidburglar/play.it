@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171222.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Hand Of Fate'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_hand_of_fate_2.12.0.16.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/hand_of_fate'
 ARCHIVE_GOG_MD5='54c61dce76b1281b4161d53d096d6ffe'
 ARCHIVE_GOG_SIZE='1700000'
 ARCHIVE_GOG_VERSION='2.12.0.16-gog1.3.17'

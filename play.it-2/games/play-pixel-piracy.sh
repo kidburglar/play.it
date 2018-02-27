@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180217.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Pixel Piracy'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_pixel_piracy_2.5.0.9.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pixel_piracy'
 ARCHIVE_GOG_MD5='b689db9e42afa0a83d364f95cfb4d6bf'
 ARCHIVE_GOG_SIZE='290000'
 ARCHIVE_GOG_VERSION='1.1.21-gog2.5.0.9'

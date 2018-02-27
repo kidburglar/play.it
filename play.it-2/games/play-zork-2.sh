@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170608.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Zork II: The Wizard of Frobozz'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_zork2_2.1.0.17.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_zork_anthology'
 ARCHIVE_GOG_MD5='2ea2cf45bb6cf76b0365567e81f27aab'
 ARCHIVE_GOG_SIZE='23000'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.17'

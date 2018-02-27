@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180130.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Melody’s Escape'
 ARCHIVES_LIST='ARCHIVE_HUMBLE'
 
 ARCHIVE_HUMBLE='Melodys_Escape_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/melodys-escape'
 ARCHIVE_HUMBLE_MD5='4d463482418c2d9917c56df3bbde6eea'
 ARCHIVE_HUMBLE_SIZE='60000'
 ARCHIVE_HUMBLE_VERSION='1.0-humble160601'

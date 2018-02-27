@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20170523.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Zork III: The Dungeon Master'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_zork3_2.1.0.17.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_zork_anthology'
 ARCHIVE_GOG_MD5='1526e9be21bf47412dc053f4097e25bd'
 ARCHIVE_GOG_SIZE='23000'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.17'

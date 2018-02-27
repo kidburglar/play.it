@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171217.2
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Worms Armageddon'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_worms_armageddon_2.0.0.2.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/worms_armageddon'
 ARCHIVE_GOG_MD5='7f0bb89729662ebe74b7c9c2cd97d1c8'
 ARCHIVE_GOG_VERSION='3.7.2.1-gog2.0.0.2'
 ARCHIVE_GOG_SIZE='570000'

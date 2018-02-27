@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171115.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Star Vikings (demo)'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='gog_star_vikings_demo_2.1.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/star_vikings_demo'
 ARCHIVE_GOG_MD5='9eea4e30b81ae17790db3a63f7bea382'
 ARCHIVE_GOG_SIZE='550000'
 ARCHIVE_GOG_VERSION='1.0-gog2.1.0.2'

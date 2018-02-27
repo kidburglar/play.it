@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20171230.1
+script_version=20180224.1
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='Dungeon Keeper II'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_dungeon_keeper2_2.0.0.32.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/dungeon_keeper_2'
 ARCHIVE_GOG_MD5='92d04f84dd870d9624cd18449d3622a5'
 ARCHIVE_GOG_SIZE='510000'
 ARCHIVE_GOG_VERSION='1.7-gog2.0.0.32'
