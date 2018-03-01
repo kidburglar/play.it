@@ -7,6 +7,7 @@ print_instructions() {
 		print_instructions $PACKAGES_LIST
 		return 0
 	fi
+	local string
 	case "${LANG%_*}" in
 		('fr')
 			string='\nInstallez %s en lançant la série de commandes suivantes en root :\n'

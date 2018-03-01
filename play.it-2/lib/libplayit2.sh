@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.3~dev
-library_revision=20180224.1
+library_revision=20180302.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1283,6 +1283,7 @@ print_instructions() {
 		print_instructions $PACKAGES_LIST
 		return 0
 	fi
+	local string
 	case "${LANG%_*}" in
 		('fr')
 			string='\nInstallez %s en lançant la série de commandes suivantes en root :\n'
