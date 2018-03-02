@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# Mark of the Ninja
+# Mark of the Ninja - Special Edition
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -39,52 +39,36 @@ script_version=20180303.1
 # Set game-specific variables
 
 GAME_ID='mark-of-the-ninja'
-GAME_NAME='Mark of the Ninja'
+GAME_ID_DLC="${GAME_ID}-special-edition"
+GAME_NAME='Mark of the Ninja - Special Edition'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_mark_of_the_ninja_2.0.0.4.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/mark_of_the_ninja'
-ARCHIVE_GOG_MD5='126ded567b38580f574478fd994e3728'
-ARCHIVE_GOG_SIZE='2200000'
+ARCHIVE_GOG='gog_mark_of_the_ninja_special_edition_dlc_2.0.0.4.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/mark_of_the_ninja_special_edition_upgrade'
+ARCHIVE_GOG_MD5='bbce70b80932ec9c14fbedf0b6b33eb1'
+ARCHIVE_GOG_SIZE='250000'
 ARCHIVE_GOG_VERSION='1.0-gog2.0.0.4'
 
-ARCHIVE_HUMBLE='markoftheninja_linux38_1380755375.zip'
-ARCHIVE_HUMBLE_MD5='7871a48068ef43e93916325eedd6913e'
-ARCHIVE_HUMBLE_SIZE='2300000'
-ARCHIVE_HUMBLE_VERSION='1.0-humble130310'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./bin/*32*'
 
-ARCHIVE_DOC_DATA_PATH_GOG='data/noarch/game/bin'
-ARCHIVE_DOC_DATA_PATH_HUMBLE='bin'
-ARCHIVE_DOC_DATA_FILES='./motn_readme.txt'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./bin/*64*'
 
-ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN32_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN32_FILES='./bin/*32'
-
-ARCHIVE_GAME_BIN64_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_BIN64_PATH_HUMBLE='.'
-ARCHIVE_GAME_BIN64_FILES='./bin/*64'
-
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_PATH_HUMBLE='.'
-ARCHIVE_GAME_DATA_FILES='./data* ./bin/*.xpm'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='bin/ninja-bin32'
-APP_MAIN_EXE_BIN64='bin/ninja-bin64'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='bin/motn_icon.xpm'
-APP_MAIN_ICON_RES='128'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./dlc'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
-PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_ID="${GAME_ID_DLC}-data"
 PKG_DATA_DESCRIPTION='data'
 
+PKG_BIN32_ID="$GAME_ID_DLC"
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx sdl2"
+PKG_BIN32_DEPS="$GAME_ID $PKG_DATA_ID glibc libstdc++ glx sdl2"
 
+PKG_BIN64_ID="$GAME_ID_DLC"
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
@@ -112,37 +96,57 @@ extract_data_from "$SOURCE_ARCHIVE"
 set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
 
 for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
 	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
 done
 
+(
+	cd "${PKG_BIN32_PATH}${PATH_GAME}/bin"
+	chmod +x 'ninja-bin32'
+	mv 'ninja-bin32' 'ninja-bin32.dlc'
+	cd "${PKG_BIN64_PATH}${PATH_GAME}/bin"
+	chmod +x 'ninja-bin64'
+	mv 'ninja-bin64' 'ninja-bin64.dlc'
+)
+
+
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
-
-# Write launchers
-
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
-
-# Set working directory to the directory containing the game binary before running it
-
-pattern='s|^cd "$PATH_PREFIX"$|cd "$PATH_PREFIX/${APP_EXE%/*}"|'
-pattern="$pattern;s|^\"\./\$APP_EXE\"|\"./\${APP_EXE##*/}\"|"
-for file in \
-"${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID" \
-"${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"; do
-	sed --in-place "$pattern" "$file"
-done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-pattern='s#\(/[^/]\+\).png#\1.xpm#g'
-for file in "$postinst" "$prerm"; do
-	sed --in-place "$pattern" "$file"
-done
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+
+cat > "$postinst" << EOF
+(
+	cd "$PATH_GAME/bin"
+	mv 'ninja-bin32' 'ninja-bin32.orig'
+	ln --symbolic './ninja-bin32.dlc' 'ninja-bin32'
+)
+EOF
+cat > "$prerm" << EOF
+(
+	cd "$PATH_GAME/bin"
+	rm 'ninja-bin32'
+	mv 'ninja-bin32.orig' 'ninja-bin32'
+)
+EOF
+write_metadata 'PKG_BIN32'
+
+cat > "$postinst" << EOF
+(
+	cd "$PATH_GAME/bin"
+	mv 'ninja-bin64' 'ninja-bin64.orig'
+	ln --symbolic './ninja-bin64.dlc' 'ninja-bin64'
+)
+EOF
+cat > "$prerm" << EOF
+(
+	cd "$PATH_GAME/bin"
+	rm 'ninja-bin64'
+	mv 'ninja-bin64.orig' 'ninja-bin64'
+)
+EOF
+write_metadata 'PKG_BIN64'
+
 build_pkg
 
 # Clean up
