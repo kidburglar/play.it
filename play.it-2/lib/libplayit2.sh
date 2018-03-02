@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.5.2
-library_revision=20180219.2
+library_version=2.5.3
+library_revision=20180302.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -256,6 +256,8 @@ set_source_archive() {
 # CALLED BY: set_source_archive
 set_archive_error_not_found() {
 	print_error
+	local archive_name
+	local archive_url
 	local string
 	if [ "$#" = 1 ]; then
 		case "${LANG%_*}" in
@@ -278,7 +280,13 @@ set_archive_error_not_found() {
 	fi
 	printf "$string"
 	for archive in "$@"; do
-		printf '%s\n' "$(eval printf -- '%b' \"\$$archive\")"
+		archive_name="$(eval printf -- '%b' \"\$$archive\")"
+		archive_url="$(eval printf -- '%b' \"\$${archive}_URL\")"
+		if [ -n "$archive_url" ]; then
+			printf '%s — %s\n' "$archive_name" "$archive_url"
+		else
+			printf '%s\n' "$archive_name"
+		fi
 	done
 	return 1
 }
@@ -1275,6 +1283,7 @@ print_instructions() {
 		print_instructions $PACKAGES_LIST
 		return 0
 	fi
+	local string
 	case "${LANG%_*}" in
 		('fr')
 			string='\nInstallez %s en lançant la série de commandes suivantes en root :\n'
@@ -1796,7 +1805,7 @@ write_bin_run_native() {
 
 	(
 	  cd "$source_dir"
-	  cp --parents --remove-destination "$APP_EXE" "$PATH_PREFIX"
+	  cp --parents --dereference --remove-destination "$APP_EXE" "$PATH_PREFIX"
 	)
 
 	# Run the game
