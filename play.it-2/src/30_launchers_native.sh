@@ -33,7 +33,7 @@ write_bin_run_native() {
 
 	(
 	  cd "$source_dir"
-	  cp --parents --remove-destination "$APP_EXE" "$PATH_PREFIX"
+	  cp --parents --dereference --remove-destination "$APP_EXE" "$PATH_PREFIX"
 	)
 
 	# Run the game

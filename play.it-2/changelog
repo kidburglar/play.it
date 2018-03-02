@@ -4,6 +4,8 @@
 
   * Fix variable leaking function scope when calling print_instructions
 
+  * Follow symblic links when copying native game binary in user prefix
+
 2.5.2
 
   * Fix init_prefix_files crashing when some files exist in PATH_DATA or

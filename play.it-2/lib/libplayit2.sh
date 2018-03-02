@@ -33,7 +33,7 @@
 ###
 
 library_version=2.5.3~dev
-library_revision=20180302.1
+library_revision=20180302.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1805,7 +1805,7 @@ write_bin_run_native() {
 
 	(
 	  cd "$source_dir"
-	  cp --parents --remove-destination "$APP_EXE" "$PATH_PREFIX"
+	  cp --parents --dereference --remove-destination "$APP_EXE" "$PATH_PREFIX"
 	)
 
 	# Run the game
