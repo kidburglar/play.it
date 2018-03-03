@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180303.1
+script_version=20180303.2
 
 # Set game-specific variables
 
@@ -63,6 +63,8 @@ ARCHIVE_GAME_BIN64_FILES='./ags-setup.x86_64 ./lib64 ./OotTTKC.bin.x86_64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./acsetup.cfg ./agsgame.dat ./audio.vox ./modules.lst ./oott-tkc.png ./speech.vox'
+
+CONFIG_FILES='./*.cfg'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='OotTTKC.bin.x86'
