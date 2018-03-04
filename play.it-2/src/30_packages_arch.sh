@@ -329,6 +329,12 @@ pkg_build_arch() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 
 	(
 		cd "$1"

@@ -5,6 +5,10 @@ print_instructions_arch() {
 	local str_format
 	printf 'pacman -U'
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_arch' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'

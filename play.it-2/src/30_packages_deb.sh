@@ -237,6 +237,12 @@ pkg_build_deb() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
 	eval ${pkg}_PKG=\"$pkg_filename\"
 	export ${pkg}_PKG

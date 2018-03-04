@@ -27,12 +27,14 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set allowed values for common options
 
+	ALLOWED_VALUES_ARCHITECTURE='all 32 64 auto'
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	ALLOWED_VALUES_COMPRESSION='none gzip xz'
 	ALLOWED_VALUES_PACKAGE='arch deb'
 
 	# Set default values for common options
 
+	DEFAULT_OPTION_ARCHITECTURE='all'
 	DEFAULT_OPTION_CHECKSUM='md5'
 	DEFAULT_OPTION_COMPRESSION='none'
 	DEFAULT_OPTION_PREFIX='/usr/local'
@@ -42,11 +44,13 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Parse arguments given to the script
 
+	unset OPTION_ARCHITECTURE
 	unset OPTION_CHECKSUM
 	unset OPTION_COMPRESSION
 	unset OPTION_PREFIX
 	unset OPTION_PACKAGE
 	unset SOURCE_ARCHIVE
+	DRY_RUN='0'
 
 	while [ $# -gt 0 ]; do
 		case "$1" in
@@ -54,7 +58,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				help
 				exit 0
 			;;
-			('--checksum='*|\
+			('--architecture='*|\
+			 '--architecture'|\
+			 '--checksum='*|\
 			 '--checksum'|\
 			 '--compression='*|\
 			 '--compression'|\
@@ -80,6 +86,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				unset option
 				unset value
 			;;
+			('--dry-run')
+				DRY_RUN='1'
+				export DRY_RUN
+			;;
 			('--'*)
 				print_error
 				case "${LANG%_*}" in
@@ -101,49 +111,15 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		shift 1
 	done
 
-	# Try to detect the host distribution through lsb_release
+	# Try to detect the host distribution if no package format has been explicitely set
 
-	if [ ! "$OPTION_PACKAGE" ]; then
-		unset GUESSED_HOST_OS
-		if [ -e '/etc/os-release' ]; then
-			GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-		elif which lsb_release >/dev/null 2>&1; then
-			GUESSED_HOST_OS="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
-		fi
-		case "$GUESSED_HOST_OS" in
-			('debian'|\
-			 'ubuntu'|\
-			 'linuxmint'|\
-			 'handylinux')
-				DEFAULT_OPTION_PACKAGE='deb'
-			;;
-			('arch'|\
-			 'manjaro'|'manjarolinux')
-				DEFAULT_OPTION_PACKAGE='arch'
-			;;
-			(*)
-				print_warning
-				case "${LANG%_*}" in
-					('fr')
-						string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
-						string2='Le format de paquet %s sera utilisé par défaut.\n'
-					;;
-					('en'|*)
-						string1='Most pertinent package format auto-detection failed.\n'
-						string2='%s package format will be used by default.\n'
-					;;
-				esac
-				printf "$string1"
-				printf "$string2" "$DEFAULT_OPTION_PACKAGE"
-				printf '\n'
-			;;
-		esac
-	fi
+	[ "$OPTION_PACKAGE" ] || packages_guess_format 'OPTION_PACKAGE'
 
 	# Set options not already set by script arguments to default values
 
-	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
-		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
+	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX'; do
+		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ]\
+		&& [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
 			export OPTION_$option
 		fi
@@ -185,6 +161,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	for option in 'CHECKSUM' 'COMPRESSION' 'PACKAGE'; do
 		check_option_validity "$option"
 	done
+
+	# Restrict packages list to target architecture
+
+	select_package_architecture
 
 	# Check script dependencies
 

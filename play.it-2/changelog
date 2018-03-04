@@ -1,3 +1,19 @@
+2.6.0
+
+  * Add ability to build only packages for a given architecture
+
+  * Add automatic architecture handling to print_instructions
+
+  * New function prepare_package_layout providing a wrapper for organize_data
+
+  * Improve sort_icons so it can be used on single .png file produced by
+    convert
+
+  * Add --dry-run switch, running tests but not extracting data nor building
+    packages
+
+  * Use a dedicated function to guess package format to build from host OS
+
 2.5.3
 
   * When no supported archive is provided, add download URL to archives list

@@ -12,6 +12,10 @@ extract_data_from() {
 		local destination
 		destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
+		if [ "$DRY_RUN" = '1' ]; then
+			printf '\n'
+			return 0
+		fi
 		local archive_type
 		archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 		case "$archive_type" in

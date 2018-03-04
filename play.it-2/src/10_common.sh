@@ -29,6 +29,7 @@ testvar() {
 # set defaults rights on files (755 for dirs & 644 for regular files)
 # USAGE: set_standard_permissions $dir[…]
 set_standard_permissions() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[  -d "$dir" ] || return 1
 		find "$dir" -type d -exec chmod 755 '{}' +
@@ -78,6 +79,7 @@ print_warning() {
 # convert files name to lower case
 # USAGE: tolower $dir[…]
 tolower() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
 		find "$dir" -depth -mindepth 1 | while read -r file; do
@@ -167,5 +169,22 @@ missing_pkg_error() {
 	esac
 	printf "$string" "$1" "$2"
 	exit 1
+}
+
+# display a warning when PKG value is not included in PACKAGES_LIST
+# USAGE: skipping_pkg_warning $function_name $PKG
+# NEEDED VARS: (LANG)
+skipping_pkg_warning() {
+	local string
+	print_warning
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s ne fait pas partie de la liste de paquets à construire : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s is not part of the list of packages to build: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
 }
 

@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.5.3
-library_revision=20180302.3
+library_version=2.6.0
+library_revision=20180304.7
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -66,6 +66,7 @@ testvar() {
 # set defaults rights on files (755 for dirs & 644 for regular files)
 # USAGE: set_standard_permissions $dir[…]
 set_standard_permissions() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[  -d "$dir" ] || return 1
 		find "$dir" -type d -exec chmod 755 '{}' +
@@ -115,6 +116,7 @@ print_warning() {
 # convert files name to lower case
 # USAGE: tolower $dir[…]
 tolower() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for dir in "$@"; do
 		[ -d "$dir" ] || return 1
 		find "$dir" -depth -mindepth 1 | while read -r file; do
@@ -204,6 +206,23 @@ missing_pkg_error() {
 	esac
 	printf "$string" "$1" "$2"
 	exit 1
+}
+
+# display a warning when PKG value is not included in PACKAGES_LIST
+# USAGE: skipping_pkg_warning $function_name $PKG
+# NEEDED VARS: (LANG)
+skipping_pkg_warning() {
+	local string
+	print_warning
+	case "${LANG%_*}" in
+		('fr')
+			string='La valeur de PKG fournie à %s ne fait pas partie de la liste de paquets à construire : %s\n'
+		;;
+		('en'|*)
+			string='The PKG value used by %s is not part of the list of packages to build: %s\n'
+		;;
+	esac
+	printf "$string" "$1" "$2"
 }
 
 # set distribution-specific package architecture for Arch Linux target
@@ -650,6 +669,8 @@ help() {
 	printf '%s %s [OPTION]… [ARCHIVE]\n\n' "$string" "${0##*/}"
 	
 	printf 'OPTIONS\n\n'
+	help_architecture
+	printf '\n'
 	help_checksum
 	printf '\n'
 	help_compression
@@ -657,6 +678,8 @@ help() {
 	help_prefix
 	printf '\n'
 	help_package
+	printf '\n'
+	help_dryrun
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
@@ -669,6 +692,41 @@ help() {
 		printf '%s\n' "$(eval printf -- '%b' \"\$$archive\")"
 	done
 	printf '\n'
+}
+
+# display --architecture option usage
+# USAGE: help_architecture
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_architecture() {
+	local string
+	local string_all
+	local string_32
+	local string_64
+	local string_auto
+	case "${LANG%_*}" in
+		('fr')
+			string='Choix de l’architecture à construire'
+			string_all='toutes les architectures disponibles (méthode par défaut)'
+			string_32='paquets 32-bit seulement'
+			string_64='paquets 64-bit seulement'
+			string_auto='paquets pour l’architecture du système courant uniquement'
+		;;
+		('en'|*)
+			string='Target architecture choice'
+			string_all='all available architectures (default method)'
+			string_32='32-bit packages only'
+			string_64='64-bit packages only'
+			string_auto='packages for current system architecture only'
+		;;
+	esac
+	printf -- '--architecture=all|32|64|auto\n'
+	printf -- '--architecture all|32|64|auto\n\n'
+	printf '\t%s\n\n' "$string"
+	printf '\tall\t%s\n' "$string_all"
+	printf '\t32\t%s\n' "$string_32"
+	printf '\t64\t%s\n' "$string_64"
+	printf '\tauto\t%s\n' "$string_auto"
 }
 
 # display --checksum option usage
@@ -786,6 +844,156 @@ help_package() {
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'deb' ] && printf ' %s\n' "$string_default" || printf '\n'
+}
+
+# display --dry-run option usage
+# USAGE: help_dryrun
+# NEEDED VARS: (LANG)
+# CALLED BY: help
+help_dryrun() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='Effectue des tests de syntaxe mais n’extrait pas de données et ne construit pas de paquets.'
+		;;
+		('en'|*)
+			string='Run syntax checks but do not extract data nor build packages.'
+		;;
+	esac
+	printf -- '--dry-run\n\n'
+	printf '\t%s\n\n' "$string"
+}
+
+# select package architecture to build
+# USAGE: select_package_architecture
+# NEEDED_VARS: OPTION_ARCHITECTURE PACKAGES_LIST
+# CALLS: select_package_architecture_warning_unavailable select_package_architecture_error_unknown select_package_architecture_warning_unsupported
+select_package_architecture() {
+	[ "$OPTION_ARCHITECTURE" = 'all' ] && return 0
+	local version_major_target
+	local version_minor_target
+	version_major_target="${target_version%%.*}"
+	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
+	if [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 6 ]; then
+		select_package_architecture_warning_unsupported
+		OPTION_ARCHITECTURE='all'
+		export OPTION_ARCHITECTURE
+		return 0
+	fi
+	if [ "$OPTION_ARCHITECTURE" = 'auto' ]; then
+		case "$(uname --machine)" in
+			('i686')
+				OPTION_ARCHITECTURE='32'
+			;;
+			('x86_64')
+				OPTION_ARCHITECTURE='64'
+			;;
+			(*)
+				select_package_architecture_warning_unknown
+				OPTION_ARCHITECTURE='all'
+				export OPTION_ARCHITECTURE
+				return 0
+			;;
+		esac
+		export OPTION_ARCHITECTURE
+		select_package_architecture
+		return 0
+	fi
+	local package_arch
+	local packages_list_32
+	local packages_list_64
+	local packages_list_all
+	for package in $PACKAGES_LIST; do
+		package_arch="$(eval printf -- '%b' \"\$${package}_ARCH\")"
+		case "$package_arch" in
+			('32')
+				packages_list_32="$packages_list_32 $package"
+			;;
+			('64')
+				packages_list_64="$packages_list_64 $package"
+			;;
+			(*)
+				packages_list_all="$packages_list_all $package"
+			;;
+		esac
+	done
+	case "$OPTION_ARCHITECTURE" in
+		('32')
+			if [ -z "$packages_list_32" ]; then
+				select_package_architecture_warning_unavailable
+				OPTION_ARCHITECTURE='all'
+				return 0
+			fi
+			PACKAGES_LIST="$packages_list_32 $packages_list_all"
+		;;
+		('64')
+			if [ -z "$packages_list_64" ]; then
+				select_package_architecture_warning_unavailable
+				OPTION_ARCHITECTURE-'all'
+				return 0
+			fi
+			PACKAGES_LIST="$packages_list_64 $packages_list_all"
+		;;
+		(*)
+			select_package_architecture_error_unknown
+		;;
+	esac
+	export PACKAGES_LIST
+}
+
+# display an error if selected architecture is not available
+# USAGE: select_package_architecture_warning_unavailable
+# NEEDED_VARS: (LANG) OPTION_ARCHITECTURE
+# CALLED_BY: select_package_architecture
+select_package_architecture_warning_unavailable() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’architecture demandée n’est pas disponible : %s\n'
+		;;
+		('en'|*)
+			string='Selected architecture is not available: %s\n'
+		;;
+	esac
+	print_warning
+	printf "$string" "$OPTION_ARCHITECTURE"
+}
+
+# display an error if selected architecture is not supported
+# USAGE: select_package_architecture_error_unknown
+# NEEDED_VARS: (LANG) OPTION_ARCHITECTURE
+# CALLED_BY: select_package_architecture
+select_package_architecture_error_unknown() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’architecture demandée n’est pas supportée : %s\n'
+		;;
+		('en'|*)
+			string='Selected architecture is not supported: %s\n'
+		;;
+	esac
+	print_error
+	printf "$string" "$OPTION_ARCHITECTURE"
+	exit 1
+}
+
+# display a warning if using --architecture on a pre-2.6 script
+# USAGE: select_package_architecture_warning_unsupported
+# NEEDED_VARS: (LANG)
+# CALLED_BY: select_package_architecture
+select_package_architecture_warning_unsupported() {
+	local string
+	case "${LANG%_*}" in
+		('fr')
+			string='L’option --architecture n’est pas gérée par ce script.'
+		;;
+		('en'|*)
+			string='--architecture option is not supported by this script.'
+		;;
+	esac
+	print_warning
+	printf '%s\n\n' "$string"
 }
 
 # set temporary directories
@@ -951,6 +1159,10 @@ extract_data_from() {
 		local destination
 		destination="$PLAYIT_WORKDIR/gamedata"
 		mkdir --parents "$destination"
+		if [ "$DRY_RUN" = '1' ]; then
+			printf '\n'
+			return 0
+		fi
 		local archive_type
 		archive_type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 		case "$archive_type" in
@@ -1037,12 +1249,59 @@ extract_data_from_print() {
 	printf "$string" "$1"
 }
 
+# prepare package layout by putting files from archive in the right packages
+# directories
+# USAGE: prepare_package_layout [$pkg…]
+# NEEDED VARS: (LANG) (PACKAGES_LIST) PLAYIT_WORKDIR (PKG_PATH)
+prepare_package_layout() {
+	if [ -z "$1" ]; then
+		[ -n "$PACKAGES_LIST" ] || prepare_package_layout_error_no_list
+		prepare_package_layout $PACKAGES_LIST
+		return 0
+	fi
+	for package in "$@"; do
+		PKG="$package"
+		organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
+		organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
+		for i in $(seq 0 9); do
+			organize_data "GAME${i}_${PKG#PKG_}" "$PATH_GAME"
+			organize_data "DOC${i}_${PKG#PKG_}"  "$PATH_DOC"
+		done
+	done
+}
+
+# display an error when calling prepare_package_layout() without argument while
+# $PACKAGES_LIST is unset or empty
+# USAGE: prepare_package_layout_error_no_list
+# NEEDED VARS: (LANG)
+prepare_package_layout_error_no_list() {
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='prepare_package_layout ne peut pas être appelé sans argument si $PACKAGES_LIST n’est pas défini.'
+		;;
+		('en'|*)
+			string='prepare_package_layout can not be called without argument if $PACKAGES_LIST is not set.'
+		;;
+	esac
+	printf '%s\n' "$string"
+	return 1
+}
+
 # put files from archive in the right package directories
 # USAGE: organize_data $id $path
 # NEEDED VARS: (LANG) PLAYIT_WORKDIR (PKG) (PKG_PATH)
 organize_data() {
-	if [ -z "$PKG" ]; then
-		organize_data_error_missing_pkg
+	[ -n "$PKG" ] || organize_data_error_missing_pkg
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'organize_data' "$PKG"
+		return 0
+	fi
+	local pkg_path
+	if [ "$DRY_RUN" = '1' ]; then
+		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
+		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
+		return 0
 	fi
 	use_archive_specific_value "ARCHIVE_${1}_PATH"
 	use_archive_specific_value "ARCHIVE_${1}_FILES"
@@ -1052,7 +1311,6 @@ organize_data() {
 	archive_files="$(eval printf -- '%b' \"\$ARCHIVE_${1}_FILES\")"
 
 	if [ "$archive_path" ] && [ "$archive_files" ] && [ -d "$PLAYIT_WORKDIR/gamedata/$archive_path" ]; then
-		local pkg_path
 		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'organize_data' "$PKG"
 		pkg_path="${pkg_path}$2"
@@ -1091,6 +1349,7 @@ organize_data_error_missing_pkg() {
 # NEEDED VARS: PLAYIT_WORKDIR (WRESTOOL_NAME)
 # CALLS: liberror
 extract_icon_from() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for file in "$@"; do
 		local destination
 		destination="$PLAYIT_WORKDIR/icons"
@@ -1123,28 +1382,37 @@ extract_icon_from() {
 # USAGE: sort_icons $app[…]
 # NEEDED VARS: APP_ICON_RES (APP_ID) GAME_ID PKG (PKG_PATH)
 sort_icons() {
+	local app
+	local app_id
+	local icon_res
+	local path_icon
+	local pkg_path
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 
-		local app_id
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
 			app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		else
 			app_id="$GAME_ID"
 		fi
 
-		local icon_res
 		icon_res="$(eval printf -- '%b' \"\$${app}_ICON_RES\")"
-		local pkg_path
 		pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'sort_icons' "$PKG"
-		for res in $icon_res; do
-			path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+		[ "$DRY_RUN" = '1' ] && continue
+		if [ -n "${icon_res##* *}" ]; then
+			path_icon="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 			mkdir --parents "${pkg_path}${path_icon}"
-			for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
-				mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+			mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+		else
+			for res in $icon_res; do
+				path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
+				mkdir --parents "${pkg_path}${path_icon}"
+				for file in "$PLAYIT_WORKDIR"/icons/*${res}x${res}x*.png; do
+					mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+				done
 			done
-		done
+		fi
 	done
 }
 
@@ -1157,6 +1425,7 @@ extract_and_sort_icons_from() {
 	local pkg_path
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'extract_and_sort_icons_from' "$PKG"
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'sort_icons'
 		use_archive_specific_value "${app}_ICON"
@@ -1189,6 +1458,7 @@ move_icons_to() {
 	local destination_path
 	destination_path="$(eval printf -- '%b' \"\$${1}_PATH\")"
 	[ -n "$destination_path" ] || missing_pkg_error 'move_icons_to' "$1"
+	[ "$DRY_RUN" = '1' ] && return 0
 	(
 		cd "$source_path"
 		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
@@ -1201,6 +1471,7 @@ move_icons_to() {
 # USAGE: postinst_icons_linking $app[…]
 # NEEDED VARS: APP_ICONS_LIST APP_ID|GAME_ID APP_ICON APP_ICON_RES PATH_GAME
 postinst_icons_linking() {
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		# get icons list associated with current application
 		local app_icons_list
@@ -1251,6 +1522,7 @@ get_icon_from_temp_dir() {
 	local pkg_path
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'get_icon_from_temp_dir' "$PKG"
+	[ "$DRY_RUN" = '1' ] && return 0
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'get_icon_from_temp_dir'
 		unset app_icon_name
@@ -1283,7 +1555,26 @@ print_instructions() {
 		print_instructions $PACKAGES_LIST
 		return 0
 	fi
+	local package_arch
+	local packages_list_32
+	local packages_list_64
+	local packages_list_all
 	local string
+	for package in "$@"; do
+		package_arch="$(eval printf -- '%b' \"\$${package}_ARCH\")"
+		case "$package_arch" in
+			('32')
+				packages_list_32="$packages_list_32 $package"
+			;;
+			('64')
+				packages_list_64="$packages_list_64 $package"
+			;;
+			(*)
+				packages_list_all="$packages_list_all $package"
+			;;
+		esac
+
+	done
 	case "${LANG%_*}" in
 		('fr')
 			string='\nInstallez %s en lançant la série de commandes suivantes en root :\n'
@@ -1293,6 +1584,39 @@ print_instructions() {
 		;;
 	esac
 	printf "$string" "$GAME_NAME"
+	if [ -n "$packages_list_32" ] && [ -n "$packages_list_64" ]; then
+		print_instructions_architecture_specific '32' $packages_list_all $packages_list_32
+		print_instructions_architecture_specific '64' $packages_list_all $packages_list_64
+	else
+		case $OPTION_PACKAGE in
+			('arch')
+				print_instructions_arch "$@"
+			;;
+			('deb')
+				print_instructions_deb "$@"
+			;;
+			(*)
+				liberror 'OPTION_PACKAGE' 'print_instructions'
+			;;
+		esac
+	fi
+	printf '\n'
+}
+
+# print installation instructions for Arch Linux - 32-bit version
+# USAGE: print_instructions_architecture_specific $pkg[…]
+# CALLS: print_instructions_arch print_instructions_deb
+print_instructions_architecture_specific() {
+	case "${LANG%_*}" in
+		('fr')
+			string='\nversion %s-bit :\n'
+		;;
+		('en'|*)
+			string='\n%s-bit version:\n'
+		;;
+	esac
+	printf "$string" "$1"
+	shift 1
 	case $OPTION_PACKAGE in
 		('arch')
 			print_instructions_arch "$@"
@@ -1304,7 +1628,6 @@ print_instructions() {
 			liberror 'OPTION_PACKAGE' 'print_instructions'
 		;;
 	esac
-	printf '\n'
 }
 
 # print installation instructions for Arch Linux
@@ -1314,6 +1637,10 @@ print_instructions_arch() {
 	local str_format
 	printf 'pacman -U'
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_arch' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
@@ -1371,6 +1698,10 @@ print_instructions_deb_common() {
 	local pkg_path
 	local str_format
 	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_deb_common' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
 		if [ -z "${pkg_path##* *}" ]; then
 			str_format=' "%s"'
@@ -1387,6 +1718,10 @@ print_instructions_deb_common() {
 # NEEDED VARS: (APP_CAT) APP_ID|GAME_ID APP_EXE APP_LIBS APP_NAME|GAME_NAME APP_OPTIONS APP_POSTRUN APP_PRERUN APP_TYPE CONFIG_DIRS CONFIG_FILES DATA_DIRS DATA_FILES GAME_ID (LANG) PATH_BIN PATH_DESK PATH_GAME PKG (PKG_PATH)
 # CALLS: write_bin write_dekstop
 write_launcher() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_launcher' "$PKG"
+		return 0
+	fi
 	write_bin "$@"
 	write_desktop "$@"
 }
@@ -1398,6 +1733,10 @@ write_launcher() {
 # CALLED BY: write_launcher
 write_bin() {
 	local pkg_path
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_bin' "$PKG"
+		return 0
+	fi
 	pkg_path="$(eval printf -- '%b' \"\$${PKG}_PATH\")"
 	[ -n "$pkg_path" ] || missing_pkg_error 'write_bin' "$PKG"
 	local app
@@ -1411,6 +1750,7 @@ write_bin() {
 	local file
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_bin'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		# Get app-specific variables
 		if [ -n "$(eval printf -- '%b' \"\$${app}_ID\")" ]; then
@@ -1665,6 +2005,10 @@ write_bin() {
 # CALLS: liberror testvar write_desktop_winecfg
 # CALLED BY: write_launcher
 write_desktop() {
+	if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$PKG*}" ]; then
+		skipping_pkg_warning 'write_desktop' "$PKG"
+		return 0
+	fi
 	local app
 	local app_cat
 	local app_id
@@ -1674,6 +2018,7 @@ write_desktop() {
 	local target
 	for app in "$@"; do
 		testvar "$app" 'APP' || liberror 'app' 'write_desktop'
+		[ "$DRY_RUN" = '1' ] && continue
 
 		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
@@ -2025,6 +2370,10 @@ write_metadata() {
 	local pkg_provide
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'write_metadata'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'write_metadata' "$pkg"
+			continue
+		fi
 
 		# Set package-specific variables
 		set_architecture "$pkg"
@@ -2032,6 +2381,7 @@ write_metadata() {
 		pkg_maint="$(whoami)@$(hostname)"
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
+		[ "$DRY_RUN" = '1' ] && continue
 		pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
@@ -2070,6 +2420,10 @@ build_pkg() {
 	local pkg_path
 	for pkg in "$@"; do
 		testvar "$pkg" 'PKG' || liberror 'pkg' 'build_pkg'
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'build_pkg' "$pkg"
+			return 0
+		fi
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
 		[ -n "$pkg_path" ] || missing_pkg_error 'build_pkg' "$PKG"
 		case $OPTION_PACKAGE in
@@ -2118,6 +2472,49 @@ pkg_build_print_already_exists() {
 		;;
 	esac
 	printf "$string" "$1"
+}
+
+# guess package format to build from host OS
+# USAGE: packages_guess_format $variable_name
+# NEEDED VARS: (LANG) DEFAULT_OPTION_PACKAGE
+packages_guess_format() {
+	local guessed_host_os
+	local variable_name
+	eval variable_name=\"$1\"
+	if [ -e '/etc/os-release' ]; then
+		guessed_host_os="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
+	elif which lsb_release >/dev/null 2>&1; then
+		guessed_host_os="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
+	fi
+	case "$guessed_host_os" in
+		('debian'|\
+		 'ubuntu'|\
+		 'linuxmint'|\
+		 'handylinux')
+			eval $variable_name=\'deb\'
+		;;
+		('arch'|\
+		 'manjaro'|'manjarolinux')
+			eval $variable_name=\'arch\'
+		;;
+		(*)
+			print_warning
+			case "${LANG%_*}" in
+				('fr')
+					string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
+					string2='Le format de paquet %s sera utilisé par défaut.\n'
+				;;
+				('en'|*)
+					string1='Most pertinent package format auto-detection failed.\n'
+					string2='%s package format will be used by default.\n'
+				;;
+			esac
+			printf "$string1"
+			printf "$string2" "$DEFAULT_OPTION_PACKAGE"
+			printf '\n'
+		;;
+	esac
+	export $variable_name
 }
 
 # write .pkg.tar package meta-data
@@ -2451,6 +2848,12 @@ pkg_build_arch() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 
 	(
 		cd "$1"
@@ -2707,6 +3110,12 @@ pkg_build_deb() {
 	esac
 
 	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
 	TMPDIR="$PLAYIT_WORKDIR" fakeroot -- dpkg-deb $dpkg_options --build "$1" "$pkg_filename" 1>/dev/null
 	eval ${pkg}_PKG=\"$pkg_filename\"
 	export ${pkg}_PKG
@@ -2743,12 +3152,14 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set allowed values for common options
 
+	ALLOWED_VALUES_ARCHITECTURE='all 32 64 auto'
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	ALLOWED_VALUES_COMPRESSION='none gzip xz'
 	ALLOWED_VALUES_PACKAGE='arch deb'
 
 	# Set default values for common options
 
+	DEFAULT_OPTION_ARCHITECTURE='all'
 	DEFAULT_OPTION_CHECKSUM='md5'
 	DEFAULT_OPTION_COMPRESSION='none'
 	DEFAULT_OPTION_PREFIX='/usr/local'
@@ -2758,11 +3169,13 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Parse arguments given to the script
 
+	unset OPTION_ARCHITECTURE
 	unset OPTION_CHECKSUM
 	unset OPTION_COMPRESSION
 	unset OPTION_PREFIX
 	unset OPTION_PACKAGE
 	unset SOURCE_ARCHIVE
+	DRY_RUN='0'
 
 	while [ $# -gt 0 ]; do
 		case "$1" in
@@ -2770,7 +3183,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				help
 				exit 0
 			;;
-			('--checksum='*|\
+			('--architecture='*|\
+			 '--architecture'|\
+			 '--checksum='*|\
 			 '--checksum'|\
 			 '--compression='*|\
 			 '--compression'|\
@@ -2796,6 +3211,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 				unset option
 				unset value
 			;;
+			('--dry-run')
+				DRY_RUN='1'
+				export DRY_RUN
+			;;
 			('--'*)
 				print_error
 				case "${LANG%_*}" in
@@ -2817,49 +3236,15 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		shift 1
 	done
 
-	# Try to detect the host distribution through lsb_release
+	# Try to detect the host distribution if no package format has been explicitely set
 
-	if [ ! "$OPTION_PACKAGE" ]; then
-		unset GUESSED_HOST_OS
-		if [ -e '/etc/os-release' ]; then
-			GUESSED_HOST_OS="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-		elif which lsb_release >/dev/null 2>&1; then
-			GUESSED_HOST_OS="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
-		fi
-		case "$GUESSED_HOST_OS" in
-			('debian'|\
-			 'ubuntu'|\
-			 'linuxmint'|\
-			 'handylinux')
-				DEFAULT_OPTION_PACKAGE='deb'
-			;;
-			('arch'|\
-			 'manjaro'|'manjarolinux')
-				DEFAULT_OPTION_PACKAGE='arch'
-			;;
-			(*)
-				print_warning
-				case "${LANG%_*}" in
-					('fr')
-						string1='L’auto-détection du format de paquet le plus adapté a échoué.\n'
-						string2='Le format de paquet %s sera utilisé par défaut.\n'
-					;;
-					('en'|*)
-						string1='Most pertinent package format auto-detection failed.\n'
-						string2='%s package format will be used by default.\n'
-					;;
-				esac
-				printf "$string1"
-				printf "$string2" "$DEFAULT_OPTION_PACKAGE"
-				printf '\n'
-			;;
-		esac
-	fi
+	[ "$OPTION_PACKAGE" ] || packages_guess_format 'OPTION_PACKAGE'
 
 	# Set options not already set by script arguments to default values
 
-	for option in 'CHECKSUM' 'COMPRESSION' 'PREFIX' 'PACKAGE'; do
-		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ] && [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
+	for option in 'ARCHITECTURE' 'CHECKSUM' 'COMPRESSION' 'PREFIX'; do
+		if [ -z "$(eval printf -- '%b' \"\$OPTION_$option\")" ]\
+		&& [ -n "$(eval printf -- \"\$DEFAULT_OPTION_$option\")" ]; then
 			eval OPTION_$option=\"$(eval printf -- '%b' \"\$DEFAULT_OPTION_$option\")\"
 			export OPTION_$option
 		fi
@@ -2901,6 +3286,10 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	for option in 'CHECKSUM' 'COMPRESSION' 'PACKAGE'; do
 		check_option_validity "$option"
 	done
+
+	# Restrict packages list to target architecture
+
+	select_package_architecture
 
 	# Check script dependencies
 
