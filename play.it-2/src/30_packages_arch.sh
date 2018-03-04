@@ -16,11 +16,14 @@ pkg_write_arch() {
 	local target
 	target="$pkg_path/.PKGINFO"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	pkgname = $pkg_id
-	pkgver = $pkg_version
+	pkgver = $PKG_VERSION
 	packager = $pkg_maint
 	builddate = $(date +"%m%d%Y")
 	size = $pkg_size

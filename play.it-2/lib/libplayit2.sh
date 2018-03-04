@@ -33,7 +33,7 @@
 ###
 
 library_version=2.7.0~dev
-library_revision=20180318.3
+library_revision=20180318.4
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -380,7 +380,6 @@ archive_get_infos() {
 	local name
 	local size
 	local type
-	local version
 	ARCHIVE="$1"
 	name="$2"
 	file="$3"
@@ -389,8 +388,7 @@ archive_get_infos() {
 	md5="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
-	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
@@ -401,10 +399,6 @@ archive_get_infos() {
 	if [ -n "$size" ]; then
 		[ -n "$ARCHIVE_SIZE" ] || ARCHIVE_SIZE='0'
 		ARCHIVE_SIZE="$((ARCHIVE_SIZE + size))"
-	fi
-	if [ -n "$version" ]; then
-		[ -n "$script_version" ] || script_version="$(date +%Y%m%d).0"
-		PKG_VERSION="${version}+${script_version}"
 	fi
 	export ARCHIVE_SIZE
 	export PKG_VERSION
@@ -1042,6 +1036,19 @@ select_package_architecture_warning_unsupported() {
 	printf '%s\n\n' "$string"
 }
 
+# get version of current package, exported as PKG_VERSION
+# USAGE: get_package_version
+# NEEDED_VARS: PKG
+get_package_version() {
+	use_package_specific_value "${ARCHIVE}_VERSION"
+	PKG_VERSION="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
+	if [ -z "$PKG_VERSION" ]; then
+		PKG_VERSION='1.0-1'
+	fi
+	PKG_VERSION="${PKG_VERSION}+$script_version"
+	export PKG_VERSION
+}
+
 # set temporary directories
 # USAGE: set_temp_directories $pkg[…]
 # NEEDED VARS: (ARCHIVE_SIZE) GAME_ID (LANG) (PWD) (XDG_CACHE_HOME) (XDG_RUNTIME_DIR)
@@ -1114,40 +1121,32 @@ set_temp_directories() {
 
 # set package-secific temporary directory
 # USAGE: set_temp_directories_pkg $pkg
-# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID PKG_VERSION|script_version
+# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID
 # CALLED BY: set_temp_directories
 set_temp_directories_pkg() {
+	PKG="$1"
 
 	# Get package ID
-	use_archive_specific_value "${1}_ID"
+	use_archive_specific_value "${PKG}_ID"
 	local pkg_id
-	pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	pkg_id="$(eval printf -- '%b' \"\$${PKG}_ID\")"
 	if [ -z "$pkg_id" ]; then
-		eval ${1}_ID=\"$GAME_ID\"
-		export ${1}_ID
+		eval ${PKG}_ID=\"$GAME_ID\"
+		export ${PKG}_ID
 		pkg_id="$GAME_ID"
-	fi
-
-	# Get package version
-	local pkg_version
-	if [ -n "$(eval printf -- '%b' \"\$${1}_VERSION\")" ]; then
-		pkg_version="$(eval printf -- '%b' \"\$${1}_VERSION\")+$script_version"
-	elif [ "$PKG_VERSION" ]; then
-		pkg_version="$PKG_VERSION"
-	else
-		pkg_version='1.0-1+$script_version'
 	fi
 
 	# Get package architecture
 	local pkg_architecture
-	set_architecture "$1"
+	set_architecture "$PKG"
 
 	# Set $PKG_PATH
-	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${1}_ARCH\")" = '32' ]; then
+	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${PKG}_ARCH\")" = '32' ]; then
 		pkg_id="lib32-$pkg_id"
 	fi
-	eval ${1}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${pkg_version}_${pkg_architecture}\"
-	export ${1}_PATH
+	get_package_version
+	eval ${PKG}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${PKG_VERSION}_${pkg_architecture}\"
+	export ${PKG}_PATH
 }
 
 # display an error if set_temp_directories() is called before setting $ARCHIVE_SIZE
@@ -2435,7 +2434,7 @@ write_desktop_winecfg() {
 
 # write package meta-data
 # USAGE: write_metadata [$pkg…]
-# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE PKG_VERSION
+# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE
 # CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
 write_metadata() {
 	if [ $# = 0 ]; then
@@ -2466,12 +2465,6 @@ write_metadata() {
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
 		pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-
-		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
-			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
-		else
-			pkg_version="$PKG_VERSION"
-		fi
 
 		case $OPTION_PACKAGE in
 			('arch')
@@ -2615,11 +2608,14 @@ pkg_write_arch() {
 	local target
 	target="$pkg_path/.PKGINFO"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	pkgname = $pkg_id
-	pkgver = $pkg_version
+	pkgver = $PKG_VERSION
 	packager = $pkg_maint
 	builddate = $(date +"%m%d%Y")
 	size = $pkg_size
@@ -2973,11 +2969,14 @@ pkg_write_deb() {
 	local target
 	target="$pkg_path/DEBIAN/control"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	Package: $pkg_id
-	Version: $pkg_version
+	Version: $PKG_VERSION
 	Architecture: $pkg_architecture
 	Maintainer: $pkg_maint
 	Installed-Size: $pkg_size

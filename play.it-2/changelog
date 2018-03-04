@@ -9,6 +9,9 @@
 
   * Add automatic detection of multi-parts archives
 
+  * New function get_package_version allowing a reliable way to use different
+    version values for multiple packages generated from a single archive
+
 2.6.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity

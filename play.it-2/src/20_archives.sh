@@ -122,7 +122,6 @@ archive_get_infos() {
 	local name
 	local size
 	local type
-	local version
 	ARCHIVE="$1"
 	name="$2"
 	file="$3"
@@ -131,8 +130,7 @@ archive_get_infos() {
 	md5="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
-	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
@@ -143,10 +141,6 @@ archive_get_infos() {
 	if [ -n "$size" ]; then
 		[ -n "$ARCHIVE_SIZE" ] || ARCHIVE_SIZE='0'
 		ARCHIVE_SIZE="$((ARCHIVE_SIZE + size))"
-	fi
-	if [ -n "$version" ]; then
-		[ -n "$script_version" ] || script_version="$(date +%Y%m%d).0"
-		PKG_VERSION="${version}+${script_version}"
 	fi
 	export ARCHIVE_SIZE
 	export PKG_VERSION

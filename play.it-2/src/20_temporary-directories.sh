@@ -70,40 +70,32 @@ set_temp_directories() {
 
 # set package-secific temporary directory
 # USAGE: set_temp_directories_pkg $pkg
-# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID PKG_VERSION|script_version
+# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID
 # CALLED BY: set_temp_directories
 set_temp_directories_pkg() {
+	PKG="$1"
 
 	# Get package ID
-	use_archive_specific_value "${1}_ID"
+	use_archive_specific_value "${PKG}_ID"
 	local pkg_id
-	pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	pkg_id="$(eval printf -- '%b' \"\$${PKG}_ID\")"
 	if [ -z "$pkg_id" ]; then
-		eval ${1}_ID=\"$GAME_ID\"
-		export ${1}_ID
+		eval ${PKG}_ID=\"$GAME_ID\"
+		export ${PKG}_ID
 		pkg_id="$GAME_ID"
-	fi
-
-	# Get package version
-	local pkg_version
-	if [ -n "$(eval printf -- '%b' \"\$${1}_VERSION\")" ]; then
-		pkg_version="$(eval printf -- '%b' \"\$${1}_VERSION\")+$script_version"
-	elif [ "$PKG_VERSION" ]; then
-		pkg_version="$PKG_VERSION"
-	else
-		pkg_version='1.0-1+$script_version'
 	fi
 
 	# Get package architecture
 	local pkg_architecture
-	set_architecture "$1"
+	set_architecture "$PKG"
 
 	# Set $PKG_PATH
-	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${1}_ARCH\")" = '32' ]; then
+	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${PKG}_ARCH\")" = '32' ]; then
 		pkg_id="lib32-$pkg_id"
 	fi
-	eval ${1}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${pkg_version}_${pkg_architecture}\"
-	export ${1}_PATH
+	get_package_version
+	eval ${PKG}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${PKG_VERSION}_${pkg_architecture}\"
+	export ${PKG}_PATH
 }
 
 # display an error if set_temp_directories() is called before setting $ARCHIVE_SIZE
