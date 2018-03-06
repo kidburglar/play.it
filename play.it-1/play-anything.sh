@@ -29,7 +29,7 @@
 
 ###
 # common functions for ./play.it scripts
-# library version 1.14.8
+# library version 1.14.9
 #
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -1057,7 +1057,14 @@ done
 }
 
 init_prefix () {
-cp -surf "\${GAME_PATH}"/* "\${USERDIR_DATA}"
+(
+	cd "\$GAME_PATH"
+	find . ! -type d | while read file; do
+		if [ ! -e "\$USERDIR_DATA/\$file" ]; then
+			cp --parents --symbolic-link "\$(readlink --canonicalize "\$file")" "\$USERDIR_DATA"
+		fi
+	done
+)
 for dir in \${GAME_CACHE_DIRS} \${GAME_CONFIG_DIRS}; do
 	rm -rf "\${USERDIR_DATA}/\${dir}"
 done
