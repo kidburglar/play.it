@@ -7,6 +7,8 @@
 
   * Use 'APP_ICON' as a fallback value for APP_ICONS_LIST if it is not set
 
+  * Add automatic detection of multi-parts archives
+
 2.6.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity

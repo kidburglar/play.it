@@ -48,7 +48,7 @@ set_archive_error_not_found() { archive_set_error_not_found "$@"; }
 
 # set a single archive for data extraction
 # USAGE: archive_set $name $archive[…]
-# CALLS: archive_get_infos
+# CALLS: archive_get_infos archive_check_for_extra_parts
 archive_set() {
 	local archive
 	local current_value
@@ -62,6 +62,7 @@ archive_set() {
 			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ "$(basename "$current_value")" = "$file" ]; then
 				archive_get_infos "$archive" "$name" "$current_value"
+				archive_check_for_extra_parts "$archive" "$name"
 				return 0
 			fi
 		done
@@ -73,6 +74,7 @@ archive_set() {
 			fi
 			if [ -f "$file" ]; then
 				archive_get_infos "$archive" "$name" "$file"
+				archive_check_for_extra_parts "$archive" "$name"
 				return 0
 			fi
 		done
@@ -81,6 +83,34 @@ archive_set() {
 }
 # compatibility alias
 set_archive() { archive_set "$@"; }
+
+# automatically check for presence of archives using the name of the base archive with a _PART1 to _PART9 suffix appended
+# returns an error if such an archive is set by the script but not found
+# returns success on the first archive not set by the script
+# USAGE: archive_check_for_extra_parts $archive $name
+# NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
+# CALLS: set_archive
+archive_check_for_extra_parts() {
+	local archive
+	local file
+	local name
+	local part_archive
+	local part_name
+	archive="$1"
+	name="$2"
+	for i in $(seq 1 9); do
+		part_archive="${archive}_PART${i}"
+		part_name="${name}_PART${i}"
+		file="$(eval printf -- '%b' \"\$$part_archive\")"
+		[ -n "$file" ] || return 0
+		set_archive "$part_name" "$part_archive"
+		if [ -z "$(eval printf -- '%b' \"\$$part_name\")" ]; then
+			set_archive_error_not_found "$part_archive"
+		fi
+	done
+	ARCHIVE="$archive"
+	export ARCHIVE
+}
 
 # get informations about a single archive and export them
 # USAGE: archive_get_infos $archive $name $file
