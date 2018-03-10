@@ -1,3 +1,7 @@
+2.6.1
+
+  * Fix postinst_icons_linking not working on more than one single app
+
 2.6.0
 
   * Add ability to build only packages for a given architecture
