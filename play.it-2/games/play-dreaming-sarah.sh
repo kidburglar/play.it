@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180310.1
+script_version=20180310.2
 
 # Set game-specific variables
 
@@ -44,11 +44,13 @@ GAME_NAME='Dreaming Sarah'
 ARCHIVES_LIST='ARCHIVE_HUMBLE_32 ARCHIVE_HUMBLE_64'
 
 ARCHIVE_HUMBLE_32='DreamingSarah-linux32_1.3.zip'
+ARCHIVE_HUMBLE_32_URL='https://www.humblebundle.com/store/dreaming-sarah'
 ARCHIVE_HUMBLE_32_MD5='73682a545e979ad9a2b6123222ddb517'
 ARCHIVE_HUMBLE_32_SIZE='200000'
 ARCHIVE_HUMBLE_32_VERSION='1.3-humble1'
 
 ARCHIVE_HUMBLE_64='DreamingSarah-linux64_1.3.zip'
+ARCHIVE_HUMBLE_64_URL='https://www.humblebundle.com/store/dreaming-sarah'
 ARCHIVE_HUMBLE_64_MD5='a68f3956eb09ea7b34caa20f6e89b60c'
 ARCHIVE_HUMBLE_64_SIZE='200000'
 ARCHIVE_HUMBLE_64_VERSION='1.3-humble1'
