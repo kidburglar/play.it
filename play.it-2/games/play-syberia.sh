@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180310.1
+script_version=20180310.2
 
 # Set game-specific variables
 
@@ -44,6 +44,7 @@ GAME_NAME='syberia'
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
 ARCHIVE_GOG_EN='setup_syberia_1.0.0_hotfix3_(18946).exe'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/syberia'
 ARCHIVE_GOG_EN_MD5='53d91df35a154584812d31b9ee353cb8'
 ARCHIVE_GOG_EN_SIZE='1600000'
 ARCHIVE_GOG_EN_VERSION='1.0.0.3-gog18946'
@@ -54,6 +55,7 @@ ARCHIVE_GOG_EN_OLD_SIZE='1600000'
 ARCHIVE_GOG_EN_OLD_VERSION='1.0.0.2-gog17897'
 
 ARCHIVE_GOG_FR='setup_syberia_french_1.0.0_hotfix3_(18946).exe'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/syberia'
 ARCHIVE_GOG_FR_MD5='41881248eefd53929bbaa97c1905a7fe'
 ARCHIVE_GOG_FR_SIZE='1600000'
 ARCHIVE_GOG_FR_VERSION='1.0.0.3-gog18946'
