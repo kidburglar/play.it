@@ -29,47 +29,63 @@ set -o errexit
 ###
 
 ###
-# Softporn Adventure
+# Pyre
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180307.1
+script_version=20180308.1
 
 # Set game-specific variables
 
-GAME_ID='softporn-adventure'
-GAME_NAME='Softporn Adventure'
+GAME_ID='pyre'
+GAME_NAME='Pyre'
 
 ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='gog_softporn_adventure_2.0.0.1.sh'
-ARCHIVE_GOG_MD5='1e51094f928757140c5a0dacc70773c0'
-ARCHIVE_GOG_SIZE='11000'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
+ARCHIVE_GOG='pyre_en_1_0_18732.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/pyre'
+ARCHIVE_GOG_MD5='83ea264e95e2519aba72078d35290d49'
+ARCHIVE_GOG_SIZE='8100000'
+ARCHIVE_GOG_VERSION='1.0-gog18732'
+ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*.doc ./*.txt'
+ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC0_DATA_FILES='./*'
 
-ARCHIVE_GAME_PATH='data/noarch/data'
-ARCHIVE_GAME_FILES='./*'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC1_DATA_FILES='./Linux.README ./ReadMe.txt'
 
-DATA_FILES='./*.GAM'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./Pyre.bin.x86 ./lib'
 
-APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='softporn.exe'
-APP_MAIN_ICON='data/noarch/support/icon.png'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./Pyre.bin.x86_64 ./lib64'
+
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*'
+
+APP_MAIN_TYPE='native'
+APP_MAIN_PRERUN='export LC_ALL=C'
+APP_MAIN_EXE_BIN32='Pyre.bin.x86'
+APP_MAIN_EXE_BIN64='Pyre.bin.x86_64'
+APP_MAIN_ICON='PyreIcon.bmp'
 APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_MAIN'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
-PKG_MAIN_ARCH='32'
-PKG_MAIN_DEPS_DEB='dosbox'
-PKG_MAIN_DEPS_ARCH='dosbox'
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 alsa"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.6'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -88,17 +104,18 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-tolower "$PLAYIT_WORKDIR/gamedata"
+prepare_package_layout
 
-organize_data 'DOC'  "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
-get_icon_from_temp_dir 'APP_MAIN'
+PKG='PKG_DATA'
+extract_and_sort_icons_from 'APP_MAIN'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 

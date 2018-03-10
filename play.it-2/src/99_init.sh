@@ -192,9 +192,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		;;
 	esac
 
-	# Set source archive
+	# Set main archive
 
-	set_source_archive $ARCHIVES_LIST
+	archive_set_main $ARCHIVES_LIST
 
 	# Set working directories
 

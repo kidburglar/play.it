@@ -1,6 +1,6 @@
 # check script dependencies
 # USAGE: check_deps
-# NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (LANG) (OPTION_PACKAGE) (SCRIPT_DEPS)
+# NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
 # CALLS: check_deps_7z check_deps_error_not_found
 check_deps() {
 	if [ "$ARCHIVE" ]; then
@@ -69,7 +69,6 @@ check_deps() {
 
 # check presence of a software to handle .7z archives
 # USAGE: check_deps_7z
-# NEEDED VARS: (LANG)
 # CALLS: check_deps_error_not_found
 # CALLED BY: check_deps
 check_deps_7z() {
@@ -86,7 +85,6 @@ check_deps_7z() {
 
 # display a message if a required dependency is missing
 # USAGE: check_deps_error_not_found $command_name
-# NEEDED VARS: (LANG)
 # CALLED BY: check_deps check_deps_7z
 check_deps_error_not_found() {
 	print_error

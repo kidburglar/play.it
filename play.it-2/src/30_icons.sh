@@ -126,21 +126,15 @@ move_icons_to() {
 # NEEDED VARS: APP_ICONS_LIST APP_ID|GAME_ID APP_ICON APP_ICON_RES PATH_GAME
 postinst_icons_linking() {
 	[ "$DRY_RUN" = '1' ] && return 0
+	local app
+	local app_icons_list
+	local app_id
+	local icon_file
+	local icon_res
 	for app in "$@"; do
-		# get icons list associated with current application
-		local app_icons_list
-		app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
-
-		# get current application id (falls back on $GAME_ID if it is not set)
-		local app_id
-		if [ -n "$(eval printf -- '%b' \"\$${1}_ID\")" ]; then
-			app_id="$(eval printf -- '%b' \"\$${1}_ID\")"
-		else
-			app_id="$GAME_ID"
-		fi
-
-		local icon_file
-		local icon_res
+		app_icons_list="$(eval printf -- '%b' \"\$${app}_ICONS_LIST\")"
+		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
+		[ -n "$app_id" ] || app_id="$GAME_ID"
 		for icon in $app_icons_list; do
 			icon_file="$(eval printf -- '%b' \"\$$icon\")"
 			icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"

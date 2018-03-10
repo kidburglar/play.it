@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.6.0
-library_revision=20180304.7
+library_version=2.6.1
+library_revision=20180310.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -256,259 +256,258 @@ set_architecture_deb() {
 	esac
 }
 
-# set source archive for data extraction
-# USAGE: set_source_archive $archive[…]
-# NEEDED VARS: (LANG)
-# CALLS: set_archive_error_not_found
-set_source_archive() {
-	set_archive 'SOURCE_ARCHIVE' "$@"
-	if [ "$SOURCE_ARCHIVE" ]; then
-		return 0
-	else
-		set_archive_error_not_found "$@"
-	fi
+# set main archive for data extraction
+# USAGE: archive_set_main $archive[…]
+# CALLS: archive_set archive_set_error_not_found
+archive_set_main() {
+	archive_set 'SOURCE_ARCHIVE' "$@"
+	[ -n "$SOURCE_ARCHIVE" ] || archive_set_error_not_found "$@"
 }
 
-# display an error message if a mandatory archive is not found
-# USAGE: set_archive_error_not_found $archive[…]
-# NEEDED VARS: (LANG)
-# CALLED BY: set_source_archive
-set_archive_error_not_found() {
-	print_error
+# display an error message if a required archive is not found
+# list all the archives that could fulfill the requirements, with their download URL if provided by the script
+# USAGE: archive_set_error_not_found $archive[…]
+# CALLED BY: archive_set_main
+archive_set_error_not_found() {
+	local archive
 	local archive_name
 	local archive_url
 	local string
+	local string_multiple
+	local string_single
+	case "${LANG%_*}" in
+		('fr')
+			string_multiple='Aucun des fichiers suivants n’est présent :'
+			string_single='Le fichier suivant est introuvable :'
+		;;
+		('en'|*)
+			string_multiple='None of the following files could be found:'
+			string_single='The following file could not be found:'
+		;;
+	esac
 	if [ "$#" = 1 ]; then
-		case "${LANG%_*}" in
-			('fr')
-				string='Le fichier suivant est introuvable :\n'
-			;;
-			('en'|*)
-				string='The following file could not be found:\n'
-			;;
-		esac
+		string="$string_single"
 	else
-		case "${LANG%_*}" in
-			('fr')
-				string='Aucun des fichiers suivants n’est présent :\n'
-			;;
-			('en'|*)
-				string='None of the following files could be found:\n'
-			;;
-		esac
+		string="$string_multiple"
 	fi
-	printf "$string"
+	print_error
+	printf '%s\n' "$string"
 	for archive in "$@"; do
 		archive_name="$(eval printf -- '%b' \"\$$archive\")"
 		archive_url="$(eval printf -- '%b' \"\$${archive}_URL\")"
-		if [ -n "$archive_url" ]; then
-			printf '%s — %s\n' "$archive_name" "$archive_url"
-		else
-			printf '%s\n' "$archive_name"
-		fi
+		printf '%s' "$archive_name"
+		[ -n "$archive_url" ] && printf ' — %s' "$archive_url"
+		printf '\n'
 	done
 	return 1
 }
+# compatibility alias
+set_archive_error_not_found() { archive_set_error_not_found "$@"; }
 
-# set archive for data extraction
-# USAGE: set_archive $name $archive[…]
-# NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
-# CALLS: set_archive_vars
-set_archive() {
+# set a single archive for data extraction
+# USAGE: archive_set $name $archive[…]
+# CALLS: archive_get_infos
+archive_set() {
+	local archive
+	local current_value
+	local file
 	local name
 	name=$1
 	shift 1
-	local file
-	if [ -n "$(eval printf -- '%b' \"\$$name\")" ]; then
+	current_value="$(eval printf -- '%b' \"\$$name\")"
+	if [ -n "$current_value" ]; then
 		for archive in "$@"; do
 			file="$(eval printf -- '%b' \"\$$archive\")"
-			if [ "$(basename "$(eval printf -- '%b' \"\$$name\")")" = "$file" ]; then
-				set_archive_vars "$archive" "$name" "$(eval printf -- '%b' \"\$$name\")"
+			if [ "$(basename "$current_value")" = "$file" ]; then
+				archive_get_infos "$archive" "$name" "$current_value"
 				return 0
 			fi
 		done
 	else
 		for archive in "$@"; do
 			file="$(eval printf -- '%b' \"\$$archive\")"
-			if [ -f "$file" ]; then
-				set_archive_vars "$archive" "$name" "$file"
-				return 0
-			elif [ "$SOURCE_ARCHIVE" ] && [ -f "${SOURCE_ARCHIVE%/*}/$file" ]; then
+			if [ ! -f "$file" ] && [ -n "$SOURCE_ARCHIVE" ] && [ -f "${SOURCE_ARCHIVE%/*}/$file" ]; then
 				file="${SOURCE_ARCHIVE%/*}/$file"
-				set_archive_vars "$archive" "$name" "$file"
+			fi
+			if [ -f "$file" ]; then
+				archive_get_infos "$archive" "$name" "$file"
 				return 0
 			fi
 		done
 	fi
 	unset $name
 }
+# compatibility alias
+set_archive() { archive_set "$@"; }
 
-# set archive-specific variables
-# USAGE: set_archive_vars $archive $name $file
-# CALLS: archive_guess_type check_deps set_archive_print
-# NEEDED_VARS: (LANG)
-# CALLED BY: set_archive
-set_archive_vars() {
-	ARCHIVE="$1"
-	export ARCHIVE
-
-	local name
-	name="$2"
+# get informations about a single archive and export them
+# USAGE: archive_get_infos $archive $name $file
+# CALLS: archive_guess_type archive_integrity_check archive_print_file_in_use check_deps
+# CALLED BY: archive_set
+archive_get_infos() {
 	local file
+	local md5
+	local name
+	local size
+	local type
+	local version
+	ARCHIVE="$1"
+	name="$2"
 	file="$3"
-
-	set_archive_print "$file"
-
-	# set target file
+	archive_print_file_in_use "$file"
 	eval $name=\"$file\"
-	export $name
-
-	# set archive type + check dependencies
-	if [ -z "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" ]; then
-		archive_guess_type "$file"
+	md5="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
+	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
+	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
+	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
+	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
+	if [ -z "$type" ]; then
+		archive_guess_type "$ARCHIVE" "$file"
+		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	fi
-	eval ${name}_TYPE=\"$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")\"
+	eval ${name}_TYPE=\"$type\"
 	export ${name}_TYPE
 	check_deps
-
-	# compute total size of all archives
-	if [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")" ]; then
-		if [ -z "$ARCHIVE_SIZE" ]; then
-			ARCHIVE_SIZE='0'
-		fi
-		ARCHIVE_SIZE="$((ARCHIVE_SIZE + $(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")))"
-		export ARCHIVE_SIZE
+	if [ -n "$size" ]; then
+		[ -n "$ARCHIVE_SIZE" ] || ARCHIVE_SIZE='0'
+		ARCHIVE_SIZE="$((ARCHIVE_SIZE + size))"
 	fi
-
-	# set package version
-	if [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")" ]; then
-		PKG_VERSION="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")+${script_version}"
+	if [ -n "$version" ]; then
+		[ -n "$script_version" ] || script_version="$(date +%Y%m%d).0"
+		PKG_VERSION="${version}+${script_version}"
 	fi
-
-	# check file integrity
-	if [ -n "$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")" ]; then
-		file_checksum "$file"
-	fi
+	export ARCHIVE_SIZE
+	export PKG_VERSION
+	export $name
+	export ARCHIVE
 }
 
 # try to guess archive type from file name
-# USAGE: archive_guess_type $file
+# USAGE: archive_guess_type $archive $file
 # CALLS: archive_guess_type_error
-# NEEDED VARS: ARCHIVE (LANG)
-# CALLED BY: set_archive_vars
+# CALLED BY: archive_get_infos
 archive_guess_type() {
-	case "${1##*/}" in
-		(*.cab)
-			eval ${ARCHIVE}_TYPE=\'cabinet\'
+	local archive
+	local file
+	local type
+	archive="$1"
+	file="$2"
+	case "${file##*/}" in
+		(*'.cab')
+			type='cabinet'
 		;;
-		(*.deb)
-			eval ${ARCHIVE}_TYPE=\'debian\'
+		(*'.deb')
+			type='debian'
 		;;
-		(setup_*.exe|patch_*.exe)
-			eval ${ARCHIVE}_TYPE=\'innosetup\'
+		('setup_'*'.exe'|'patch_'*'.exe')
+			type='innosetup'
 		;;
-		(gog_*.sh)
-			eval ${ARCHIVE}_TYPE=\'mojosetup\'
+		('gog_'*'.sh')
+			type='mojosetup'
 		;;
-		(*.msi)
-			eval ${ARCHIVE}_TYPE=\'msi\'
+		(*'.msi')
+			type='msi'
 		;;
-		(*.rar)
-			eval ${ARCHIVE}_TYPE=\'rar\'
+		(*'.rar')
+			type='rar'
 		;;
-		(*.tar)
-			eval ${ARCHIVE}_TYPE=\'tar\'
+		(*'.tar')
+			type='tar'
 		;;
-		(*.tar.gz|*.tgz)
-			eval ${ARCHIVE}_TYPE=\'tar.gz\'
+		(*'.tar.gz'|*'.tgz')
+			type='tar.gz'
 		;;
-		(*.zip)
-			eval ${ARCHIVE}_TYPE=\'zip\'
+		(*'.zip')
+			type='zip'
 		;;
 		(*)
-			archive_guess_type_error
+			archive_guess_type_error "$archive"
 		;;
 	esac
-	export ${ARCHIVE}_TYPE
+	eval ${archive}_TYPE=\'$type\'
+	export ${archive}_TYPE
 }
 
-# display an error message telling the type of the target archive is not set
-# USAGE: archive_guess_type_error
-# NEEDED VARS: ARCHIVE (LANG)
+# display an error message if archive_guess_type failed to guess the type of an archive
+# USAGE: archive_guess_type_error $archive
 # CALLED BY: archive_guess_type
 archive_guess_type_error() {
-	print_error
 	local string
 	case "${LANG%_*}" in
 		('fr')
-			string='ARCHIVE_TYPE n’est pas défini pour %s\n'
+			string='ARCHIVE_TYPE n’est pas défini pour %s et n’a pas pu être détecté automatiquement.'
 		;;
 		('en'|*)
-			string='ARCHIVE_TYPE is not set for %s\n'
+			string='ARCHIVE_TYPE is not set for %s and could not be guessed.'
 		;;
 	esac
-	printf "$string" "$ARCHIVE"
+	print_error
+	printf "$string\\n" "$archive"
 	return 1
 }
 
-# print archive use message
-# USAGE: set_archive_print $file
-# NEEDED VARS: (LANG)
-# CALLED BY: set_archive_vars
-set_archive_print() {
+# print the name and path to the archive currently in use
+# USAGE: archive_print_file_in_use $file
+# CALLED BY: archive_get_infos
+archive_print_file_in_use() {
+	local file
 	local string
+	file="$1"
 	case "${LANG%_*}" in
 		('fr')
-			string='Utilisation de %s\n'
+			string='Utilisation de %s'
 		;;
 		('en'|*)
-			string='Using %s\n'
+			string='Using %s'
 		;;
 	esac
-	printf "$string" "$1"
+	printf "$string\\n" "$file"
 }
 
 # check integrity of target file
-# USAGE: file_checksum $file
-# NEEDED VARS: ARCHIVE OPTION_CHECKSUM (LANG)
-# CALLS: file_checksum_md5 liberror
-file_checksum() {
+# USAGE: archive_integrity_check $archive $file
+# CALLS: archive_integrity_check_md5 liberror
+archive_integrity_check() {
+	local archive
+	local file
+	archive="$1"
+	file="$2"
 	case "$OPTION_CHECKSUM" in
 		('md5')
-			file_checksum_md5 "$1"
+			archive_integrity_check_md5 "$archive" "$file"
 			print_ok
 		;;
 		('none')
 			return 0
 		;;
 		(*)
-			liberror 'OPTION_CHECKSUM' 'file_checksum'
+			liberror 'OPTION_CHECKSUM' 'archive_integrity_check'
 		;;
 	esac
 }
 
 # check integrity of target file against MD5 control sum
-# USAGE: file_checksum_md5 $file
-# NEEDED VARS: ARCHIVE
-# CALLS: file_checksum_print file_checksum_error
-# CALLED BY: file_checksum
-file_checksum_md5() {
-	file_checksum_print "$1"
-	FILE_MD5="$(md5sum "$1" | awk '{print $1}')"
-	if [ "$FILE_MD5" = "$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")" ]; then
-		return 0
-	else
-		file_checksum_error "$1"
-		return 1
-	fi
+# USAGE: archive_integrity_check_md5 $archive $file
+# CALLS: archive_integrity_check_print archive_integrity_check_error
+# CALLED BY: archive_integrity_check
+archive_integrity_check_md5() {
+	local archive
+	local file
+	archive="$1"
+	file="$2"
+	archive_integrity_check_print "$file"
+	archive_sum="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
+	file_sum="$(md5sum "$file" | awk '{print $1}')"
+	[ "$file_sum" = "$archive_sum" ] || archive_integrity_check_error "$file"
 }
 
 # print integrity check message
-# USAGE: file_checksum_print $file
-# NEEDED VARS: (LANG)
-# CALLED BY: file_checksum_md5
-file_checksum_print() {
+# USAGE: archive_integrity_check_print $file
+# CALLED BY: archive_integrity_check_md5
+archive_integrity_check_print() {
+	local file
 	local string
+	file="$1"
 	case "${LANG%_*}" in
 		('fr')
 			string='Contrôle de l’intégrité de %s'
@@ -517,34 +516,34 @@ file_checksum_print() {
 			string='Checking integrity of %s'
 		;;
 	esac
-	printf "$string" "$(basename "$1")"
+	printf "$string" "$(basename "$file")"
 }
 
-# print integrity check error message
-# USAGE: file_checksum_error $file
-# NEEDED VARS: (LANG)
-# CALLED BY: file_checksum_md5
-file_checksum_error() {
-	print_error
+# print an error message if an integrity check fails
+# USAGE: archive_integrity_check_error $file
+# CALLED BY: archive_integrity_check_md5
+archive_integrity_check_error() {
 	local string1
 	local string2
 	case "${LANG%_*}" in
 		('fr')
-			string1='Somme de contrôle incohérente. %s n’est pas le fichier attendu.\n'
-			string2='Utilisez --checksum=none pour forcer son utilisation.\n'
+			string1='Somme de contrôle incohérente. %s n’est pas le fichier attendu.'
+			string2='Utilisez --checksum=none pour forcer son utilisation.'
 		;;
 		('en'|*)
-			string1='Hashsum mismatch. %s is not the expected file.\n'
-			string2='Use --checksum=none to force its use.\n'
+			string1='Hashsum mismatch. %s is not the expected file.'
+			string2='Use --checksum=none to force its use.'
 		;;
 	esac
-	printf "$string1" "$(basename "$1")"
-	printf "$string2"
+	print_error
+	printf "$string1\\n" "$(basename "$1")"
+	printf "$string2\\n"
+	return 1
 }
 
 # check script dependencies
 # USAGE: check_deps
-# NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (LANG) (OPTION_PACKAGE) (SCRIPT_DEPS)
+# NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
 # CALLS: check_deps_7z check_deps_error_not_found
 check_deps() {
 	if [ "$ARCHIVE" ]; then
@@ -613,7 +612,6 @@ check_deps() {
 
 # check presence of a software to handle .7z archives
 # USAGE: check_deps_7z
-# NEEDED VARS: (LANG)
 # CALLS: check_deps_error_not_found
 # CALLED BY: check_deps
 check_deps_7z() {
@@ -630,7 +628,6 @@ check_deps_7z() {
 
 # display a message if a required dependency is missing
 # USAGE: check_deps_error_not_found $command_name
-# NEEDED VARS: (LANG)
 # CALLED BY: check_deps check_deps_7z
 check_deps_error_not_found() {
 	print_error
@@ -1472,21 +1469,15 @@ move_icons_to() {
 # NEEDED VARS: APP_ICONS_LIST APP_ID|GAME_ID APP_ICON APP_ICON_RES PATH_GAME
 postinst_icons_linking() {
 	[ "$DRY_RUN" = '1' ] && return 0
+	local app
+	local app_icons_list
+	local app_id
+	local icon_file
+	local icon_res
 	for app in "$@"; do
-		# get icons list associated with current application
-		local app_icons_list
-		app_icons_list="$(eval printf -- '%b' \"\$${1}_ICONS_LIST\")"
-
-		# get current application id (falls back on $GAME_ID if it is not set)
-		local app_id
-		if [ -n "$(eval printf -- '%b' \"\$${1}_ID\")" ]; then
-			app_id="$(eval printf -- '%b' \"\$${1}_ID\")"
-		else
-			app_id="$GAME_ID"
-		fi
-
-		local icon_file
-		local icon_res
+		app_icons_list="$(eval printf -- '%b' \"\$${app}_ICONS_LIST\")"
+		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
+		[ -n "$app_id" ] || app_id="$GAME_ID"
 		for icon in $app_icons_list; do
 			icon_file="$(eval printf -- '%b' \"\$$icon\")"
 			icon_res="$(eval printf -- '%b' \"\$${icon}_RES\")"
@@ -3317,9 +3308,9 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 		;;
 	esac
 
-	# Set source archive
+	# Set main archive
 
-	set_source_archive $ARCHIVES_LIST
+	archive_set_main $ARCHIVES_LIST
 
 	# Set working directories
 

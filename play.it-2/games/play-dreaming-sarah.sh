@@ -29,47 +29,56 @@ set -o errexit
 ###
 
 ###
-# Softporn Adventure
+# Dreaming Sarah
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180307.1
+script_version=20180310.2
 
 # Set game-specific variables
 
-GAME_ID='softporn-adventure'
-GAME_NAME='Softporn Adventure'
+GAME_ID='dreaming-sarah'
+GAME_NAME='Dreaming Sarah'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_HUMBLE_32 ARCHIVE_HUMBLE_64'
 
-ARCHIVE_GOG='gog_softporn_adventure_2.0.0.1.sh'
-ARCHIVE_GOG_MD5='1e51094f928757140c5a0dacc70773c0'
-ARCHIVE_GOG_SIZE='11000'
-ARCHIVE_GOG_VERSION='1.0-gog2.0.0.1'
+ARCHIVE_HUMBLE_32='DreamingSarah-linux32_1.3.zip'
+ARCHIVE_HUMBLE_32_URL='https://www.humblebundle.com/store/dreaming-sarah'
+ARCHIVE_HUMBLE_32_MD5='73682a545e979ad9a2b6123222ddb517'
+ARCHIVE_HUMBLE_32_SIZE='200000'
+ARCHIVE_HUMBLE_32_VERSION='1.3-humble1'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*.doc ./*.txt'
+ARCHIVE_HUMBLE_64='DreamingSarah-linux64_1.3.zip'
+ARCHIVE_HUMBLE_64_URL='https://www.humblebundle.com/store/dreaming-sarah'
+ARCHIVE_HUMBLE_64_MD5='a68f3956eb09ea7b34caa20f6e89b60c'
+ARCHIVE_HUMBLE_64_SIZE='200000'
+ARCHIVE_HUMBLE_64_VERSION='1.3-humble1'
 
-ARCHIVE_GAME_PATH='data/noarch/data'
-ARCHIVE_GAME_FILES='./*'
+ARCHIVE_GAME_BIN_PATH_HUMBLE_32='DreamingSarah-linux32'
+ARCHIVE_GAME_BIN_PATH_HUMBLE_64='DreamingSarah-linux64'
+ARCHIVE_GAME_BIN_FILES='./lib ./nacl_helper ./nacl_helper_bootstrap ./nw'
 
-DATA_FILES='./*.GAM'
+ARCHIVE_GAME_DATA_PATH_HUMBLE_32='DreamingSarah-linux32'
+ARCHIVE_GAME_DATA_PATH_HUMBLE_64='DreamingSarah-linux64'
+ARCHIVE_GAME_DATA_FILES='./icudtl.dat ./locales ./natives_blob.bin ./nw_100_percent.pak ./nw_200_percent.pak ./package.nw ./resources.pak'
 
-APP_MAIN_TYPE='dosbox'
-APP_MAIN_EXE='softporn.exe'
-APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='nw'
+APP_MAIN_LIB='lib'
 
-PACKAGES_LIST='PKG_MAIN'
+PACKAGES_LIST='PKG_DATA PKG_BIN'
 
-PKG_MAIN_ARCH='32'
-PKG_MAIN_DEPS_DEB='dosbox'
-PKG_MAIN_DEPS_ARCH='dosbox'
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN_ARCH_HUMBLE_32='32'
+PKG_BIN_ARCH_HUMBLE_64='64'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ libxrandr xcursor nss gconf gtk2"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.6'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -88,16 +97,12 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-tolower "$PLAYIT_WORKDIR/gamedata"
-
-organize_data 'DOC'  "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
-get_icon_from_temp_dir 'APP_MAIN'
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
 # Build package
