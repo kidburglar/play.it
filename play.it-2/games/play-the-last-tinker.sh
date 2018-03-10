@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180303.4
+script_version=20180310.1
 
 # Set game-specific variables
 
@@ -87,7 +87,7 @@ APP_MAIN_ICON_RES_GOG_WINDOWS_OLD='16 24 32 48 64 96 128 192 256'
 
 APP_MAIN_TYPE_GOG_LINUX='native'
 APP_MAIN_EXE_GOG_LINUX='the last tinker.x86'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON_LINUX'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON_GOG_LINUX='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES_GOG_LINUX='128'
 
@@ -102,7 +102,7 @@ PKG_BIN_DEPS_GOG_LINUX="$PKG_DATA_ID alsa glu xcursor"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.6'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -122,8 +122,8 @@ fi
 
 if [ "$ARCHIVE" = 'ARCHIVE_GOG_WINDOWS' ]; then
 	ARCHIVE_MAIN="$ARCHIVE"
-	set_archive 'ARCHIVE_PART1' "${ARCHIVE}_PART1"
-	[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE}_PART1"
+	set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
+	[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
 	ARCHIVE="$ARCHIVE_MAIN"
 fi
 
@@ -137,11 +137,7 @@ use_archive_specific_value 'APP_MAIN_ICON_RES'
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+prepare_package_layout
 
 if [ $ARCHIVE = 'ARCHIVE_GOG_WINDOWS' ] || [ $ARCHIVE = 'ARCHIVE_GOG_WINDOWS_OLD' ]; then
 	PKG='PKG_BIN'
