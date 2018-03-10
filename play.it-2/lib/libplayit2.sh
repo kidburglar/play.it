@@ -33,7 +33,7 @@
 ###
 
 library_version=2.7.0~dev
-library_revision=20180318.1
+library_revision=20180318.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1534,6 +1534,7 @@ postinst_icons_linking() {
 	local icon_res
 	for app in "$@"; do
 		app_icons_list="$(eval printf -- '%b' \"\$${app}_ICONS_LIST\")"
+		[ -n "$app_icons_list" ] || app_icons_list="${app}_ICON"
 		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		[ -n "$app_id" ] || app_id="$GAME_ID"
 		for icon in $app_icons_list; do

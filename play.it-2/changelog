@@ -5,6 +5,8 @@
 
   * Try to guess the value of ARCHIVES_LIST if it is not set by the script
 
+  * Use 'APP_ICON' as a fallback value for APP_ICONS_LIST if it is not set
+
 2.6.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity
