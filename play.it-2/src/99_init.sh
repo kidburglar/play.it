@@ -194,6 +194,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set main archive
 
+	archives_get_list
 	archive_set_main $ARCHIVES_LIST
 
 	# Set working directories

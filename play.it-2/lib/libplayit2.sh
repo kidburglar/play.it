@@ -33,7 +33,7 @@
 ###
 
 library_version=2.7.0~dev
-library_revision=20180315.1
+library_revision=20180318.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -541,6 +541,24 @@ archive_integrity_check_error() {
 	return 1
 }
 
+# get list of available archives, exported as ARCHIVES_LIST
+# USAGE: archives_get_list
+archives_get_list() {
+	local script
+	[ -n "$ARCHIVES_LIST" ] && return 0
+	script="$0"
+	while read archive; do
+		if [ -z "$ARCHIVES_LIST" ]; then
+			ARCHIVES_LIST="$archive"
+		else
+			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
+		fi
+	done <<- EOL
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	EOL
+	export ARCHIVES_LIST
+}
+
 # check script dependencies
 # USAGE: check_deps
 # NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
@@ -680,6 +698,7 @@ help() {
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
+	archives_get_list
 	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
@@ -3349,6 +3368,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set main archive
 
+	archives_get_list
 	archive_set_main $ARCHIVES_LIST
 
 	# Set working directories

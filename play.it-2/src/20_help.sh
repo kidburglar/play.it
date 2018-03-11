@@ -35,6 +35,7 @@ help() {
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
+	archives_get_list
 	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else

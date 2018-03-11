@@ -283,3 +283,21 @@ archive_integrity_check_error() {
 	return 1
 }
 
+# get list of available archives, exported as ARCHIVES_LIST
+# USAGE: archives_get_list
+archives_get_list() {
+	local script
+	[ -n "$ARCHIVES_LIST" ] && return 0
+	script="$0"
+	while read archive; do
+		if [ -z "$ARCHIVES_LIST" ]; then
+			ARCHIVES_LIST="$archive"
+		else
+			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
+		fi
+	done <<- EOL
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	EOL
+	export ARCHIVES_LIST
+}
+

@@ -3,6 +3,8 @@
   * InnoSetup archives: Check ability of available innoextract version to
     extract the target archive before trying to proceed with extraction
 
+  * Try to guess the value of ARCHIVES_LIST if it is not set by the script
+
 2.6.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity
