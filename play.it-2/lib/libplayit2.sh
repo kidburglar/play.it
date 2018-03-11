@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.6.1
-library_revision=20180310.3
+library_version=2.6.2~dev
+library_revision=20180311.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -360,7 +360,7 @@ archive_get_infos() {
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
 	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"

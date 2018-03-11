@@ -102,7 +102,7 @@ archive_get_infos() {
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
 	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
