@@ -1,3 +1,8 @@
+2.6.2
+
+  * Fix an inverted test in archive_get_infos that broke the MD5 integrity
+    check
+
 2.6.1
 
   * Fix postinst_icons_linking not working on more than one single app
