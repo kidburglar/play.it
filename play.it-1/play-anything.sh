@@ -29,7 +29,7 @@
 
 ###
 # common functions for ./play.it scripts
-# library version 1.14.9
+# library version 1.14.10
 #
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -1061,7 +1061,8 @@ init_prefix () {
 	cd "\$GAME_PATH"
 	find . ! -type d | while read file; do
 		if [ ! -e "\$USERDIR_DATA/\$file" ]; then
-			cp --parents --symbolic-link "\$(readlink --canonicalize "\$file")" "\$USERDIR_DATA"
+			mkdir --parents "\$USERDIR_DATA/\${file%/*}"
+			cp --symbolic-link "\$(readlink --canonicalize "\$file")" "\$USERDIR_DATA/\$file"
 		fi
 	done
 )
