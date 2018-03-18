@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.7.0
-library_revision=20180318.5
+library_version=2.7.1~dev
+library_revision=20180318.6
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -321,6 +321,8 @@ archive_set() {
 			if [ "$(basename "$current_value")" = "$file" ]; then
 				archive_get_infos "$archive" "$name" "$current_value"
 				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -333,6 +335,8 @@ archive_set() {
 			if [ -f "$file" ]; then
 				archive_get_infos "$archive" "$name" "$file"
 				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -366,8 +370,6 @@ archive_check_for_extra_parts() {
 			set_archive_error_not_found "$part_archive"
 		fi
 	done
-	ARCHIVE="$archive"
-	export ARCHIVE
 }
 
 # get informations about a single archive and export them
