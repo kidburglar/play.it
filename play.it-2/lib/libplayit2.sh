@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.6.2
-library_revision=20180313.1
+library_version=2.7.1
+library_revision=20180318.7
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -306,7 +306,7 @@ set_archive_error_not_found() { archive_set_error_not_found "$@"; }
 
 # set a single archive for data extraction
 # USAGE: archive_set $name $archive[…]
-# CALLS: archive_get_infos
+# CALLS: archive_get_infos archive_check_for_extra_parts
 archive_set() {
 	local archive
 	local current_value
@@ -320,6 +320,9 @@ archive_set() {
 			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ "$(basename "$current_value")" = "$file" ]; then
 				archive_get_infos "$archive" "$name" "$current_value"
+				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -331,6 +334,9 @@ archive_set() {
 			fi
 			if [ -f "$file" ]; then
 				archive_get_infos "$archive" "$name" "$file"
+				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -339,6 +345,32 @@ archive_set() {
 }
 # compatibility alias
 set_archive() { archive_set "$@"; }
+
+# automatically check for presence of archives using the name of the base archive with a _PART1 to _PART9 suffix appended
+# returns an error if such an archive is set by the script but not found
+# returns success on the first archive not set by the script
+# USAGE: archive_check_for_extra_parts $archive $name
+# NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
+# CALLS: set_archive
+archive_check_for_extra_parts() {
+	local archive
+	local file
+	local name
+	local part_archive
+	local part_name
+	archive="$1"
+	name="$2"
+	for i in $(seq 1 9); do
+		part_archive="${archive}_PART${i}"
+		part_name="${name}_PART${i}"
+		file="$(eval printf -- '%b' \"\$$part_archive\")"
+		[ -n "$file" ] || return 0
+		set_archive "$part_name" "$part_archive"
+		if [ -z "$(eval printf -- '%b' \"\$$part_name\")" ]; then
+			set_archive_error_not_found "$part_archive"
+		fi
+	done
+}
 
 # get informations about a single archive and export them
 # USAGE: archive_get_infos $archive $name $file
@@ -350,7 +382,6 @@ archive_get_infos() {
 	local name
 	local size
 	local type
-	local version
 	ARCHIVE="$1"
 	name="$2"
 	file="$3"
@@ -359,8 +390,7 @@ archive_get_infos() {
 	md5="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
-	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
@@ -371,10 +401,6 @@ archive_get_infos() {
 	if [ -n "$size" ]; then
 		[ -n "$ARCHIVE_SIZE" ] || ARCHIVE_SIZE='0'
 		ARCHIVE_SIZE="$((ARCHIVE_SIZE + size))"
-	fi
-	if [ -n "$version" ]; then
-		[ -n "$script_version" ] || script_version="$(date +%Y%m%d).0"
-		PKG_VERSION="${version}+${script_version}"
 	fi
 	export ARCHIVE_SIZE
 	export PKG_VERSION
@@ -541,6 +567,24 @@ archive_integrity_check_error() {
 	return 1
 }
 
+# get list of available archives, exported as ARCHIVES_LIST
+# USAGE: archives_get_list
+archives_get_list() {
+	local script
+	[ -n "$ARCHIVES_LIST" ] && return 0
+	script="$0"
+	while read archive; do
+		if [ -z "$ARCHIVES_LIST" ]; then
+			ARCHIVES_LIST="$archive"
+		else
+			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
+		fi
+	done <<- EOL
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	EOL
+	export ARCHIVES_LIST
+}
+
 # check script dependencies
 # USAGE: check_deps
 # NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
@@ -680,6 +724,7 @@ help() {
 	printf '\n'
 
 	printf 'ARCHIVE\n\n'
+	archives_get_list
 	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
@@ -993,6 +1038,19 @@ select_package_architecture_warning_unsupported() {
 	printf '%s\n\n' "$string"
 }
 
+# get version of current package, exported as PKG_VERSION
+# USAGE: get_package_version
+# NEEDED_VARS: PKG
+get_package_version() {
+	use_package_specific_value "${ARCHIVE}_VERSION"
+	PKG_VERSION="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
+	if [ -z "$PKG_VERSION" ]; then
+		PKG_VERSION='1.0-1'
+	fi
+	PKG_VERSION="${PKG_VERSION}+$script_version"
+	export PKG_VERSION
+}
+
 # set temporary directories
 # USAGE: set_temp_directories $pkg[…]
 # NEEDED VARS: (ARCHIVE_SIZE) GAME_ID (LANG) (PWD) (XDG_CACHE_HOME) (XDG_RUNTIME_DIR)
@@ -1065,40 +1123,32 @@ set_temp_directories() {
 
 # set package-secific temporary directory
 # USAGE: set_temp_directories_pkg $pkg
-# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID PKG_VERSION|script_version
+# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) PLAYIT_WORKDIR (PKG_ARCH) PKG_ID|GAME_ID
 # CALLED BY: set_temp_directories
 set_temp_directories_pkg() {
+	PKG="$1"
 
 	# Get package ID
-	use_archive_specific_value "${1}_ID"
+	use_archive_specific_value "${PKG}_ID"
 	local pkg_id
-	pkg_id="$(eval printf -- '%b' \"\$${1}_ID\")"
+	pkg_id="$(eval printf -- '%b' \"\$${PKG}_ID\")"
 	if [ -z "$pkg_id" ]; then
-		eval ${1}_ID=\"$GAME_ID\"
-		export ${1}_ID
+		eval ${PKG}_ID=\"$GAME_ID\"
+		export ${PKG}_ID
 		pkg_id="$GAME_ID"
-	fi
-
-	# Get package version
-	local pkg_version
-	if [ -n "$(eval printf -- '%b' \"\$${1}_VERSION\")" ]; then
-		pkg_version="$(eval printf -- '%b' \"\$${1}_VERSION\")+$script_version"
-	elif [ "$PKG_VERSION" ]; then
-		pkg_version="$PKG_VERSION"
-	else
-		pkg_version='1.0-1+$script_version'
 	fi
 
 	# Get package architecture
 	local pkg_architecture
-	set_architecture "$1"
+	set_architecture "$PKG"
 
 	# Set $PKG_PATH
-	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${1}_ARCH\")" = '32' ]; then
+	if [ "$OPTION_PACKAGE" = 'arch' ] && [ "$(eval printf -- '%b' \"\$${PKG}_ARCH\")" = '32' ]; then
 		pkg_id="lib32-$pkg_id"
 	fi
-	eval ${1}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${pkg_version}_${pkg_architecture}\"
-	export ${1}_PATH
+	get_package_version
+	eval ${PKG}_PATH=\"$PLAYIT_WORKDIR/${pkg_id}_${PKG_VERSION}_${pkg_architecture}\"
+	export ${PKG}_PATH
 }
 
 # display an error if set_temp_directories() is called before setting $ARCHIVE_SIZE
@@ -1149,7 +1199,7 @@ set_temp_directories_error_not_enough_space() {
 extract_data_from() {
 	[ "$PLAYIT_WORKDIR" ] || return 1
 	[ "$ARCHIVE" ] || return 1
-
+	local file
 	for file in "$@"; do
 		extract_data_from_print "$(basename "$file")"
 
@@ -1174,12 +1224,7 @@ extract_data_from() {
 				dpkg-deb --extract "$file" "$destination"
 			;;
 			('innosetup'*)
-				options='--progress=1 --silent'
-				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
-					options="$options --lowercase"
-				fi
-				printf '\n'
-				innoextract $options --extract --output-dir "$destination" "$file"
+				archive_extraction_innosetup "$archive_type" "$file" "$destination"
 			;;
 			('msi')
 				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
@@ -1244,6 +1289,50 @@ extract_data_from_print() {
 		;;
 	esac
 	printf "$string" "$1"
+}
+
+# extract data from InnoSetup archive
+# USAGE: archive_extraction_innosetup $archive_type $archive $destination
+# CALLS: archive_extraction_innosetup_error_version
+archive_extraction_innosetup() {
+	local archive
+	local archive_type
+	local destination
+	local options
+	archive_type="$1"
+	archive="$2"
+	destination="$3"
+	options='--progress=1 --silent'
+	if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+		options="$options --lowercase"
+	fi
+	if ( innoextract --list --silent "$archive" 2>&1 1>/dev/null |\
+		head --lines=1 |\
+		grep 'unexpected setup data version' 1>/dev/null )
+	then
+		archive_extraction_innosetup_error_version "$archive"
+	fi
+	printf '\n'
+	innoextract $options --extract --output-dir "$destination" "$file"
+}
+
+# print error if available version of innoextract is too low
+# USAGE: archive_extraction_innosetup_error_version $archive
+# CALLED BY: archive_extraction_innosetup
+archive_extraction_innosetup_error_version() {
+	local archive
+	archive="$1"
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='La version de innoextract disponible sur ce système est trop ancienne pour extraire les données de l’archive suivante :'
+		;;
+		('en'|*)
+			string='Available innoextract version is too old to extract data from the following archive:'
+		;;
+	esac
+	printf "$string %s\\n" "$archive"
+	exit 1
 }
 
 # prepare package layout by putting files from archive in the right packages
@@ -1476,6 +1565,7 @@ postinst_icons_linking() {
 	local icon_res
 	for app in "$@"; do
 		app_icons_list="$(eval printf -- '%b' \"\$${app}_ICONS_LIST\")"
+		[ -n "$app_icons_list" ] || app_icons_list="${app}_ICON"
 		app_id="$(eval printf -- '%b' \"\$${app}_ID\")"
 		[ -n "$app_id" ] || app_id="$GAME_ID"
 		for icon in $app_icons_list; do
@@ -2346,7 +2436,7 @@ write_desktop_winecfg() {
 
 # write package meta-data
 # USAGE: write_metadata [$pkg…]
-# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE PKG_VERSION
+# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE
 # CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
 write_metadata() {
 	if [ $# = 0 ]; then
@@ -2377,12 +2467,6 @@ write_metadata() {
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
 		pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-
-		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
-			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
-		else
-			pkg_version="$PKG_VERSION"
-		fi
 
 		case $OPTION_PACKAGE in
 			('arch')
@@ -2526,11 +2610,14 @@ pkg_write_arch() {
 	local target
 	target="$pkg_path/.PKGINFO"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	pkgname = $pkg_id
-	pkgver = $pkg_version
+	pkgver = $PKG_VERSION
 	packager = $pkg_maint
 	builddate = $(date +"%m%d%Y")
 	size = $pkg_size
@@ -2884,11 +2971,14 @@ pkg_write_deb() {
 	local target
 	target="$pkg_path/DEBIAN/control"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	Package: $pkg_id
-	Version: $pkg_version
+	Version: $PKG_VERSION
 	Architecture: $pkg_architecture
 	Maintainer: $pkg_maint
 	Installed-Size: $pkg_size
@@ -3310,6 +3400,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Set main archive
 
+	archives_get_list
 	archive_set_main $ARCHIVES_LIST
 
 	# Set working directories

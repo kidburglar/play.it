@@ -20,11 +20,14 @@ pkg_write_deb() {
 	local target
 	target="$pkg_path/DEBIAN/control"
 
+	PKG="$pkg"
+	get_package_version
+
 	mkdir --parents "${target%/*}"
 
 	cat > "$target" <<- EOF
 	Package: $pkg_id
-	Version: $pkg_version
+	Version: $PKG_VERSION
 	Architecture: $pkg_architecture
 	Maintainer: $pkg_maint
 	Installed-Size: $pkg_size

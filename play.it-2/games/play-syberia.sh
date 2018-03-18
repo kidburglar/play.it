@@ -34,12 +34,12 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180310.2
+script_version=20180318.1
 
 # Set game-specific variables
 
 GAME_ID='syberia'
-GAME_NAME='syberia'
+GAME_NAME='Syberia'
 
 ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_EN_OLD ARCHIVE_GOG_FR ARCHIVE_GOG_FR_OLD'
 
@@ -103,7 +103,7 @@ PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.6'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"

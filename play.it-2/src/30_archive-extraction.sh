@@ -5,7 +5,7 @@
 extract_data_from() {
 	[ "$PLAYIT_WORKDIR" ] || return 1
 	[ "$ARCHIVE" ] || return 1
-
+	local file
 	for file in "$@"; do
 		extract_data_from_print "$(basename "$file")"
 
@@ -30,12 +30,7 @@ extract_data_from() {
 				dpkg-deb --extract "$file" "$destination"
 			;;
 			('innosetup'*)
-				options='--progress=1 --silent'
-				if [ "$archive_type" != 'innosetup_nolowercase' ]; then
-					options="$options --lowercase"
-				fi
-				printf '\n'
-				innoextract $options --extract --output-dir "$destination" "$file"
+				archive_extraction_innosetup "$archive_type" "$file" "$destination"
 			;;
 			('msi')
 				msiextract --directory "$destination" "$file" 1>/dev/null 2>&1
@@ -100,5 +95,49 @@ extract_data_from_print() {
 		;;
 	esac
 	printf "$string" "$1"
+}
+
+# extract data from InnoSetup archive
+# USAGE: archive_extraction_innosetup $archive_type $archive $destination
+# CALLS: archive_extraction_innosetup_error_version
+archive_extraction_innosetup() {
+	local archive
+	local archive_type
+	local destination
+	local options
+	archive_type="$1"
+	archive="$2"
+	destination="$3"
+	options='--progress=1 --silent'
+	if [ "$archive_type" != 'innosetup_nolowercase' ]; then
+		options="$options --lowercase"
+	fi
+	if ( innoextract --list --silent "$archive" 2>&1 1>/dev/null |\
+		head --lines=1 |\
+		grep 'unexpected setup data version' 1>/dev/null )
+	then
+		archive_extraction_innosetup_error_version "$archive"
+	fi
+	printf '\n'
+	innoextract $options --extract --output-dir "$destination" "$file"
+}
+
+# print error if available version of innoextract is too low
+# USAGE: archive_extraction_innosetup_error_version $archive
+# CALLED BY: archive_extraction_innosetup
+archive_extraction_innosetup_error_version() {
+	local archive
+	archive="$1"
+	print_error
+	case "${LANG%_*}" in
+		('fr')
+			string='La version de innoextract disponible sur ce système est trop ancienne pour extraire les données de l’archive suivante :'
+		;;
+		('en'|*)
+			string='Available innoextract version is too old to extract data from the following archive:'
+		;;
+	esac
+	printf "$string %s\\n" "$archive"
+	exit 1
 }
 

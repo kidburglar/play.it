@@ -48,7 +48,7 @@ set_archive_error_not_found() { archive_set_error_not_found "$@"; }
 
 # set a single archive for data extraction
 # USAGE: archive_set $name $archive[…]
-# CALLS: archive_get_infos
+# CALLS: archive_get_infos archive_check_for_extra_parts
 archive_set() {
 	local archive
 	local current_value
@@ -62,6 +62,9 @@ archive_set() {
 			file="$(eval printf -- '%b' \"\$$archive\")"
 			if [ "$(basename "$current_value")" = "$file" ]; then
 				archive_get_infos "$archive" "$name" "$current_value"
+				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -73,6 +76,9 @@ archive_set() {
 			fi
 			if [ -f "$file" ]; then
 				archive_get_infos "$archive" "$name" "$file"
+				archive_check_for_extra_parts "$archive" "$name"
+				ARCHIVE="$archive"
+				export ARCHIVE
 				return 0
 			fi
 		done
@@ -81,6 +87,32 @@ archive_set() {
 }
 # compatibility alias
 set_archive() { archive_set "$@"; }
+
+# automatically check for presence of archives using the name of the base archive with a _PART1 to _PART9 suffix appended
+# returns an error if such an archive is set by the script but not found
+# returns success on the first archive not set by the script
+# USAGE: archive_check_for_extra_parts $archive $name
+# NEEDED_VARS: (LANG) (SOURCE_ARCHIVE)
+# CALLS: set_archive
+archive_check_for_extra_parts() {
+	local archive
+	local file
+	local name
+	local part_archive
+	local part_name
+	archive="$1"
+	name="$2"
+	for i in $(seq 1 9); do
+		part_archive="${archive}_PART${i}"
+		part_name="${name}_PART${i}"
+		file="$(eval printf -- '%b' \"\$$part_archive\")"
+		[ -n "$file" ] || return 0
+		set_archive "$part_name" "$part_archive"
+		if [ -z "$(eval printf -- '%b' \"\$$part_name\")" ]; then
+			set_archive_error_not_found "$part_archive"
+		fi
+	done
+}
 
 # get informations about a single archive and export them
 # USAGE: archive_get_infos $archive $name $file
@@ -92,7 +124,6 @@ archive_get_infos() {
 	local name
 	local size
 	local type
-	local version
 	ARCHIVE="$1"
 	name="$2"
 	file="$3"
@@ -101,8 +132,7 @@ archive_get_infos() {
 	md5="$(eval printf -- '%b' \"\$${ARCHIVE}_MD5\")"
 	type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
 	size="$(eval printf -- '%b' \"\$${ARCHIVE}_SIZE\")"
-	version="$(eval printf -- '%b' \"\$${ARCHIVE}_VERSION\")"
-	[ -n "$md5" ] && archive_integrity_check "$ARCHIVE" "$file"
+	[ -n "$md5" ] || archive_integrity_check "$ARCHIVE" "$file"
 	if [ -z "$type" ]; then
 		archive_guess_type "$ARCHIVE" "$file"
 		type="$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")"
@@ -113,10 +143,6 @@ archive_get_infos() {
 	if [ -n "$size" ]; then
 		[ -n "$ARCHIVE_SIZE" ] || ARCHIVE_SIZE='0'
 		ARCHIVE_SIZE="$((ARCHIVE_SIZE + size))"
-	fi
-	if [ -n "$version" ]; then
-		[ -n "$script_version" ] || script_version="$(date +%Y%m%d).0"
-		PKG_VERSION="${version}+${script_version}"
 	fi
 	export ARCHIVE_SIZE
 	export PKG_VERSION
@@ -281,5 +307,23 @@ archive_integrity_check_error() {
 	printf "$string1\\n" "$(basename "$1")"
 	printf "$string2\\n"
 	return 1
+}
+
+# get list of available archives, exported as ARCHIVES_LIST
+# USAGE: archives_get_list
+archives_get_list() {
+	local script
+	[ -n "$ARCHIVES_LIST" ] && return 0
+	script="$0"
+	while read archive; do
+		if [ -z "$ARCHIVES_LIST" ]; then
+			ARCHIVES_LIST="$archive"
+		else
+			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
+		fi
+	done <<- EOL
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	EOL
+	export ARCHIVES_LIST
 }
 

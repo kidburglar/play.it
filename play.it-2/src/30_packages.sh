@@ -1,6 +1,6 @@
 # write package meta-data
 # USAGE: write_metadata [$pkg…]
-# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE PKG_VERSION
+# NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE
 # CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
 write_metadata() {
 	if [ $# = 0 ]; then
@@ -31,12 +31,6 @@ write_metadata() {
 
 		use_archive_specific_value "${pkg}_DESCRIPTION"
 		pkg_description="$(eval printf -- '%b' \"\$${pkg}_DESCRIPTION\")"
-
-		if [ "$(eval printf -- '%b' \"\$${pkg}_VERSION\")" ]; then
-			pkg_version="$(eval printf -- '%b' \"\$${pkg}_VERSION\")"
-		else
-			pkg_version="$PKG_VERSION"
-		fi
 
 		case $OPTION_PACKAGE in
 			('arch')

@@ -1,3 +1,21 @@
+2.7.1
+
+  * Fix variable leak during multi-parts archive automatic handling
+
+2.7.0
+
+  * InnoSetup archives: Check ability of available innoextract version to
+    extract the target archive before trying to proceed with extraction
+
+  * Try to guess the value of ARCHIVES_LIST if it is not set by the script
+
+  * Use 'APP_ICON' as a fallback value for APP_ICONS_LIST if it is not set
+
+  * Add automatic detection of multi-parts archives
+
+  * New function get_package_version allowing a reliable way to use different
+    version values for multiple packages generated from a single archive
+
 2.6.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity

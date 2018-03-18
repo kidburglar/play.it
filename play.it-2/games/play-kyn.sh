@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180318.1
 
 # Set game-specific variables
 
@@ -88,7 +88,7 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -104,13 +104,6 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Check that all parts of the installer are present
-
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
-ARCHIVE="$ARCHIVE_MAIN"
-
 # Extract game data
 
 case "$ARCHIVE" in
@@ -118,14 +111,12 @@ case "$ARCHIVE" in
 		extract_data_from "$SOURCE_ARCHIVE"
 	;;
 	('ARCHIVE_GOG_OLD')
-		extract_data_from "$ARCHIVE_PART1"
+		extract_data_from "$SOURCE_ARCHIVE_PART1"
 		tolower "$PLAYIT_WORKDIR/gamedata"
 	;;
 esac
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+prepare_package_layout
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
@@ -151,14 +142,12 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
