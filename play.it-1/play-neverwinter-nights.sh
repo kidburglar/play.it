@@ -34,7 +34,7 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20161207.3
+script_version=20180318.1
 
 # Set game-specific variables
 
@@ -193,7 +193,8 @@ set_compression
 set_prefix
 set_nwmovies
 
-check_deps_hard ${SCRIPT_DEPS_HARD}
+check_deps_hard $SCRIPT_DEPS_HARD
+check_deps_soft $SCRIPT_DEPS_SOFT
 
 printf '\n'
 set_target '5' 'gog.com'
