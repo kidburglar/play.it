@@ -4,6 +4,9 @@
 
   * Fix archives_get_list not detecting archives named ARCHIVE_(…)_OLD
 
+  * Fix error message displayed by write_metadata when called on an unknown
+    package
+
 2.7.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity
