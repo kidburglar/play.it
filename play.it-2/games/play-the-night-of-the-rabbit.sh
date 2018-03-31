@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180331.4
+script_version=20180331.5
 
 # Set game-specific variables
 
@@ -57,7 +57,6 @@ ARCHIVE_GOG_PART2_MD5='3b510f6837a5aee5fb4ab5c34643c844'
 ARCHIVE_GOG_PART2_TYPE='innosetup'
 
 ARCHIVE_GOG_OLD='setup_the_night_of_the_rabbit_2.1.0.5-1.bin'
-ARCHIVE_GOG_OLD_URL='https://www.gog.com/game/the_night_of_the_rabbit'
 ARCHIVE_GOG_OLD_MD5='565c8c59266eced8483ad579ecf3c454'
 ARCHIVE_GOG_OLD_VERSION='1.2.3.0389-gog2.1.0.5'
 ARCHIVE_GOG_OLD_SIZE='6200000'
@@ -92,6 +91,8 @@ ARCHIVE_GAME_DATA_PATH_GOG_OLD='game'
 ARCHIVE_GAME_DATA_FILES='./banner.jpg ./characters ./data.vis ./folder.jpg ./languages.xml ./lua'
 
 CONFIG_FILES='./config.ini'
+
+APP_WINETRICKS='directx9'
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='./rabbit.exe'
