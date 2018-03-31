@@ -33,7 +33,7 @@
 ###
 
 library_version=2.7.3~dev
-library_revision=20180401.1
+library_revision=20180402.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -580,7 +580,7 @@ archives_get_list() {
 			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
 		fi
 	done <<- EOL
-	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
 	EOL
 	export ARCHIVES_LIST
 }

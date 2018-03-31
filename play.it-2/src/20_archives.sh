@@ -322,7 +322,7 @@ archives_get_list() {
 			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
 		fi
 	done <<- EOL
-	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
 	EOL
 	export ARCHIVES_LIST
 }

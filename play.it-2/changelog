@@ -2,6 +2,8 @@
 
   * archive_extraction_innosetup: Fix InnoSetup version test
 
+  * Fix archives_get_list not detecting archives named ARCHIVE_(…)_OLD
+
 2.7.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity
