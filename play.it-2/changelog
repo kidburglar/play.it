@@ -7,6 +7,8 @@
   * WINE: Remove most links pointing outside of the WINE prefix, to reduce
     $HOME clutter
 
+  * Rework most icon-related code for easier understanding and maintenance
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file
