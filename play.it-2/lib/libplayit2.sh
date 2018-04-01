@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.7.2
-library_revision=20180318.9
+library_version=2.7.3~dev
+library_revision=20180401.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1308,7 +1308,7 @@ archive_extraction_innosetup() {
 	fi
 	if ( innoextract --list --silent "$archive" 2>&1 1>/dev/null |\
 		head --lines=1 |\
-		grep 'unexpected setup data version' 1>/dev/null )
+		grep --ignore-case 'unexpected setup data version' 1>/dev/null )
 	then
 		archive_extraction_innosetup_error_version "$archive"
 	fi

@@ -1,3 +1,7 @@
+2.7.3
+
+  * archive_extraction_innosetup: Fix InnoSetup version test
+
 2.7.2
 
   * Fix an inverted test in archive_get_infos that broke the MD5 integrity
