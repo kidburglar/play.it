@@ -31,29 +31,31 @@ set -o errexit
 ###
 # Oddworld: Abe's Oddysee
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180331.2
 
 # Set game-specific variables
 
 GAME_ID='oddworld-abes-oddysee'
 GAME_NAME='Oddworld: Abe’s Oddysee'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='setup_abes_oddysee_2.0.0.4.exe'
+ARCHIVE_GOG='setup_abes_oddysee_1.0_(19071).exe'
 ARCHIVE_GOG_URL='https://www.gog.com/game/oddworld_abes_oddysee'
-ARCHIVE_GOG_MD5='c22a44d208e524dc2760ea6ce57829d5'
-ARCHIVE_GOG_SIZE='660000'
-ARCHIVE_GOG_VERSION='2.1-gog2.0.0.4'
+ARCHIVE_GOG_MD5='1c60cd9f43cc6392fc7c5185580eb048'
+ARCHIVE_GOG_SIZE='650000'
+ARCHIVE_GOG_VERSION='1.0-gog19071'
 
-ARCHIVE_DOC1_DATA_PATH='tmp'
-ARCHIVE_DOC1_DATA_FILES='./*.txt'
+ARCHIVE_GOG_OLD='setup_abes_oddysee_2.0.0.4.exe'
+ARCHIVE_GOG_OLD_MD5='c22a44d208e524dc2760ea6ce57829d5'
+ARCHIVE_GOG_OLD_SIZE='660000'
+ARCHIVE_GOG_OLD_VERSION='2.1-gog2.0.0.4'
 
-ARCHIVE_DOC2_DATA_PATH='app'
-ARCHIVE_DOC2_DATA_FILES='./*.txt ./*.pdf'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./*.txt ./*.pdf'
 
 ARCHIVE_GAME_BIN_PATH='app'
 ARCHIVE_GAME_BIN_FILES='./abewin.exe'
@@ -75,12 +77,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, wine32-development | wine32 | wine-bin | wine-i386 | wine-staging-i386, wine:amd64 | wine"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID wine"
+PKG_BIN_DEPS="$PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.1'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -100,11 +101,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+prepare_package_layout
 
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'

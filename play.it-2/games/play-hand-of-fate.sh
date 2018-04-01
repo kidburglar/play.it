@@ -34,21 +34,18 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180331.1
 
 # Set game-specific variables
 
 GAME_ID='hand-of-fate'
 GAME_NAME='Hand Of Fate'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
 ARCHIVE_GOG='gog_hand_of_fate_2.12.0.16.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/hand_of_fate'
 ARCHIVE_GOG_MD5='54c61dce76b1281b4161d53d096d6ffe'
 ARCHIVE_GOG_SIZE='1700000'
-ARCHIVE_GOG_VERSION='2.12.0.16-gog1.3.17'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG_VERSION='1.3.17-gog2.12.0.16'
 
 DATA_DIRS='./logs'
 
@@ -68,7 +65,6 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Hand of Fate.x86'
 APP_MAIN_EXE_BIN64='Hand of Fate.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
 APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
@@ -85,7 +81,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -104,12 +100,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -131,10 +122,6 @@ rm --recursive "${PLAYIT_WORKDIR}"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
