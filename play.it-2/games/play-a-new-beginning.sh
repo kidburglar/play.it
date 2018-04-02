@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180401.2
+script_version=20180402.1
 
 # Set game-specific variables
 
@@ -46,7 +46,7 @@ ARCHIVES_LIST='ARCHIVE_GOG'
 ARCHIVE_GOG='setup_a_new_beginning_final_cut_2.2.0.7.bin'
 ARCHIVE_GOG_URL='https://www.gog.com/game/a_new_beginning'
 ARCHIVE_GOG_MD5='1babc74ae7f29ff6ce16ea9fd3e4d3ff'
-ARCHIVE_GOG_SIZE='11000000'
+ARCHIVE_GOG_SIZE='4100000'
 ARCHIVE_GOG_VERSION='1.0-gog2.2.0.7'
 ARCHIVE_GOG_TYPE='rar'
 ARCHIVE_GOG_GOGID='1207659150'
