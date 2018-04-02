@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.7.3
-library_revision=20180402.3
+library_version=2.7.4
+library_revision=20180402.5
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -2319,7 +2319,7 @@ write_bin_winecfg() {
 		local target
 		target="${pkg_path}${PATH_BIN}/$APP_WINECFG_ID"
 		sed --in-place 's/# Run the game/# Run WINE configuration/' "$target"
-		sed --in-place 's/cd "$PATH_PREFIX"//'                      "$target"
+		sed --in-place 's/^cd "$PATH_PREFIX"//'                     "$target"
 		sed --in-place 's/wine "$APP_EXE" $APP_OPTIONS $@/winecfg/' "$target"
 	fi
 }
