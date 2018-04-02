@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.7.2
-library_revision=20180318.9
+library_version=2.7.3
+library_revision=20180402.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -580,7 +580,7 @@ archives_get_list() {
 			ARCHIVES_LIST="$ARCHIVES_LIST $archive"
 		fi
 	done <<- EOL
-	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
+	$(grep --regexp='^ARCHIVE_[^_]\+=' --regexp='^ARCHIVE_[^_]\+_OLD=' --regexp='^ARCHIVE_[^_]\+_OLD[^_]\+=' "$script" | sed 's/\([^=]\)=.\+/\1/')
 	EOL
 	export ARCHIVES_LIST
 }
@@ -1308,7 +1308,7 @@ archive_extraction_innosetup() {
 	fi
 	if ( innoextract --list --silent "$archive" 2>&1 1>/dev/null |\
 		head --lines=1 |\
-		grep 'unexpected setup data version' 1>/dev/null )
+		grep --ignore-case 'unexpected setup data version' 1>/dev/null )
 	then
 		archive_extraction_innosetup_error_version "$archive"
 	fi
@@ -2461,7 +2461,7 @@ write_metadata() {
 		pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\")"
 		pkg_maint="$(whoami)@$(hostname)"
 		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PATH\")"
-		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$PKG"
+		[ -n "$pkg_path" ] || missing_pkg_error 'write_metadata' "$pkg"
 		[ "$DRY_RUN" = '1' ] && continue
 		pkg_provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
 

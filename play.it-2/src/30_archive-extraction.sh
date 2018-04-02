@@ -114,7 +114,7 @@ archive_extraction_innosetup() {
 	fi
 	if ( innoextract --list --silent "$archive" 2>&1 1>/dev/null |\
 		head --lines=1 |\
-		grep 'unexpected setup data version' 1>/dev/null )
+		grep --ignore-case 'unexpected setup data version' 1>/dev/null )
 	then
 		archive_extraction_innosetup_error_version "$archive"
 	fi
