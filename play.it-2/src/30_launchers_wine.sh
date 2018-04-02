@@ -64,8 +64,14 @@ write_bin_build_wine() {
 	cat >> "$file" <<- 'EOF'
 	if ! [ -e "$WINEPREFIX" ]; then
 	  mkdir --parents "${WINEPREFIX%/*}"
-	  wineboot --init 2>/dev/null
+	  # Use LANG=C to avoid localized directory names
+	  LANG=C wineboot --init 2>/dev/null
+	  # Remove most links pointing outside of the WINE prefix
 	  rm "$WINEPREFIX/dosdevices/z:"
+	  find "$WINEPREFIX/drive_c/users/$(whoami)" -type l | while read directory; do
+	    rm "$directory"
+	    mkdir "$directory"
+	  done
 	EOF
 
 	if [ "$APP_WINETRICKS" ]; then

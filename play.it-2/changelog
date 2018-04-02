@@ -4,6 +4,9 @@
     script for an archive, by using file name before falling back on MD5 hash
     sum
 
+  * WINE: Remove most links pointing outside of the WINE prefix, to reduce
+    $HOME clutter
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file
