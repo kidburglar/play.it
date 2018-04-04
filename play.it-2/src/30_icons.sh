@@ -104,20 +104,6 @@ extract_icon_from() {
 }
 
 
-# convert .bmp file to .png
-# USAGE: icon_convert_bmp_to_png $file $destination
-# CALLED BY: icon_extract_png_from_file
-icon_convert_bmp_to_png() {
-	[ "$DRY_RUN" = '1' ] && return 0
-	local destination
-	local file
-	local name
-	file="$1"
-	destination="$2"
-	name="${file##*/}"
-	convert "$file" "$destination/${name%.bmp}.png"
-}
-
 # extract .png file(s) for .exe
 # USAGE: icon_extract_png_from_exe $file $destination
 # CALLS: icon_extract_ico_from_exe icon_extract_png_from_ico
@@ -149,16 +135,28 @@ icon_extract_ico_from_exe() {
 	wrestool --extract --type=14 $options --output="$destination" "$file"
 }
 
+# convert .bmp file to .png
+# USAGE: icon_convert_bmp_to_png $file $destination
+# CALLED BY: icon_extract_png_from_file
+icon_convert_bmp_to_png() { icon_convert_to_png "$@"; }
+
 # extract .png file(s) from .ico
 # USAGE: icon_extract_png_from_ico $file $destination
 # CALLED BY: icon_extract_png_from_file icon_extract_png_from_exe
-icon_extract_png_from_ico() {
+icon_extract_png_from_ico() { icon_convert_to_png "$@"; }
+
+# convert multiple icon formats to .png
+# USAGE: icon_convert_to_png $file $destination
+# CALLED BY: icon_extract_png_from_bmp icon_extract_png_from_ico
+icon_convert_to_png() {
 	[ "$DRY_RUN" = '1' ] && return 0
 	local destination
 	local file
+	local name
 	file="$1"
 	destination="$2"
-	icotool --extract --output="$destination" "$file" 2>/dev/null
+	name="${file##*/}"
+	convert "$file" "$destination/${name%.*}.png"
 }
 
 # copy .png file to directory

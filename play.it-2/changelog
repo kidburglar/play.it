@@ -9,6 +9,8 @@
 
   * Rework most icon-related code for easier understanding and maintenance
 
+  * Use ImageMagick to extract .png files from .ico containers
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file
