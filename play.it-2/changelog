@@ -11,6 +11,9 @@
 
   * Use ImageMagick to extract .png files from .ico containers
 
+  * Update dependencies automatic detection based on new icon extraction
+    methods
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file

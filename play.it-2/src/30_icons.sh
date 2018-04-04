@@ -1,3 +1,34 @@
+# update dependencies list with commands needed for icons extraction
+# USAGE: icons_list_dependencies
+icons_list_dependencies() {
+	local script
+	script="$0"
+	if grep\
+		--regexp="^APP_[^_]\\+_ICON='.\\+'"\
+		--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+'"\
+		"$script" 1>/dev/null
+	then
+		SCRIPT_DEPS="$SCRIPT_DEPS identify"
+		if grep\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.bmp'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.bmp'"\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.ico'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.ico'"\
+			"$script" 1>/dev/null
+		then
+			SCRIPT_DEPS="$SCRIPT_DEPS convert"
+		fi
+		if grep\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.exe'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.exe'"\
+			"$script" 1>/dev/null
+		then
+			SCRIPT_DEPS="$SCRIPT_DEPS convert wrestool"
+		fi
+	fi
+	export SCRIPT_DEPS
+}
+
 # get .png file(s) from various icon sources in current package
 # USAGE: icons_get_from_package $app[…]
 # NEEDED VARS: APP_ID|GAME_ID PATH_GAME PATH_ICON_BASE PLAYIT_WORKDIR PKG

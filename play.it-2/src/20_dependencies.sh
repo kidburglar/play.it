@@ -1,8 +1,9 @@
 # check script dependencies
 # USAGE: check_deps
 # NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
-# CALLS: check_deps_7z check_deps_error_not_found
+# CALLS: check_deps_7z check_deps_error_not_found icons_list_dependencies
 check_deps() {
+	icons_list_dependencies
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
 			('cabinet')
@@ -42,16 +43,6 @@ check_deps() {
 	fi
 	if [ "$OPTION_PACKAGE" = 'deb' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS fakeroot dpkg"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'bmp' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS convert"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'exe' ] ||\
-	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
 	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in

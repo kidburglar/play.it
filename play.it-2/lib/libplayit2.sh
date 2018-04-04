@@ -33,7 +33,7 @@
 ###
 
 library_version=2.8.0~dev
-library_revision=20180505.3
+library_revision=20180505.4
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -588,8 +588,9 @@ archives_get_list() {
 # check script dependencies
 # USAGE: check_deps
 # NEEDED VARS: (ARCHIVE) (ARCHIVE_TYPE) (OPTION_CHECKSUM) (OPTION_PACKAGE) (SCRIPT_DEPS)
-# CALLS: check_deps_7z check_deps_error_not_found
+# CALLS: check_deps_7z check_deps_error_not_found icons_list_dependencies
 check_deps() {
+	icons_list_dependencies
 	if [ "$ARCHIVE" ]; then
 		case "$(eval printf -- '%b' \"\$${ARCHIVE}_TYPE\")" in
 			('cabinet')
@@ -629,16 +630,6 @@ check_deps() {
 	fi
 	if [ "$OPTION_PACKAGE" = 'deb' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS fakeroot dpkg"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'bmp' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS convert"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'exe' ] ||\
-	   [ "${APP_MAIN_ICON##*.}" = 'ico' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS icotool"
-	fi
-	if [ "${APP_MAIN_ICON##*.}" = 'exe' ]; then
-		SCRIPT_DEPS="$SCRIPT_DEPS wrestool"
 	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in
@@ -1428,6 +1419,37 @@ organize_data_error_missing_pkg() {
 	esac
 	printf "$string"
 	return 1
+}
+
+# update dependencies list with commands needed for icons extraction
+# USAGE: icons_list_dependencies
+icons_list_dependencies() {
+	local script
+	script="$0"
+	if grep\
+		--regexp="^APP_[^_]\\+_ICON='.\\+'"\
+		--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+'"\
+		"$script" 1>/dev/null
+	then
+		SCRIPT_DEPS="$SCRIPT_DEPS identify"
+		if grep\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.bmp'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.bmp'"\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.ico'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.ico'"\
+			"$script" 1>/dev/null
+		then
+			SCRIPT_DEPS="$SCRIPT_DEPS convert"
+		fi
+		if grep\
+			--regexp="^APP_[^_]\\+_ICON='.\\+\\.exe'"\
+			--regexp="^APP_[^_]\\+_ICON_.\\+='.\\+\\.exe'"\
+			"$script" 1>/dev/null
+		then
+			SCRIPT_DEPS="$SCRIPT_DEPS convert wrestool"
+		fi
+	fi
+	export SCRIPT_DEPS
 }
 
 # get .png file(s) from various icon sources in current package
