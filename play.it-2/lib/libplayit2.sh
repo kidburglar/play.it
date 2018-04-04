@@ -33,7 +33,7 @@
 ###
 
 library_version=2.8.0~dev
-library_revision=20180505.4
+library_revision=20180505.5
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1708,12 +1708,7 @@ icons_linking_postinst() {
 		[ "$name" ] || name="$GAME_ID"
 		for icon in $list; do
 			file="$(eval printf -- '%b' \"\$$icon\")"
-			if [ -e "$path/$file" ]; then
-				icon_get_resolution_from_file "$path/$file"
-			else
-				resolution="$(eval printf -- '%b' \"\$${icon}_RES\")"
-				resolution="${resolution}x${resolution}"
-			fi
+			icon_get_resolution_from_file "$path/$file"
 			path_icon="$PATH_ICON_BASE/$resolution/apps"
 			if [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ]; then
 				cat >> "$postinst" <<- EOF
@@ -1742,8 +1737,28 @@ icons_linking_postinst() {
 # compatibility alias
 postinst_icons_linking() { icons_linking_postinst "$@"; }
 
+# move icons to the target package
+# USAGE: icons_move_to $pkg
+# NEEDED VARS: PATH_ICON_BASE PKG
+icons_move_to() {
+	local destination
+	local source
+	destination="$1"
+	destination_path="$(eval printf -- '%b' \"\$${destination}_PATH\")"
+	[ -n "$destination_path" ] || missing_pkg_error 'icons_move_to' "$destination"
+	source="$PKG"
+	source_path="$(eval printf -- '%b' \"\$${source}_PATH\")"
+	[ -n "$source_path" ] || missing_pkg_error 'icons_move_to' "$source"
+	[ "$DRY_RUN" = '1' ] && return 0
+	(
+		cd "$source_path"
+		cp --link --parents --recursive --no-dereference --preserve=links "./$PATH_ICON_BASE" "$destination_path"
+		rm --recursive "./$PATH_ICON_BASE"
+		rmdir --ignore-fail-on-non-empty --parents "./${PATH_ICON_BASE%/*}"
+	)
+}
 # compatibility alias
-move_icons_to() { return 0; }
+move_icons_to() { icons_move_to "$@"; }
 
 # print installation instructions
 # USAGE: print_instructions $pkg[…]
