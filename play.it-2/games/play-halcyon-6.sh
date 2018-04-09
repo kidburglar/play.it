@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180408.1
+script_version=20180409.1
 
 # Set game-specific variables
 
@@ -63,7 +63,7 @@ APP_MAIN_EXE_BIN32='H6.x86'
 APP_MAIN_EXE_BIN64='H6.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Mini?Metro_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='H6_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
