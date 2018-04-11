@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180411.1
 
 # Set game-specific variables
 
@@ -49,8 +49,8 @@ ARCHIVE_GOG_MD5='a505372a8b3b0c98e0968301679e6781'
 ARCHIVE_GOG_SIZE='2100000'
 ARCHIVE_GOG_VERSION='2.1-gog2.0.0.5'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/Mono/x86 ./*_Data/Plugins/x86'
@@ -62,24 +62,22 @@ DATA_DIRS='./logs'
 DATA_FILES='./slot*.data'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./Kingdom Rush.x86'
+APP_MAIN_EXE='Kingdom Rush.x86'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='./Kingdom Rush_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='Kingdom?Rush_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libglu1-mesa | libglu1, libxcursor1"
-PKG_BIN_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor"
+PKG_BIN_DEPS="$PKG_DATA_ID glu xcursor"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -98,14 +96,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
