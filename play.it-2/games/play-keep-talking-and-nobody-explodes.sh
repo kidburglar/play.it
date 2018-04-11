@@ -34,19 +34,26 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180409.1
+script_version=20180409.2
 
 # Set game-specific variables
 
 GAME_ID='keep-talking-and-nobody-explodes'
 GAME_NAME='Keep Talking and Nobody Explodes'
 
+ARCHIVES_LIST='ARCHIVE_HUMBLE'
+
 ARCHIVE_HUMBLE='Keep_Talking_and_Nobody_Explodes_1.6.1_-_Linux.zip'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/keep-talking-and-nobody-explodes'
 ARCHIVE_HUMBLE_MD5='ac321144f9ed9dc6797d35a33bd0b0e7'
-ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_VERSION='1.6.1-humble171219'
 ARCHIVE_HUMBLE_SIZE='940000'
 ARCHIVE_HUMBLE_TYPE='zip'
+
+ARCHIVE_MANUAL='Bomb-Defusal-Manual_1.pdf'
+ARCHIVE_MANUAL_URL='http://www.bombmanual.com/manual/1/pdf/Bomb-Defusal-Manual_1.pdf'
+ARCHIVE_MANUAL_MD5='fde93a9ad8de6ab04bdff40359145e11'
+ARCHIVE_MANUAL_TYPE='misc'
 
 ARCHIVE_GAME_BIN32_PATH='Keep Talking and Nobody Explodes'
 ARCHIVE_GAME_BIN32_FILES='./ktane.x86 ./*_Data/*/x86'
@@ -96,12 +103,25 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Check for optional archives
+
+ARCHIVE_MAIN="$ARCHIVE"
+archive_set 'GAME_MANUAL' 'ARCHIVE_MANUAL'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Include game manual
+
+if [ "$GAME_MANUAL" ]; then
+	path="${PKG_DATA_PATH}${PATH_DOC}"
+	mkdir --parents "$path"
+	cp "$GAME_MANUAL" "$path"
+fi
 
 # Write launchers
 
