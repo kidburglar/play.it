@@ -1,3 +1,9 @@
+2.8.0
+
+  * Greatly reduce time taken by play.it meta-script to identify the correct
+    script for an archive, by using file name before falling back on MD5 hash
+    sum
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file
