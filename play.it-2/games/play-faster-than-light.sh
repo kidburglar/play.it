@@ -34,14 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180227.1
+script_version=20180411.1
 
 # Set game-specific variables
 
 GAME_ID='faster-than-light'
 GAME_NAME='Faster Than Light'
-
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='ftl_advanced_edition_en_1_6_7_18662.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/faster_than_light'
@@ -94,6 +92,7 @@ ARCHIVE_GAME_DATA_FILES_GOG_OLDER='./exe_icon.bmp ./resources'
 ARCHIVE_GAME_DATA_FILES_HUMBLE='./exe_icon.bmp ./resources'
 
 APP_MAIN_TYPE='native'
+APP_MAIN_PRERUN='export LANG=C'
 APP_MAIN_EXE_BIN32_GOG='FTL.x86'
 APP_MAIN_EXE_BIN32_GOG_OLDER='x86/bin/FTL'
 APP_MAIN_EXE_BIN32_HUMBLE='x86/bin/FTL'
@@ -126,7 +125,7 @@ PKG_BIN64_DEPS_HUMBLE="$PKG_BIN32_DEPS_HUMBLE"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -146,28 +145,23 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 set_standard_permissions "$PLAYIT_WORKDIR/gamedata"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Extract icons
 
 extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON1"
 res="$APP_MAIN_ICON1_RES"
 PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
 mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON1%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
-
-if [ "$ARCHIVE" = 'ARCHIVE_GOG_OLDER' ] || [ "$ARCHIVE" = 'ARCHIVE_HUMBLE' ]; then
+if [ -f "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON2" ]; then
 	extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON2"
 	res="$APP_MAIN_ICON2_RES"
 	PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
 	mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-	mv "$PLAYIT_WORKDIR/icons/$(basename ${APP_MAIN_ICON2%.bmp}).png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
+	mv "$PLAYIT_WORKDIR/icons/$(basename "$APP_MAIN_ICON2" .bmp).png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
 fi
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
@@ -188,10 +182,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
