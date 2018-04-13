@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180227.1
+script_version=20180413.1
 
 # Set game-specific variables
 
@@ -44,7 +44,6 @@ GAME_NAME='System Shock 2'
 ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
 
 ARCHIVE_GOG='setup_system_shock_2_2.46_update_2_(18733).exe'
-ARCHIVE_GOG_URL='https://www.gog.com/game/system_shock_2'
 ARCHIVE_GOG_MD5='39fab64451ace95966988bb90c7bb17e'
 ARCHIVE_GOG_SIZE='680000'
 ARCHIVE_GOG_VERSION='2.46.2-gog18733'

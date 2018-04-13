@@ -34,14 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180411.1
 
 # Set game-specific variables
 
 GAME_ID='race-the-sun'
 GAME_NAME='Race The Sun'
-
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
 
 ARCHIVE_GOG='gog_race_the_sun_2.4.0.8.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/race_the_sun'
@@ -55,8 +53,8 @@ ARCHIVE_HUMBLE_MD5='e225afb660090b9aa8281574b658accf'
 ARCHIVE_HUMBLE_SIZE='190000'
 ARCHIVE_HUMBLE_VERSION='1.50-humble170131'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE='RaceTheSunLINUX_1.50'
@@ -76,31 +74,28 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='RaceTheSun.x86'
 APP_MAIN_EXE_BIN64='RaceTheSun.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='RaceTheSun_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libglu1-mesa | libglu1, libxcursor1, libxrandr2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libxcursor lib32-libxrandr"
+PKG_BIN32_DEPS="$PKG_DATA_ID glu xcursor libxrandr"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu libxcursor libxrandr"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
 	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/liblibplayit2.sh"
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
 	elif [ -e './libplayit2.sh' ]; then
 		PLAYIT_LIB2='./libplayit2.sh'
 	else
@@ -114,17 +109,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -146,10 +131,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
