@@ -1,3 +1,7 @@
+2.7.5
+
+  * Fix sort_icons behaviour when icon extraction produced a single file
+
 2.7.4
 
   * Fix write_bin_winecfg breaking init_prefix_dirs in winecfg launcher
