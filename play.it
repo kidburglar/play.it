@@ -56,7 +56,8 @@ if [ -z "$SCRIPT" ]; then
 	return 1
 fi
 
-export PLAYIT_LIB=~/.local/share/play.it/play.it-1/play-anything.sh
+PLAYIT_LIB="$HOME/.local/share/play.it/play.it-1/play-anything.sh"
+export PLAYIT_LIB
 export PLAYIT_LIB2
 
 "$SCRIPT" "$INPUT_FILE" --checksum=none "$@"

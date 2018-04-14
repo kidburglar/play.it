@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.7.4
-library_revision=20180402.5
+library_version=2.7.5
+library_revision=20180414.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1489,7 +1489,7 @@ sort_icons() {
 		if [ -n "${icon_res##* *}" ]; then
 			path_icon="$PATH_ICON_BASE/${icon_res}x${icon_res}/apps"
 			mkdir --parents "${pkg_path}${path_icon}"
-			mv "$file" "${pkg_path}${path_icon}/${app_id}.png"
+			mv "$PLAYIT_WORKDIR/icons"/*.png "${pkg_path}${path_icon}/${app_id}.png"
 		else
 			for res in $icon_res; do
 				path_icon="$PATH_ICON_BASE/${res}x${res}/apps"
