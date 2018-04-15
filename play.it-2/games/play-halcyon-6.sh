@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180409.1
+script_version=20180415.1
 
 # Set game-specific variables
 
@@ -43,7 +43,7 @@ GAME_NAME='Halcyon 6'
 
 ARCHIVE_HUMBLE='H6LINUX.zip'
 ARCHIVE_HUMBLE_MD5='60ac71e3532c201024cf9a430e2746a1'
-ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_VERSION='1.4.3.4-humble1'
 ARCHIVE_HUMBLE_SIZE='1700000'
 ARCHIVE_HUMBLE_TYPE='zip_unclean'
 
