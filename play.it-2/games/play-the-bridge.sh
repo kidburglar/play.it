@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180408.1
+script_version=20180415.1
 
 # Set game-specific variables
 
@@ -68,8 +68,8 @@ PACKAGES_LIST='PKG_BIN PKG_DATA'
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glu xcursor libxrandr"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glu xcursor libxrandr"
 
 # Load common functions
 
