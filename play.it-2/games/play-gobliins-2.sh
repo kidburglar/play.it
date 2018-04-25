@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180310.1
+script_version=20180426.1
 
 # Set game-specific variables
 
@@ -44,7 +44,6 @@ GAME_NAME='Gobliins 2: The Prince Buffoon'
 ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_gobliiins2_2.1.0.63.exe'
-ARCHIVE_GOG_URL='https://www.gog.com/game/gobliiins_pack'
 ARCHIVE_GOG_MD5='0baf2ce55d00fce9af4c98848e88d7dc'
 ARCHIVE_GOG_SIZE='100000'
 ARCHIVE_GOG_VERSION='2.01-gog2.1.0.63'
