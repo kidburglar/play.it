@@ -29,57 +29,42 @@ set -o errexit
 ###
 
 ###
-# Gobliins 2: The Prince Buffoon
+# JYDGE
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180426.1
+script_version=20180419.1
 
 # Set game-specific variables
 
-GAME_ID='gobliins-2'
-GAME_NAME='Gobliins 2: The Prince Buffoon'
+GAME_ID='jydge'
+GAME_NAME='JYDGE'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVE_HUMBLE='JYDGE'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/jydge'
+ARCHIVE_HUMBLE_MD5='3b8c8a14b7d7bc7c059c479910eb449d'
+ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_SIZE='310000'
+ARCHIVE_HUMBLE_TYPE='zip'
 
-ARCHIVE_GOG='setup_gobliiins2_2.1.0.63.exe'
-ARCHIVE_GOG_MD5='0baf2ce55d00fce9af4c98848e88d7dc'
-ARCHIVE_GOG_SIZE='100000'
-ARCHIVE_GOG_VERSION='2.01-gog2.1.0.63'
-ARCHIVE_GOG_VERSION_DATA_DISK='2.01-gog2.1.0.63'
-ARCHIVE_GOG_VERSION_DATA_FLOPPY='1.02-gog2.1.0.63'
+ARCHIVE_GAME_BIN_PATH='.'
+ARCHIVE_GAME_BIN_FILES='./JYDGE ./libSDL2-2.0.so.0'
 
-ARCHIVE_GAME_DATA_DISK_PATH='app'
-ARCHIVE_GAME_DATA_DISK_FILES='./gobnew.lic ./intro.stk ./track1.mp3'
+ARCHIVE_GAME_DATA_PATH='.'
+ARCHIVE_GAME_DATA_FILES='./*.pak ./*.xml'
 
-ARCHIVE_GAME_DATA_FLOPPY_PATH='app/fdd'
-ARCHIVE_GAME_DATA_FLOPPY_FILES='./*'
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='JYDGE'
+APP_MAIN_ICON_RES='128'
 
-ARCHIVE_DOC_MAIN_PATH='app'
-ARCHIVE_DOC_MAIN_FILES='./*.pdf'
-
-ARCHIVE_GAME_MAIN_PATH='app'
-ARCHIVE_GAME_MAIN_FILES='./goggame-1207662293.ico'
-
-APP_MAIN_TYPE='scummvm'
-APP_MAIN_SCUMMID='gob'
-APP_MAIN_ICON='goggame-1207662293.ico'
-APP_MAIN_ICON_RES='16 32 48 256'
-
-PACKAGES_LIST='PKG_MAIN PKG_DATA_DISK PKG_DATA_FLOPPY'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
 
-PKG_DATA_DISK_ID="${PKG_DATA_ID}-disk"
-PKG_DATA_DISK_PROVIDE="$PKG_DATA_ID"
-PKG_DATA_DISK_DESCRIPTION='data - CD-ROM version'
-
-PKG_DATA_FLOPPY_ID="${PKG_DATA_ID}-floppy"
-PKG_DATA_FLOPPY_PROVIDE="$PKG_DATA_ID"
-PKG_DATA_FLOPPY_DESCRIPTION='data - floppy version'
-
-PKG_MAIN_DEPS="$PKG_DATA_ID scummvm"
+PKG_BIN_ARCH='64'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc openal sdl2"
 
 # Load common functions
 
@@ -99,23 +84,18 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-
-# Extract data from game
+# Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
-organize_data 'GAME_MAIN' "$PATH_GAME"
-
-PKG='PKG_MAIN'
-extract_and_sort_icons_from 'APP_MAIN'
-rm "${PKG_MAIN_PATH}${PATH_GAME}/$APP_MAIN_ICON"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_MAIN'
+PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
 
 # Build package
 
@@ -128,22 +108,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-case "${LANG%_*}" in
-	('fr')
-		version_string='version %s :'
-		version_disk='CD-ROM'
-		version_floppy='disquette'
-	;;
-	('en'|*)
-		version_string='%s version:'
-		version_disk='CD-ROM'
-		version_floppy='Floppy'
-	;;
-esac
-printf '\n'
-printf "$version_string" "$version_disk"
-print_instructions 'PKG_DATA_DISK' 'PKG_MAIN'
-printf "$version_string" "$version_floppy"
-print_instructions 'PKG_DATA_FLOPPY' 'PKG_MAIN'
+print_instructions
 
 exit 0

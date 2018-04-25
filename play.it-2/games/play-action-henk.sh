@@ -29,57 +29,52 @@ set -o errexit
 ###
 
 ###
-# Gobliins 2: The Prince Buffoon
+# Action Henk
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180426.1
+script_version=20180419.1
 
 # Set game-specific variables
 
-GAME_ID='gobliins-2'
-GAME_NAME='Gobliins 2: The Prince Buffoon'
+GAME_ID='action-henk'
+GAME_NAME='Action Henk'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVE_HUMBLE='actionhenk_bundle_linux.zip'
+ARCHIVE_HUMBLE_MD5='eb0d74c8fd2832a4d39de9d52af514f3'
+ARCHIVE_HUMBLE_VERSION='1.0-humble1'
+ARCHIVE_HUMBLE_SIZE='2400000'
 
-ARCHIVE_GOG='setup_gobliiins2_2.1.0.63.exe'
-ARCHIVE_GOG_MD5='0baf2ce55d00fce9af4c98848e88d7dc'
-ARCHIVE_GOG_SIZE='100000'
-ARCHIVE_GOG_VERSION='2.01-gog2.1.0.63'
-ARCHIVE_GOG_VERSION_DATA_DISK='2.01-gog2.1.0.63'
-ARCHIVE_GOG_VERSION_DATA_FLOPPY='1.02-gog2.1.0.63'
+ARCHIVE_GAME_BIN32_PATH='.'
+ARCHIVE_GAME_BIN32_FILES='./ActionHenk.x86 *_Data/*/x86'
 
-ARCHIVE_GAME_DATA_DISK_PATH='app'
-ARCHIVE_GAME_DATA_DISK_FILES='./gobnew.lic ./intro.stk ./track1.mp3'
+ARCHIVE_GAME_BIN64_PATH='.'
+ARCHIVE_GAME_BIN64_FILES='./ActionHenk.x86_64 *_Data/*/x86_64'
 
-ARCHIVE_GAME_DATA_FLOPPY_PATH='app/fdd'
-ARCHIVE_GAME_DATA_FLOPPY_FILES='./*'
+ARCHIVE_GAME_DATA_PATH='.'
+ARCHIVE_GAME_DATA_FILES='*_Data/mainData *_Data/*.assets *_Data/level* *_Data/Managed *_Data/Mono/etc *_Data/Resources'
 
-ARCHIVE_DOC_MAIN_PATH='app'
-ARCHIVE_DOC_MAIN_FILES='./*.pdf'
+DATA_DIRS='./logs'
 
-ARCHIVE_GAME_MAIN_PATH='app'
-ARCHIVE_GAME_MAIN_FILES='./goggame-1207662293.ico'
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE_BIN32='ActionHenk.x86'
+APP_MAIN_EXE_BIN64='ActionHenk.x86_64'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='ActionHenk_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
 
-APP_MAIN_TYPE='scummvm'
-APP_MAIN_SCUMMID='gob'
-APP_MAIN_ICON='goggame-1207662293.ico'
-APP_MAIN_ICON_RES='16 32 48 256'
-
-PACKAGES_LIST='PKG_MAIN PKG_DATA_DISK PKG_DATA_FLOPPY'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
 
-PKG_DATA_DISK_ID="${PKG_DATA_ID}-disk"
-PKG_DATA_DISK_PROVIDE="$PKG_DATA_ID"
-PKG_DATA_DISK_DESCRIPTION='data - CD-ROM version'
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc glu xcursor"
 
-PKG_DATA_FLOPPY_ID="${PKG_DATA_ID}-floppy"
-PKG_DATA_FLOPPY_PROVIDE="$PKG_DATA_ID"
-PKG_DATA_FLOPPY_DESCRIPTION='data - floppy version'
-
-PKG_MAIN_DEPS="$PKG_DATA_ID scummvm"
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
@@ -99,27 +94,24 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-
-# Extract data from game
+# Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
-organize_data 'GAME_MAIN' "$PATH_GAME"
-
-PKG='PKG_MAIN'
-extract_and_sort_icons_from 'APP_MAIN'
-rm "${PKG_MAIN_PATH}${PATH_GAME}/$APP_MAIN_ICON"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-PKG='PKG_MAIN'
-write_launcher 'APP_MAIN'
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
 
 # Build package
 
-write_metadata
+postinst_icons_linking 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
@@ -128,22 +120,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-case "${LANG%_*}" in
-	('fr')
-		version_string='version %s :'
-		version_disk='CD-ROM'
-		version_floppy='disquette'
-	;;
-	('en'|*)
-		version_string='%s version:'
-		version_disk='CD-ROM'
-		version_floppy='Floppy'
-	;;
-esac
-printf '\n'
-printf "$version_string" "$version_disk"
-print_instructions 'PKG_DATA_DISK' 'PKG_MAIN'
-printf "$version_string" "$version_floppy"
-print_instructions 'PKG_DATA_FLOPPY' 'PKG_MAIN'
+print_instructions
 
 exit 0
