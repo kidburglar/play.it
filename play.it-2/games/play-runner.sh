@@ -29,54 +29,43 @@ set -o errexit
 ###
 
 ###
-# World of Goo
+# Runner
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180427.1
+script_version=20180424.2
 
 # Set game-specific variables
 
-SCRIPT_DEPS='find'
+GAME_ID='runner'
+GAME_NAME='Runner'
 
-GAME_ID='world-of-goo'
-GAME_NAME='World of Goo'
-
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='gog_world_of_goo_2.0.0.3.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/world_of_goo'
-ARCHIVE_GOG_MD5='5359b8e7e9289fba4bcf74cf22856655'
-ARCHIVE_GOG_SIZE='82000'
-ARCHIVE_GOG_VERSION='1.41-gog2.0.0.3'
+ARCHIVE_GOG='gog_bit_trip_runner_2.0.0.1.sh'
+ARCHIVE_GOG_MD5='b6f0fe70e1a2d9408967b8fd6bd881e1'
+ARCHIVE_GOG_VERSION='1.0.5-gog2.0.0.1'
+ARCHIVE_GOG_SIZE='120000'
 
 ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC0_DATA_FILES='./*'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
-ARCHIVE_DOC1_DATA_FILES='./*.html ./*.txt'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game/bit.trip.runner-1.0-32'
+ARCHIVE_DOC1_DATA_FILES='./README* ./*.txt'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./WorldOfGoo.bin32 ./libs32'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game/bit.trip.runner-1.0-32'
+ARCHIVE_GAME_BIN32_FILES='./bit.trip.runner/Effects ./bit.trip.runner/Layouts ./bit.trip.runner/Sounds ./bit.trip.runner/Models ./bit.trip.runner/bit.trip.runner'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./WorldOfGoo.bin64 ./libs64'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game/bit.trip.runner-1.0-64'
+ARCHIVE_GAME_BIN64_FILES='./bit.trip.runner/Effects ./bit.trip.runner/Layouts ./bit.trip.runner/Sounds ./bit.trip.runner/Models ./bit.trip.runner/bit.trip.runner'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./icons ./properties ./res'
-
-CONFIG_FILES='./properties/config.txt'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game/bit.trip.runner-1.0-32'
+ARCHIVE_GAME_DATA_FILES='./bit.trip.runner/Shaders ./bit.trip.runner/RUNNER.png ./bit.trip.runner/Fonts ./bit.trip.runner/Textures2d'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='WorldOfGoo.bin32'
-APP_MAIN_EXE_BIN64='WorldOfGoo.bin64'
-unset APP_MAIN_ICONS_LIST
-for res in 16 22 32 48 64 128; do
-	APP_MAIN_ICONS_LIST="$APP_MAIN_ICONS_LIST APP_MAIN_ICON_${res}"
-	export APP_MAIN_ICON_${res}="icons/${res}x${res}.png"
-	export APP_MAIN_ICON_${res}_RES="$res"
-done
+APP_MAIN_EXE='bit.trip.runner/bit.trip.runner'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='./bit.trip.runner/RUNNER.png'
+APP_MAIN_ICON_RES='48'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
@@ -84,14 +73,10 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glu vorbis sdl1.2"
-PKG_BIN32_DEPS_ARCH='lib32-sdl_mixer'
-PKG_BIN32_DEPS_DEB='libsdl-mixer1.2'
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor sdl openal"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
-PKG_BIN64_DEPS_ARCH='sdl_mixer'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
 
 # Load common functions
 
@@ -114,32 +99,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-(
-	cd "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_BIN32_PATH"
-	find res -name '*.binltl' | while read file; do
-		cp --parents "$file" "${PKG_BIN32_PATH}${PATH_GAME}"
-		rm "$file"
-	done
-)
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-(
-	cd "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_BIN64_PATH"
-	find res -name '*.binltl64' | while read file; do
-		cp --parents "$file" "${PKG_BIN64_PATH}${PATH_GAME}"
-		rm "$file"
-	done
-)
-
-PKG='PKG_DATA'
-find "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_DATA_PATH/res" -type d -empty -delete
-organize_data 'DOC0_DATA' "$PATH_DOC"
-organize_data 'DOC1_DATA' "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
+prepare_package_layout
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -149,21 +109,10 @@ for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
 
+sed --in-place 's|"./$APP_EXE" \($APP_OPTIONS $@\)|cd "${APP_EXE%/*}"\n"./${APP_EXE##*/}" \1|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID" "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+
 # Build package
 
-PATH_ICON="$PATH_ICON_BASE/scalable/apps"
-cat > "$postinst" << EOF
-if [ ! -f "$PATH_ICON/${GAME_ID}.svg" ]; then
-	mkdir --parents "$PATH_ICON"
-	ln --symbolic "$PATH_GAME/icons/scalable.svg" "$PATH_ICON/${GAME_ID}.svg"
-fi
-EOF
-cat > "$prerm" << EOF
-if [ -f "$PATH_ICON/${GAME_ID}.svg" ]; then
-	rm "$PATH_ICON/${GAME_ID}.svg"
-	rmdir --ignore-fail-on-non-empty --parents "$PATH_ICON"
-fi
-EOF
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
