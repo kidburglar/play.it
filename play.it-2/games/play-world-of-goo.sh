@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180427.1
 
 # Set game-specific variables
 
@@ -51,11 +51,11 @@ ARCHIVE_GOG_MD5='5359b8e7e9289fba4bcf74cf22856655'
 ARCHIVE_GOG_SIZE='82000'
 ARCHIVE_GOG_VERSION='1.41-gog2.0.0.3'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC0_DATA_FILES='./*'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./*.html ./*.txt'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC1_DATA_FILES='./*.html ./*.txt'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./WorldOfGoo.bin32 ./libs32'
@@ -65,6 +65,8 @@ ARCHIVE_GAME_BIN64_FILES='./WorldOfGoo.bin64 ./libs64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./icons ./properties ./res'
+
+CONFIG_FILES='./properties/config.txt'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='WorldOfGoo.bin32'
@@ -76,22 +78,24 @@ for res in 16 22 32 48 64 128; do
 	export APP_MAIN_ICON_${res}_RES="$res"
 done
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libglu1-mesa | libglu1, libogg0, libsdl1.2debian, libsdl-mixer1.2"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glu lib32-libogg lib32-sdl lib32-sdl_mixer"
+PKG_BIN32_DEPS="$PKG_DATA_ID glu vorbis sdl1.2"
+PKG_BIN32_DEPS_ARCH='lib32-sdl_mixer'
+PKG_BIN32_DEPS_DEB='libsdl-mixer1.2'
 
 PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS_ARCH='sdl_mixer'
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glu libogg sdl sdl_mixer"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.7'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -133,7 +137,8 @@ organize_data 'GAME_BIN64' "$PATH_GAME"
 
 PKG='PKG_DATA'
 find "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_DATA_PATH/res" -type d -empty -delete
-organize_data 'DOC'       "$PATH_DOC"
+organize_data 'DOC0_DATA' "$PATH_DOC"
+organize_data 'DOC1_DATA' "$PATH_DOC"
 organize_data 'GAME_DATA' "$PATH_GAME"
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
@@ -148,12 +153,16 @@ done
 
 PATH_ICON="$PATH_ICON_BASE/scalable/apps"
 cat > "$postinst" << EOF
-mkdir -p "$PATH_ICON"
-ln -s "$PATH_GAME/icons/scalable.svg" "$PATH_ICON/${GAME_ID}.svg"
+if [ ! -f "$PATH_ICON/${GAME_ID}.svg" ]; then
+	mkdir --parents "$PATH_ICON"
+	ln --symbolic "$PATH_GAME/icons/scalable.svg" "$PATH_ICON/${GAME_ID}.svg"
+fi
 EOF
 cat > "$prerm" << EOF
-rm "$PATH_ICON/${GAME_ID}.svg"
-rmdir -p --ignore-fail-on-non-empty "$PATH_ICON"
+if [ -f "$PATH_ICON/${GAME_ID}.svg" ]; then
+	rm "$PATH_ICON/${GAME_ID}.svg"
+	rmdir --ignore-fail-on-non-empty --parents "$PATH_ICON"
+fi
 EOF
 postinst_icons_linking 'APP_MAIN'
 write_metadata 'PKG_DATA'
@@ -166,10 +175,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
