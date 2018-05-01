@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180501.3
+script_version=20180501.4
 
 # Set game-specific variables
 
@@ -78,7 +78,9 @@ esac
 file="$PATH_CONFIG/Data/Localization/language.lsx"
 pattern="$(printf '"'"'s/id="Value" value=".*"/id="Value" value="%s" type="20"/g'"'"' "$lang")"
 sed --in-place "$pattern" "$file"
-pulseaudio --start'
+pulseaudio --start
+gcc -s -O2 -shared -fPIC -o preload.so preload.c -ldl
+export LD_PRELOAD=./preload.so'
 
 APP_MAIN_EXE='EoCApp'
 APP_MAIN_LIBS='.'
@@ -96,6 +98,8 @@ PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
 PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ sdl2 openal glx pulseaudio"
+PKG_BIN_DEPS_ARCH='gcc mesa'
+PKG_BIN_DEPS_DEB='gcc, mesa-common-dev'
 
 # Load common functions
 
@@ -131,6 +135,41 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
+# Hack to work around crash on Mesa drivers
+
+cat > "${PKG_BIN_PATH}${PATH_GAME}/preload.c" << EOF
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE
+#endif
+#include <dlfcn.h>
+#include <GL/gl.h>
+#include <string.h>
+#define _GLX_PUBLIC
+const GLubyte *GLAPIENTRY glGetString( GLenum name ) {
+	static void *next = NULL;
+	static const char *vendor = "ATI Technologies, Inc.";
+	if(name == GL_VENDOR)
+		return (const GLubyte *)vendor;
+	if(!next)
+		next = dlsym(RTLD_NEXT, "glGetString");
+	return ((const GLubyte *GLAPIENTRY (*)(GLenum))next)(name);
+}
+ _GLX_PUBLIC void (*glXGetProcAddressARB(const GLubyte * procName)) (void) {
+	static void *next = NULL;
+	if (
+		strcmp((const char *) procName, "glNamedStringARB") == 0 ||
+		strcmp((const char *) procName, "glDeleteNamedStringARB") == 0 ||
+		strcmp((const char *) procName, "glCompileShaderIncludeARB") == 0 ||
+		strcmp((const char *) procName, "glIsNamedStringARB") == 0 ||
+		strcmp((const char *) procName, "glGetNamedStringARB") == 0 ||
+		strcmp((const char *) procName, "glGetNamedStringivARB") == 0
+	) return NULL;
+	if(!next)
+		next = dlsym(RTLD_NEXT, "glXGetProcAddressARB");
+		return ((_GLX_PUBLIC void (*(*)(const GLubyte *))(void))next)(procName);
+}
+EOF
 
 # Build packages
 
