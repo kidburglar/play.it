@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180505.2
+script_version=20180505.3
 
 # Set game-specific variables
 
@@ -132,6 +132,7 @@ ARCHIVE_SETTINGS_PATH='support/userdocs'
 ARCHIVE_SETTINGS_FILES='./*'
 
 CONFIG_DIRS='./settings'
+DATA_DIRS='./characters'
 
 APP_WINETRICKS='physx csmt=on'
 
@@ -267,6 +268,16 @@ pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
 pattern="$pattern\\nif [ ! -e \"$settings_path\" ]; then"
 pattern="$pattern\\n\\tmkdir --parents \"${settings_path%/*}\""
 pattern="$pattern\\n\\tln --symbolic \"\$PATH_CONFIG/settings\" \"$settings_path\""
+pattern="$pattern\\nfi#"
+sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
+
+# Store saved games outside of WINE prefix
+
+saves_path='$WINEPREFIX/drive_c/users/$(whoami)/My Documents/BioWare/Dragon Age/Characters'
+pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
+pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
+pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
+pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/characters\" \"$saves_path\""
 pattern="$pattern\\nfi#"
 sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 
