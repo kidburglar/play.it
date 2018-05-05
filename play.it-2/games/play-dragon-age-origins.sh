@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180505.1
+script_version=20180505.2
 
 # Set game-specific variables
 
@@ -128,6 +128,11 @@ ARCHIVE_GAME_L10N_TXT_HU_FILES='./modules/single?player/locale/hu-hu ./addins/*/
 ARCHIVE_GAME_L10N_TXT_IT_PATH='game'
 ARCHIVE_GAME_L10N_TXT_IT_FILES='./modules/single?player/locale/it-it ./addins/*/*/data/talktables/*_it-it* */*/data/talktables/*_it-it*'
 
+ARCHIVE_SETTINGS_PATH='support/userdocs'
+ARCHIVE_SETTINGS_FILES='./*'
+
+CONFIG_DIRS='./settings'
+
 APP_WINETRICKS='physx csmt=on'
 
 APP_MAIN_TYPE='wine'
@@ -213,7 +218,7 @@ PKG_BIN_DEPS="$PKG_L10N_VOICE_ID $PKG_L10N_TXT_ID $PKG_ENVIRONMENT_ID $PKG_MOVIE
 
 # Load common functions
 
-target_version='2.7'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -241,6 +246,9 @@ extract_data_from "$PLAYIT_WORKDIR/$GAME_ID.r00"
 tolower "$PLAYIT_WORKDIR/gamedata"
 prepare_package_layout
 
+PKG='PKG_DATA'
+organize_data 'SETTINGS' "$PATH_GAME/settings"
+
 PKG='PKG_BIN'
 extract_and_sort_icons_from 'APP_MAIN'
 move_icons_to 'PKG_DATA'
@@ -251,6 +259,16 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
+
+# Enable included DLCs
+
+settings_path='$WINEPREFIX/drive_c/users/$(whoami)/My Documents/BioWare/Dragon Age/Settings'
+pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
+pattern="$pattern\\nif [ ! -e \"$settings_path\" ]; then"
+pattern="$pattern\\n\\tmkdir --parents \"${settings_path%/*}\""
+pattern="$pattern\\n\\tln --symbolic \"\$PATH_CONFIG/settings\" \"$settings_path\""
+pattern="$pattern\\nfi#"
+sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 
 # Build package
 
