@@ -1,3 +1,8 @@
+2.8.1
+
+  * Fix icon_get_resolution_from_file and icons_linking_postinst compatibility
+    with scripts targeting library version 2.7 or older
+
 2.8.0
 
   * Greatly reduce time taken by play.it meta-script to identify the correct

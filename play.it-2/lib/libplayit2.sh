@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.0
-library_revision=20180505.6
+library_version=2.8.1~dev
+library_revision=20180505.8
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1673,8 +1673,14 @@ icon_get_resolution_from_file() {
 	file="$1"
 	version_major_target="${target_version%%.*}"
 	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
-	if [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ]; then
+	if
+		[ -n "${file##* *}" ] &&
+		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] )
+	then
 		resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
+		if [ -n "${resolution##*x*}" ]; then
+			resolution="$(identify $file | sed "s;^$file ;;" | awk '{print $3}')"
+		fi
 	else
 		resolution="$(identify "$file" | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
 	fi
@@ -1708,9 +1714,19 @@ icons_linking_postinst() {
 		[ "$name" ] || name="$GAME_ID"
 		for icon in $list; do
 			file="$(eval printf -- '%b' \"\$$icon\")"
-			icon_get_resolution_from_file "$path/$file"
+			if
+				ls "$path/$file" >/dev/null 2>&1 ||
+				ls "$path"/$file >/dev/null 2>&1
+			then
+				icon_get_resolution_from_file "$path/$file"
+			else
+				icon_get_resolution_from_file "${PKG_DATA_PATH}${PATH_GAME}/$file"
+			fi
 			path_icon="$PATH_ICON_BASE/$resolution/apps"
-			if [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ]; then
+			if
+				[ -n "${file##* *}" ] &&
+				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] )
+			then
 				cat >> "$postinst" <<- EOF
 				if [ ! -e "$path_icon/$name.png" ]; then
 				  mkdir --parents "$path_icon"
