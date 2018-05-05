@@ -33,7 +33,7 @@
 ###
 
 library_version=2.8.1~dev
-library_revision=20180505.8
+library_revision=20180505.9
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1674,8 +1674,8 @@ icon_get_resolution_from_file() {
 	version_major_target="${target_version%%.*}"
 	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 	if
-		[ -n "${file##* *}" ] &&
-		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] )
+		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+		[ -n "${file##* *}" ]
 	then
 		resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
 		if [ -n "${resolution##*x*}" ]; then
@@ -1715,8 +1715,8 @@ icons_linking_postinst() {
 		for icon in $list; do
 			file="$(eval printf -- '%b' \"\$$icon\")"
 			if
-				ls "$path/$file" >/dev/null 2>&1 ||
-				ls "$path"/$file >/dev/null 2>&1
+				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				( ls "$path/$file" >/dev/null 2>&1 || ls "$path"/$file >/dev/null 2>&1 )
 			then
 				icon_get_resolution_from_file "$path/$file"
 			else
@@ -1724,8 +1724,8 @@ icons_linking_postinst() {
 			fi
 			path_icon="$PATH_ICON_BASE/$resolution/apps"
 			if
-				[ -n "${file##* *}" ] &&
-				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] )
+				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				[ -n "${file##* *}" ]
 			then
 				cat >> "$postinst" <<- EOF
 				if [ ! -e "$path_icon/$name.png" ]; then
