@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180504.1
+script_version=20180505.1
 
 # Set game-specific variables
 
@@ -79,6 +79,12 @@ ARCHIVE_GAME_BIN_FILES='./bin_ship ./daoriginslauncher.exe'
 
 ARCHIVE_GAME_DATA_PATH='game'
 ARCHIVE_GAME_DATA_FILES='./addins ./data ./modules ./offers ./packages'
+
+ARCHIVE_GAME_ENVIRONMENT_PATH='game'
+ARCHIVE_GAME_ENVIRONMENT_FILES='./addins/*/*/env ./packages/*/env'
+
+ARCHIVE_GAME_MOVIES_PATH='game'
+ARCHIVE_GAME_MOVIES_FILES='./addins/*/core/data/movies ./modules/*/data/movies ./packages/*/data/movies'
 
 ARCHIVE_GAME_L10N_VOICE_DE_PATH='game'
 ARCHIVE_GAME_L10N_VOICE_DE_FILES='./offers/*/module/audio/vo/de-de ./addins/*/module/audio/vo/de-de ./packages/*/audio/vo/de-de ./modules/*/locale/de-de ./modules/*/audio/vo/de-de'
@@ -129,10 +135,16 @@ APP_MAIN_EXE='bin_ship/daorigins.exe'
 APP_MAIN_ICON='bin_ship/daorigins.exe'
 APP_MAIN_ICON_RES='16 24 32 48 256'
 
-PACKAGES_LIST='PKG_BIN PKG_L10N_VOICE_DE PKG_L10N_VOICE_EN PKG_L10N_VOICE_FR PKG_L10N_VOICE_RU PKG_L10N_VOICE_PL PKG_L10N_TXT_DE PKG_L10N_TXT_EN PKG_L10N_TXT_FR PKG_L10N_TXT_RU PKG_L10N_TXT_PL PKG_L10N_TXT_CS PKG_L10N_TXT_ES PKG_L10N_TXT_HU PKG_L10N_TXT_IT PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_L10N_VOICE_DE PKG_L10N_VOICE_EN PKG_L10N_VOICE_FR PKG_L10N_VOICE_RU PKG_L10N_VOICE_PL PKG_L10N_TXT_DE PKG_L10N_TXT_EN PKG_L10N_TXT_FR PKG_L10N_TXT_RU PKG_L10N_TXT_PL PKG_L10N_TXT_CS PKG_L10N_TXT_ES PKG_L10N_TXT_HU PKG_L10N_TXT_IT PKG_ENVIRONMENT PKG_MOVIES PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
+
+PKG_ENVIRONMENT_ID="${GAME_ID}-environment"
+PKG_ENVIRONMENT_DESCRIPTION='environment'
+
+PKG_MOVIES_ID="${GAME_ID}-movies"
+PKG_MOVIES_DESCRIPTION='movies'
 
 PKG_L10N_VOICE_ID="${GAME_ID}-l10n-voice"
 PKG_L10N_VOICE_DESCRIPTION='voice localization'
@@ -197,7 +209,7 @@ PKG_L10N_TXT_IT_PROVIDE="$PKG_L10N_TXT_ID"
 PKG_L10N_TXT_IT_DESCRIPTION="$PKG_L10N_TXT_DESCRIPTION - Italian"
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_L10N_VOICE_ID $PKG_L10N_TXT_ID $PKG_DATA_ID wine winetricks"
+PKG_BIN_DEPS="$PKG_L10N_VOICE_ID $PKG_L10N_TXT_ID $PKG_ENVIRONMENT_ID $PKG_MOVIES_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
@@ -279,22 +291,22 @@ case "${LANG%_*}" in
 esac
 printf '\n'
 printf "$lang_string" "$lang_de"
-print_instructions 'PKG_L10N_VOICE_DE' 'PKG_L10N_TXT_DE' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_DE' 'PKG_L10N_TXT_DE' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_en"
-print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_EN' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_EN' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_fr"
-print_instructions 'PKG_L10N_VOICE_FR' 'PKG_L10N_TXT_FR' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_FR' 'PKG_L10N_TXT_FR' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_ru"
-print_instructions 'PKG_L10N_VOICE_RU' 'PKG_L10N_TXT_RU' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_RU' 'PKG_L10N_TXT_RU' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_pl"
-print_instructions 'PKG_L10N_VOICE_PL' 'PKG_L10N_TXT_PL' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_PL' 'PKG_L10N_TXT_PL' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_cs"
-print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_CS' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_CS' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_es"
-print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_ES' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_ES' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_hu"
-print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_HU' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_HU' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 printf "$lang_string" "$lang_it"
-print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_IT' 'PKG_DATA' 'PKG_BIN'
+print_instructions 'PKG_L10N_VOICE_EN' 'PKG_L10N_TXT_IT' 'PKG_ENVIRONMENT' 'PKG_MOVIES' 'PKG_DATA' 'PKG_BIN'
 
 exit 0
