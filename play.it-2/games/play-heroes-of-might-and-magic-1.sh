@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180302.2
+script_version=20180506.1
 
 # Set game-specific variables
 
@@ -79,7 +79,6 @@ DATA_DIRS='./games ./maps'
 APP_MAIN_TYPE='dosbox'
 APP_MAIN_EXE='heroes.exe'
 APP_MAIN_ICON='goggame-1207658748.ico'
-APP_MAIN_ICON_RES='16 32 48 256'
 
 APP_EDITOR_ID="${GAME_ID}-editor"
 APP_EDITOR_NAME="$GAME_NAME - editor"
@@ -109,7 +108,7 @@ PKG_BIN_DESCRIPTION_GOG_EN='English version'
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -125,50 +124,43 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Extract data from game
+# Set archive specific variables
+
+case "$ARCHIVE" in
+	('ARCHIVE_GOG_EN')
+		PKG_BIN_DEPS="$PKG_BIN_DEPS_GOG_EN"
+	;;
+	('ARCHIVE_GOG_FR')
+		PKG_BIN_DEPS="$PKG_BIN_DEPS_GOG_FR"
+	;;
+esac
+
+# Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"   "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}"  "$PATH_GAME"
-	organize_data "GAME0_${PKG#PKG_}" "$PATH_GAME"
-	organize_data "GAME1_${PKG#PKG_}" "$PATH_GAME"
-done
+# Extract icons
 
 PKG='PKG_DATA'
-extract_and_sort_icons_from 'APP_MAIN'
+icons_get_from_package 'APP_MAIN'
 rm "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN' 'APP_EDITOR'
 
+# Use base game icon for editor launcher
+
+file="${PKG_BIN_PATH}${PATH_DESK}/$APP_EDITOR_ID.desktop"
+pattern="s/\(Icon\)=.*/\1=$GAME_ID/"
+sed --in-place "$pattern" "$file"
+
 # Build packages
 
-cat > "$postinst" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="$PATH_ICON_BASE/\${res}x\${res}/apps"
-	if [ ! -e "\$PATH_ICON/${APP_EDITOR_ID}.png" ]; then
-		ln --symbolic "./${GAME_ID}.png" "\$PATH_ICON/${APP_EDITOR_ID}.png"
-	fi
-done
-EOF
-
-cat > "$prerm" << EOF
-for res in ${APP_MAIN_ICON_RES}; do
-	PATH_ICON="$PATH_ICON_BASE/\${res}x\${res}/apps"
-	if [ -e "\$PATH_ICON/${APP_EDITOR_ID}.png" ]; then
-		rm "\$PATH_ICON/${APP_EDITOR_ID}.png"
-	fi
-done
-EOF
-
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN' 'PKG_L10N'
+write_metadata
 build_pkg
 
 # Clean up
