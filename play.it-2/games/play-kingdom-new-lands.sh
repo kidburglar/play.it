@@ -34,21 +34,27 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180506.1
 
 # Set game-specific variables
 
 GAME_ID='kingdom-new-lands'
 GAME_NAME='Kingdom New Lands'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
+ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
 
-ARCHIVE_GOG='gog_kingdom_new_lands_2.6.0.8.sh'
+ARCHIVE_GOG='kingdom_new_lands_en_1_2_8_19096.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/kingdom_new_lands'
-ARCHIVE_GOG_MD5='0d662366f75d5da214e259d792e720eb'
-ARCHIVE_GOG_SIZE='420000'
-ARCHIVE_GOG_VERSION='1.2.3-gog2.6.0.8'
+ARCHIVE_GOG_MD5='3499d709e78410ef7f447c12e3c66039'
+ARCHIVE_GOG_SIZE='450000'
+ARCHIVE_GOG_VERSION='1.2.8-gog19096'
 ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='gog_kingdom_new_lands_2.6.0.8.sh'
+ARCHIVE_GOG_OLD_MD5='0d662366f75d5da214e259d792e720eb'
+ARCHIVE_GOG_OLD_SIZE='420000'
+ARCHIVE_GOG_OLD_VERSION='1.2.3-gog2.6.0.8'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
 DATA_DIRS='./logs'
 
@@ -62,14 +68,14 @@ ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN64_FILES='./Kingdom_Data/Mono/x86_64 ./Kingdom_Data/Plugins/x86_64 ./Kingdom.x86_64'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources'
+ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources ./Kingdom_Data/boot.config'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Kingdom.x86'
 APP_MAIN_EXE_BIN64='Kingdom.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
 APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='Kingdom_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
@@ -85,7 +91,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -105,10 +111,7 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+prepare_package_layout
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
@@ -120,7 +123,8 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
@@ -131,10 +135,6 @@ rm --recursive "${PLAYIT_WORKDIR}"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
