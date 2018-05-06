@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180505.11
+script_version=20180506.1
 
 # Set game-specific variables
 
@@ -67,7 +67,7 @@ ARCHIVE_GAME_LINUX_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 ARCHIVE_GAME_DATA_PATH='.'
 ARCHIVE_GAME_DATA_FILES='./*_Data'
 
-DATA_DIRS='./logs'
+DATA_DIRS='./logs ./saves'
 
 APP_MAIN_TYPE_LINUX='native'
 APP_MAIN_TYPE_WINDOWS='wine'
@@ -163,6 +163,20 @@ case "$ARCHIVE" in
 	('ARCHIVE_HUMBLE_WINDOWS')
 		PKG='PKG_WINDOWS_BIN'
 		write_launcher 'APP_MAIN'
+	;;
+esac
+
+# Store saved games outside of WINE prefix
+
+case "$ARCHIVE" in
+	('ARCHIVE_HUMBLE_WINDOWS')
+		saves_path='$WINEPREFIX/drive_c/users/$(whoami)/Local Settings/Application Data/MiClos Studio/OutThereOmegaEdition'
+		pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
+		pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
+		pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
+		pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/saves\" \"$saves_path\""
+		pattern="$pattern\\nfi#"
+		sed --in-place "$pattern" "${PKG_WINDOWS_BIN_PATH}${PATH_BIN}"/*
 	;;
 esac
 
