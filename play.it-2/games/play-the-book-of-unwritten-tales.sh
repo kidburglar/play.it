@@ -34,14 +34,12 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180608.1
 
 # Set game-specific variables
 
 GAME_ID='the-book-of-unwritten-tales'
 GAME_NAME='The Book of Unwritten Tales'
-
-ARCHIVES_LIST='ARCHIVE_GOG'
 
 ARCHIVE_GOG='setup_book_of_unwritten_tales_2.0.0.4.exe'
 ARCHIVE_GOG_URL='https://www.gog.com/game/the_book_of_unwritten_tales'
@@ -70,12 +68,13 @@ ARCHIVE_GAME_L10N_FILES='./kagedata/lang'
 ARCHIVE_GAME_DATA_PATH='app'
 ARCHIVE_GAME_DATA_FILES='./data ./kagedata ./kapedata ./config.xml ./exportedfunctions.lua'
 
+DATA_DIRS='./saves'
+
 APP_WINETRICKS='directx9'
 
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='bout.exe'
 APP_MAIN_ICON='bout.exe'
-APP_MAIN_ICON_RES='16 32 48 64'
 
 PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
@@ -90,7 +89,7 @@ PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -106,35 +105,31 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Check that all parts of the installer are present
-
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_PART1' "${ARCHIVE_MAIN}_PART1"
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART1"
-set_archive 'ARCHIVE_PART2' "${ARCHIVE_MAIN}_PART2"
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART2"
-set_archive 'ARCHIVE_PART3' "${ARCHIVE_MAIN}_PART3"
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found "${ARCHIVE_MAIN}_PART3"
-ARCHIVE="$ARCHIVE_MAIN"
-
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Extract icons
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
+icons_move_to 'PKG_DATA'
 
 # Write launchers
 
 write_launcher 'APP_MAIN'
+
+# Store saved games outside of WINE prefix
+
+saves_path='$WINEPREFIX/drive_c/users/$(whoami)/My Documents/Book of Unwritten Tales/savegames'
+pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
+pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
+pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
+pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/saves\" \"$saves_path\""
+pattern="$pattern\\nfi#"
+sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 
 # Build package
 
