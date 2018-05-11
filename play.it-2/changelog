@@ -7,25 +7,11 @@
   * Remove shebang from library, as it is always meant to be sourced, never
     directly executed
 
-2.8.3
+  * Makefile: Add ability to chose the installation path, now defaulting to
+    /usr/local/share/games/play.it for library and scripts, and
+    /usr/local/games for meta-script
 
-  * Fix typo in help(), that led to suboptimal wording when called on a script
-    with a single supported archive (previous 2.8.2 fix was incomplete)
-
-  * Add automated shellcheck tests based on GitLab CI
-
-  * Improve syntax based on shellcheck 0.5.0 report
-
-2.8.2
-
-  * icon_extract_ico_from_exe: Suppress wrestool error output
-
-  * icon_get_resolution_from_file: Fix compatibility with scripts targeting
-    library version 2.7 or older in a more robust way than what has been done
-    in 2.8.1
-
-  * Fix typo in help(), that led to suboptimal wording when called on a script
-    with a single supported archive
+  * Makefile: Do not install play.it 1.x scripts and library anymore
 
 2.8.1
 
@@ -56,6 +42,28 @@
   * Fix sort_icons behaviour when icon extraction produced a single file
 
   * meta-script: Fix broken support for ./play.it 1 scripts
+
+2.8.3
+
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive (previous 2.8.2 fix was incomplete)
+
+  * Add automated shellcheck tests based on GitLab CI
+
+  * Improve syntax based on shellcheck 0.5.0 report
+
+2.8.2
+
+  * icon_extract_ico_from_exe: Suppress wrestool error output
+
+  * icon_get_resolution_from_file: Fix compatibility with scripts targeting
+    library version 2.7 or older in a more robust way than what has been done
+    in 2.8.1
+
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive
+=======
+2.9.0
 
 2.7.4
 
