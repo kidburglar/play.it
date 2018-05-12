@@ -1,3 +1,27 @@
+2.8.1
+
+  * Fix icon_get_resolution_from_file and icons_linking_postinst compatibility
+    with scripts targeting library version 2.7 or older
+
+  * WINE: Do not remove links to $HOME for scripts targeting library version
+    2.7 or older
+
+2.8.0
+
+  * Greatly reduce time taken by play.it meta-script to identify the correct
+    script for an archive, by using file name before falling back on MD5 hash
+    sum
+
+  * WINE: Remove most links pointing outside of the WINE prefix, to reduce
+    $HOME clutter
+
+  * Rework most icon-related code for easier understanding and maintenance
+
+  * Use ImageMagick to extract .png files from .ico containers
+
+  * Update dependencies automatic detection based on new icon extraction
+    methods
+
 2.7.5
 
   * Fix sort_icons behaviour when icon extraction produced a single file

@@ -29,65 +29,57 @@ set -o errexit
 ###
 
 ###
-# Kingdom New Lands
+# Xenonauts
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180506.1
+script_version=20180508.1
 
 # Set game-specific variables
 
-GAME_ID='kingdom-new-lands'
-GAME_NAME='Kingdom New Lands'
+GAME_ID='xenonauts'
+GAME_NAME='Xenonauts'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVE_GOG='gog_xenonauts_2.1.0.4.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/xenonauts'
+ARCHIVE_GOG_MD5='7830dee208e779f97858ee81a97c9327'
+ARCHIVE_GOG_SIZE='2900000'
+ARCHIVE_GOG_VERSION='1.63-gog2.1.0.4'
 
-ARCHIVE_GOG='kingdom_new_lands_en_1_2_8_19096.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/kingdom_new_lands'
-ARCHIVE_GOG_MD5='3499d709e78410ef7f447c12e3c66039'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.2.8-gog19096'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_HUMBLE='Xenonauts-DRMFree-Linux-2016-03-03.sh'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/xenonauts'
+ARCHIVE_HUMBLE_MD5='f4369e987381b84fde64be569fbab913'
+ARCHIVE_HUMBLE_SIZE='2700000'
+ARCHIVE_HUMBLE_VERSION='1.65L-humble160303'
+ARCHIVE_HUMBLE_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_kingdom_new_lands_2.6.0.8.sh'
-ARCHIVE_GOG_OLD_MD5='0d662366f75d5da214e259d792e720eb'
-ARCHIVE_GOG_OLD_SIZE='420000'
-ARCHIVE_GOG_OLD_VERSION='1.2.3-gog2.6.0.8'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_DOC0_PATH_GOG='data/noarch/game'
+ARCHIVE_DOC0_PATH_HUMBLE='data/noarch'
+ARCHIVE_DOC0_FILES='./README.linux ./*.pdf'
 
-DATA_DIRS='./logs'
+ARCHIVE_DOC1_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
-ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
-
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./Kingdom_Data/Mono/x86 ./Kingdom_Data/Plugins/x86 ./Kingdom.x86'
-
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./Kingdom_Data/Mono/x86_64 ./Kingdom_Data/Plugins/x86_64 ./Kingdom.x86_64'
+ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
+ARCHIVE_GAME_BIN_PATH_HUMBLE='data/x86'
+ARCHIVE_GAME_BIN_FILES='./Xenonauts.bin.x86 ./lib'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources ./Kingdom_Data/boot.config'
+ARCHIVE_GAME_DATA_PATH_HUMBLE='data/noarch'
+ARCHIVE_GAME_DATA_FILES='./assets ./extras ./Icon.*'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='Kingdom.x86'
-APP_MAIN_EXE_BIN64='Kingdom.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Kingdom_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_EXE='Xenonauts.bin.x86'
+APP_MAIN_ICON='Icon.png'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glx sdl2 alsa"
 
 # Load common functions
 
@@ -110,28 +102,25 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
 prepare_package_layout
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
 PKG='PKG_DATA'
 icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

@@ -29,7 +29,7 @@ set -o errexit
 ###
 
 ###
-# Kingdom New Lands
+# Worms United
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
@@ -38,56 +38,49 @@ script_version=20180506.1
 
 # Set game-specific variables
 
-GAME_ID='kingdom-new-lands'
-GAME_NAME='Kingdom New Lands'
+GAME_ID='worms-1'
+GAME_NAME='Worms United'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG'
 
-ARCHIVE_GOG='kingdom_new_lands_en_1_2_8_19096.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/kingdom_new_lands'
-ARCHIVE_GOG_MD5='3499d709e78410ef7f447c12e3c66039'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.2.8-gog19096'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='setup_worms_united_2.0.0.20.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/worms_united'
+ARCHIVE_GOG_MD5='619421cafa20f478d19222e3f49d77b6'
+ARCHIVE_GOG_SIZE='220000'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.20'
 
-ARCHIVE_GOG_OLD='gog_kingdom_new_lands_2.6.0.8.sh'
-ARCHIVE_GOG_OLD_MD5='0d662366f75d5da214e259d792e720eb'
-ARCHIVE_GOG_OLD_SIZE='420000'
-ARCHIVE_GOG_OLD_VERSION='1.2.3-gog2.6.0.8'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+CONFIG_FILES='./worms.cfg'
+DATA_DIRS='./data'
 
-DATA_DIRS='./logs'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./docs ./manual.pdf'
 
-ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./bin ./*.exe'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./Kingdom_Data/Mono/x86 ./Kingdom_Data/Plugins/x86 ./Kingdom.x86'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./batch ./data ./extras ./gfw_high.ico ./worms*.ogg ./worms.cfg ./worms.dat ./worms.gog'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./Kingdom_Data/Mono/x86_64 ./Kingdom_Data/Plugins/x86_64 ./Kingdom.x86_64'
+GAME_IMAGE='worms.dat'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources ./Kingdom_Data/boot.config'
+APP_MAIN_TYPE='dosbox'
+APP_MAIN_PRERUN='SET wormscfg=C:\\worms.cfg
+SET wormscd=D:
+D:\\fmv\\play /modex D:\\fmv\\logo2.avi
+D:\\fmv\\play /modex D:\\fmv\\logo1.avi
+D:\\fmv\\play /modex D:\\fmv\\cinadd.avi
+D:\\fmv\\play /modex D:\\fmv\\armup.avi
+bin\\black.exe'
+APP_MAIN_EXE='bin\wrms.exe'
+APP_MAIN_ICON='gfw_high.ico'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='Kingdom.x86'
-APP_MAIN_EXE_BIN64='Kingdom.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Kingdom_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
-
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID dosbox"
 
 # Load common functions
 
@@ -110,28 +103,28 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
 prepare_package_layout
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Extract icons
+
+PKG='PKG_DATA'
+icons_get_from_package 'APP_MAIN'
+rm "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 

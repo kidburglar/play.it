@@ -23,7 +23,6 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-check_deps 'md5sum'
 
 if [ ! -f "$INPUT_FILE" ]; then
 	print_error
@@ -39,20 +38,47 @@ if [ ! -f "$INPUT_FILE" ]; then
 	return 1
 fi
 
-FILE_MD5="$(md5sum $INPUT_FILE | cut --delimiter=' ' --fields=1)"
-SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
+# Locate script by file name
+FILE_NAME="${INPUT_FILE##*/}"
+case "${LANG%_*}" in
+	('fr')
+		string='Recherche d’un script par nom de fichier pour le fichier %s\n'
+	;;
+	('en'|*)
+		string='Looking for a script by file name for file %s\n'
+	;;
+esac
+printf "$string" "$FILE_NAME"
+SCRIPT="$(grep --dereference-recursive --files-with-matches "ARCHIVE_.\\+='$FILE_NAME'" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
+
+# Locate script by file MD5 checksum
+if [ -z "$SCRIPT" ]; then
+	case "${LANG%_*}" in
+		('fr')
+			string='Recherche d’un script par somme de contrôle MD5 pour le fichier %s\n'
+		;;
+		('en'|*)
+			string='Looking for a script by MD5 hash sum for file %s\n'
+		;;
+	esac
+	printf "$string" "$FILE_NAME"
+	check_deps 'md5sum'
+	FILE_MD5="$(md5sum $INPUT_FILE | cut --delimiter=' ' --fields=1)"
+	SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
+	SCRIPT_OPTIONS='--checksum=none'
+fi
 
 if [ -z "$SCRIPT" ]; then
 	print_error
 	case "${LANG%_*}" in
 		('fr')
-			string='Impossible de trouver un script pour la somme MD5 %s\n'
+			string='Impossible de trouver un script pour le fichier %s\n'
 		;;
 		('en'|*)
-			string='Could not find script for hash %s\n'
+			string='Could not find script for file %s\n'
 		;;
 	esac
-	printf "$string" "$FILE_MD5"
+	printf "$string" "$FILE_NAME"
 	return 1
 fi
 
@@ -60,6 +86,6 @@ PLAYIT_LIB="$HOME/.local/share/play.it/play.it-1/play-anything.sh"
 export PLAYIT_LIB
 export PLAYIT_LIB2
 
-"$SCRIPT" "$INPUT_FILE" --checksum=none "$@"
+"$SCRIPT" "$INPUT_FILE" $SCRIPT_OPTIONS "$@"
 
 exit 0

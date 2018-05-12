@@ -29,65 +29,54 @@ set -o errexit
 ###
 
 ###
-# Kingdom New Lands
+# Lure of the Temptress
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180506.1
+script_version=20180507.1
 
 # Set game-specific variables
 
-GAME_ID='kingdom-new-lands'
-GAME_NAME='Kingdom New Lands'
+GAME_ID='lure-of-the-temptress'
+GAME_NAME='Lure of the Temptress'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
+ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
-ARCHIVE_GOG='kingdom_new_lands_en_1_2_8_19096.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/kingdom_new_lands'
-ARCHIVE_GOG_MD5='3499d709e78410ef7f447c12e3c66039'
-ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.2.8-gog19096'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG_EN='lure_of_the_temptress_en_gog_2_20099.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/lure_of_the_temptress'
+ARCHIVE_GOG_EN_TYPE='mojosetup'
+ARCHIVE_GOG_EN_MD5='0882be47bf6dd9d619726b04fe4fb95c'
+ARCHIVE_GOG_EN_SIZE='94000'
+ARCHIVE_GOG_EN_VERSION='1.1-gog20099'
 
-ARCHIVE_GOG_OLD='gog_kingdom_new_lands_2.6.0.8.sh'
-ARCHIVE_GOG_OLD_MD5='0d662366f75d5da214e259d792e720eb'
-ARCHIVE_GOG_OLD_SIZE='420000'
-ARCHIVE_GOG_OLD_VERSION='1.2.3-gog2.6.0.8'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_GOG_FR='lure_of_the_temptress_fr_gog_2_20099.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/lure_of_the_temptress'
+ARCHIVE_GOG_FR_TYPE='mojosetup'
+ARCHIVE_GOG_FR_MD5='c890f929d3e3932915d0214fa451eb7e'
+ARCHIVE_GOG_FR_SIZE='94000'
+ARCHIVE_GOG_FR_VERSION='1.1-gog20099'
 
-DATA_DIRS='./logs'
+ARCHIVE_DOC0_MAIN_PATH='data/noarch/docs'
+ARCHIVE_DOC0_MAIN_FILES='./*'
 
-ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*'
+ARCHIVE_DOC1_MAIN_PATH='data/noarch/data/scream'
+ARCHIVE_DOC1_MAIN_FILES='./*.txt'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./Kingdom_Data/Mono/x86 ./Kingdom_Data/Plugins/x86 ./Kingdom.x86'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/data'
+ARCHIVE_GAME_MAIN_FILES='./*.vga'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./Kingdom_Data/Mono/x86_64 ./Kingdom_Data/Plugins/x86_64 ./Kingdom.x86_64'
+APP_MAIN_TYPE='scummvm'
+APP_MAIN_SCUMMID='lure'
+APP_MAIN_ICON='data/noarch/support/icon.png'
 
-ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Kingdom_Data/global* ./Kingdom_Data/level* ./Kingdom_Data/resources* ./Kingdom_Data/ScreenSelector.png ./Kingdom_Data/sharedassets* ./Kingdom_Data/Managed ./Kingdom_Data/Mono/etc ./Kingdom_Data/Resources ./Kingdom_Data/boot.config'
+PACKAGES_LIST='PKG_MAIN'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='Kingdom.x86'
-APP_MAIN_EXE_BIN64='Kingdom.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Kingdom_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
-
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
-
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_MAIN_ID="$GAME_ID"
+PKG_MAIN_ID_GOG_EN="${GAME_ID}-en"
+PKG_MAIN_ID_GOG_FR="${GAME_ID}-fr"
+PKG_MAIN_PROVIDE="$PKG_MAIN_ID"
+PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
@@ -107,31 +96,45 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Extract game data
+# Extract data from game
 
 extract_data_from "$SOURCE_ARCHIVE"
-
+tolower "$PLAYIT_WORKDIR/gamedata"
 prepare_package_layout
-
+icons_get_from_workdir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+write_launcher 'APP_MAIN'
 
 # Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+if [ "$OPTION_PACKAGE" = 'deb' ]; then
+	file="$PKG_MAIN_PATH/etc/apt/preferences.d/$GAME_ID"
+	mkdir --parents "${file%/*}"
+	cat > "$file" <<- EOF
+	Package: $GAME_ID
+	Pin: release o=Debian
+	Pin-Priority: -1
+	EOF
+fi
+cat > "$postinst" << EOF
+if [ ! -f "$PATH_GAME/lure.dat" ]; then
+	ln --symbolic /usr/share/scummvm/lure.dat "$PATH_GAME"
+fi
+EOF
+cat > "$prerm" << EOF
+if [ -f "$PATH_GAME/lure.dat" ]; then
+	rm "$PATH_GAME/lure.dat"
+fi
+EOF
+write_metadata
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
