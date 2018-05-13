@@ -163,7 +163,7 @@ icon_extract_ico_from_exe() {
 	file="$1"
 	destination="$2"
 	[ "$wrestool_id" ] && options="--name=$wrestool_id"
-	wrestool --extract --type=14 $options --output="$destination" "$file"
+	wrestool --extract --type=14 $options --output="$destination" "$file" 2>/dev/null
 }
 
 # convert .bmp file to .png
