@@ -34,26 +34,30 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180514.1
 
 # Set game-specific variables
 
 GAME_ID='braveland-wizard'
 GAME_NAME='Braveland Wizard'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
-
-ARCHIVE_GOG='braveland_wizard_en_1_1_3_13_18418.sh'
+ARCHIVE_GOG='braveland_wizard_en_1_1_4_14_19675.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/braveland_wizard'
-ARCHIVE_GOG_MD5='7153da6ceb0deda556ebdb7cfa4b9203'
+ARCHIVE_GOG_MD5='79fa2c8280b8b3370d85fc32907e2b51'
 ARCHIVE_GOG_SIZE='450000'
-ARCHIVE_GOG_VERSION='1.1.3.13-gog18418'
+ARCHIVE_GOG_VERSION='1.1.4.14-gog19675'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_braveland_wizard_2.1.0.4.sh'
-ARCHIVE_GOG_OLD_MD5='14346dc8d6e7ad410dd1b179763aa94e'
+ARCHIVE_GOG_OLD='braveland_wizard_en_1_1_3_13_18418.sh'
+ARCHIVE_GOG_OLD_MD5='7153da6ceb0deda556ebdb7cfa4b9203'
 ARCHIVE_GOG_OLD_SIZE='450000'
-ARCHIVE_GOG_OLD_VERSION='1.1.1.11-gog2.1.0.4'
+ARCHIVE_GOG_OLD_VERSION='1.1.3.13-gog18418'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLDER='gog_braveland_wizard_2.1.0.4.sh'
+ARCHIVE_GOG_OLDER_MD5='14346dc8d6e7ad410dd1b179763aa94e'
+ARCHIVE_GOG_OLDER_SIZE='450000'
+ARCHIVE_GOG_OLDER_VERSION='1.1.1.11-gog2.1.0.4'
 
 ARCHIVE_DOC_PATH='data/noarch/docs'
 ARCHIVE_DOC_FILES='./*'
@@ -70,11 +74,10 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./Braveland Wizard.x86'
-APP_MAIN_EXE_BIN64='./Braveland Wizard.x86_64'
+APP_MAIN_EXE_BIN32='Braveland Wizard.x86'
+APP_MAIN_EXE_BIN64='Braveland Wizard.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON='Braveland Wizard_Data/Resources/UnityPlayer.png'
 APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
@@ -90,15 +93,25 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -109,12 +122,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-done
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -125,7 +133,8 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
@@ -136,10 +145,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

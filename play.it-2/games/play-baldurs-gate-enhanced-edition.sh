@@ -34,25 +34,29 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180512.1
 
 # Set game-specific variables
 
 GAME_ID='baldurs-gate-enhanced-edition'
 GAME_NAME='Baldur’s Gate - Enhanced Edition'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
-
-ARCHIVE_GOG='gog_baldur_s_gate_enhanced_edition_2.5.0.9.sh'
+ARCHIVE_GOG='baldur_s_gate_enhanced_edition_en_2_3_67_3_20146.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/baldurs_gate_enhanced_edition'
-ARCHIVE_GOG_MD5='224be273fd2ec1eb0246f407dda16bc4'
+ARCHIVE_GOG_MD5='4d08fe21fcdeab51624fa2e0de2f5813'
 ARCHIVE_GOG_SIZE='3200000'
-ARCHIVE_GOG_VERSION='2.3.67.3-gog2.5.0.9'
+ARCHIVE_GOG_VERSION='2.3.67.3-gog20146'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='gog_baldur_s_gate_enhanced_edition_2.5.0.7.sh'
-ARCHIVE_GOG_OLD_MD5='37ece59534ca63a06f4c047d64b82df9'
+ARCHIVE_GOG_OLD='gog_baldur_s_gate_enhanced_edition_2.5.0.9.sh'
+ARCHIVE_GOG_OLD_MD5='224be273fd2ec1eb0246f407dda16bc4'
 ARCHIVE_GOG_OLD_SIZE='3200000'
-ARCHIVE_GOG_OLD_VERSION='2.3.67.3-gog2.5.0.7'
+ARCHIVE_GOG_OLD_VERSION='2.3.67.3-gog2.5.0.9'
+
+ARCHIVE_GOG_OLDER='gog_baldur_s_gate_enhanced_edition_2.5.0.7.sh'
+ARCHIVE_GOG_OLDER_MD5='37ece59534ca63a06f4c047d64b82df9'
+ARCHIVE_GOG_OLDER_SIZE='3200000'
+ARCHIVE_GOG_OLDER_VERSION='2.3.67.3-gog2.5.0.7'
 
 ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
@@ -63,24 +67,17 @@ ARCHIVE_DOC_DATA_FILES='./*'
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./BaldursGate ./engine.lua'
 
-ARCHIVE_GAME_AREAS_PATH='data/noarch/game'
-ARCHIVE_GAME_AREAS_FILES='./data/AR*'
-
 ARCHIVE_GAME_L10N_PATH='data/noarch/game'
 ARCHIVE_GAME_L10N_FILES='./lang'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./movies ./music ./chitin.key ./Manuals ./scripts ./data/25* ./data/C* ./data/D* ./data/E* ./data/G* ./data/H* ./data/I* ./data/L* ./data/M* ./data/N* ./data/O* ./data/P* ./data/S* ./data/T* ./data/v*'
+ARCHIVE_GAME_DATA_FILES='./movies ./music ./chitin.key ./Manuals ./scripts ./data'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='BaldursGate'
 APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_AREAS PKG_L10N PKG_DATA PKG_BIN'
-
-PKG_AREAS_ID="${GAME_ID}-areas"
-PKG_AREAS_DESCRIPTION='areas'
+PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
 PKG_L10N_ID="${GAME_ID}-l10n"
 PKG_L10N_DESCRIPTION='localizations'
@@ -89,20 +86,30 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_AREAS_ID $PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json"
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json"
 PKG_BIN_DEPS_ARCH='lib32-openssl-1.0'
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -110,7 +117,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Use libSSL 1.0.0 32-bit archive
+# Use libSSL 1.0.0 32-bit archive unless building for Arch Linux
 
 if [ "$OPTION_PACKAGE" != 'arch' ]; then
 	ARCHIVE_MAIN="$ARCHIVE"
@@ -121,15 +128,12 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_GAME"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Get icon
 
 PKG='PKG_DATA'
-get_icon_from_temp_dir 'APP_MAIN'
-
+icons_get_from_workdir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libSSL into the game directory
@@ -162,13 +166,14 @@ if [ ! -e /lib/i386-linux-gnu/libjson.so.0 ]; then
 	elif [ -e /lib/i386-linux-gnu/libjson-c.so.3 ] ; then
 		ln --symbolic libjson-c.so.3 /lib/i386-linux-gnu/libjson.so.0
 	fi
-elif [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
+fi
+if [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
 	ln --symbolic libjson-c.so /usr/lib32/libjson.so.0
 fi
 EOF
 
 write_metadata 'PKG_BIN'
-write_metadata 'PKG_AREAS' 'PKG_L10N' 'PKG_DATA'
+write_metadata 'PKG_L10N' 'PKG_DATA'
 build_pkg
 
 # Clean up

@@ -34,20 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180514.1
 
 # Set game-specific variables
 
 GAME_ID='icewind-dale-enhanced-edition'
 GAME_NAME='Icewind Dale - Enhanced Edition'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='gog_icewind_dale_enhanced_edition_2.1.0.5.sh'
+ARCHIVE_GOG='icewind_dale_enhanced_edition_en_2_5_16_3_20626.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/icewind_dale_enhanced_edition'
-ARCHIVE_GOG_MD5='fc7244f4793eec365b8ac41d91a4edbb'
+ARCHIVE_GOG_MD5='f237e9506f046862e8d1c2d21c8fd588'
 ARCHIVE_GOG_SIZE='2900000'
-ARCHIVE_GOG_VERSION='1.4.0-gog2.1.0.5'
+ARCHIVE_GOG_VERSION='2.5.16.3-gog20626'
+ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='gog_icewind_dale_enhanced_edition_2.1.0.5.sh'
+ARCHIVE_GOG_OLD_MD5='fc7244f4793eec365b8ac41d91a4edbb'
+ARCHIVE_GOG_OLD_SIZE='2900000'
+ARCHIVE_GOG_OLD_VERSION='1.4.0-gog2.1.0.5'
 
 ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
@@ -73,9 +77,8 @@ ARCHIVE_ICONS_FILES='./16x16 ./32x32 ./48x48 ./64x64 ./128x128 ./256x256'
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='IcewindDale'
 APP_MAIN_ICON_GOG='data/noarch/support/icon.png'
-APP_MAIN_ICON_GOG_RES='256'
 
-PACKAGES_LIST='PKG_L10N PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
 PKG_L10N_ID="${GAME_ID}-l10n"
 PKG_L10N_DESCRIPTION='localizations'
@@ -84,20 +87,30 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_L10N_ID, $PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libjson-c3 | libjson-c2, libopenal1"
-PKG_BIN_DEPS_ARCH="$PKG_L10N_ID $PKG_DATA_ID lib32-libgl lib32-openal lib32-json-c lib32-openssl-1.0"
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json"
+PKG_BIN_DEPS_ARCH='lib32-openssl-1.0'
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -108,44 +121,34 @@ fi
 # Try to load icons archive
 
 ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
+archive_set 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
-# Use libSSL 1.0.0 32-bit archive
+# Use libSSL 1.0.0 32-bit archive unless building for Arch Linux
 
 if [ "$OPTION_PACKAGE" != 'arch' ]; then
 	ARCHIVE_MAIN="$ARCHIVE"
-	set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
+	archive_set 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_32'
 	ARCHIVE="$ARCHIVE_MAIN"
 fi
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+
+# Get icons
+
+PKG='PKG_DATA'
 if [ "$ARCHIVE_ICONS" ]; then
 	(
 		ARCHIVE='ARCHIVE_ICONS'
 		extract_data_from "$ARCHIVE_ICONS"
 	)
-fi
-
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_L10N'
-organize_data 'GAME_L10N' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
-PKG='PKG_DATA'
-if [ "$ARCHIVE_ICONS" ]; then
 	organize_data 'ICONS' "$PATH_ICON_BASE"
 else
 	get_icon_from_temp_dir 'APP_MAIN'
 fi
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libSSL into the game directory
@@ -170,13 +173,16 @@ write_launcher 'APP_MAIN'
 # Build package
 
 cat > "$postinst" << EOF
-if [ ! -e /lib/i386-linux-gnu/libjson.so.0 ] && [ -e /lib/i386-linux-gnu/libjson-c.so ] ; then
-	ln --symbolic libjson-c.so /lib/i386-linux-gnu/libjson.so.0
-elif [ ! -e /lib/i386-linux-gnu/libjson.so.0 ] && [ -e /lib/i386-linux-gnu/libjson-c.so.2 ] ; then
-	ln --symbolic libjson-c.so.2 /lib/i386-linux-gnu/libjson.so.0
-elif [ ! -e /lib/i386-linux-gnu/libjson.so.0 ] && [ -e /lib/i386-linux-gnu/libjson-c.so.3 ] ; then
-	ln --symbolic libjson-c.so.3 /lib/i386-linux-gnu/libjson.so.0
-elif [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
+if [ ! -e /lib/i386-linux-gnu/libjson.so.0 ]; then
+	if [ -e /lib/i386-linux-gnu/libjson-c.so ] ; then
+		ln --symbolic libjson-c.so /lib/i386-linux-gnu/libjson.so.0
+	elif [ -e /lib/i386-linux-gnu/libjson-c.so.2 ] ; then
+		ln --symbolic libjson-c.so.2 /lib/i386-linux-gnu/libjson.so.0
+	elif [ -e /lib/i386-linux-gnu/libjson-c.so.3 ] ; then
+		ln --symbolic libjson-c.so.3 /lib/i386-linux-gnu/libjson.so.0
+	fi
+fi
+if [ ! -e /usr/lib32/libjson.so.0 ] && [ -e /usr/lib32/libjson-c.so ] ; then
 	ln --symbolic libjson-c.so /usr/lib32/libjson.so.0
 fi
 EOF
