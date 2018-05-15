@@ -13,6 +13,8 @@
 
   * Makefile: Do not install play.it 1.x scripts and library anymore
 
+  * meta-script: Add manpage
+
 2.8.1
 
   * Fix icon_get_resolution_from_file and icons_linking_postinst compatibility
