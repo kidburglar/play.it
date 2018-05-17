@@ -34,38 +34,35 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180514.1
 
 # Set game-specific variables
 
 GAME_ID='strafe'
 GAME_NAME='Strafe'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='setup_strafe_1.1_(16883).exe'
+ARCHIVE_GOG='strafe_en_1_2_update_25_04_2018_20318.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/strafe'
-ARCHIVE_GOG_MD5='4a867da5f23d688cb8f7695de9e24b05'
-ARCHIVE_GOG_VERSION='1.1-gog16883'
+ARCHIVE_GOG_MD5='3726412cdf951f5d4278a0a557a70db6'
+ARCHIVE_GOG_VERSION='1.2.180425-gog20318'
 ARCHIVE_GOG_SIZE='3000000'
-ARCHIVE_GOG_TYPE='innosetup'
-ARCHIVE_GOG_PART1='setup_strafe_1.1_(16883)-1.bin'
-ARCHIVE_GOG_PART1_MD5='5d1dca6ef0035e262e14d3759cd09708'
-ARCHIVE_GOG_PART1_TYPE='innosetup'
+ARCHIVE_GOG_TYPE='mojosetup'
 
 DATA_DIRS='./logs'
 
-ARCHIVE_GAME_BIN_PATH='app'
-ARCHIVE_GAME_BIN_FILES='./*.exe *_data/mono *_data/plugins *_data/managed'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
-ARCHIVE_GAME_DATA_PATH='app'
-ARCHIVE_GAME_DATA_FILES='*_data/app.info *_data/resources *_data/level* *_data/sharedassets* *_data/globalgamemanagers* *_data/ovrappinfo *_data/resources.* *_data/streamingassets'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./STRAFE.x86_64 ./STRAFE_Data/Mono ./STRAFE_Data/Plugins'
 
-APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='strafe.exe'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./STRAFE_Data'
+
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='STRAFE.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='strafe.exe'
-APP_MAIN_ICON_RES='16 24 32 48 64 96 128 192 256'
+APP_MAIN_ICON='STRAFE_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN PKG_DATA'
 
@@ -73,19 +70,29 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_DATA_ID wine-staging"
+PKG_BIN_DEPS="$PKG_DATA_ID glx xcursor libxrandr gtk2"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -93,25 +100,10 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Check that all parts of the installer are present
-
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_PART1' 'ARCHIVE_GOG_PART1'
-[ "$ARCHIVE_PART1" ] || set_archive_error_not_found 'ARCHIVE_GOG_PART1'
-ARCHIVE="$ARCHIVE_MAIN"
-
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
-
-PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -121,7 +113,10 @@ write_launcher 'APP_MAIN'
 
 # Build package
 
-write_metadata
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up

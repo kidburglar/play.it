@@ -29,71 +29,35 @@ set -o errexit
 ###
 
 ###
-# SOMA
+# War for the Overworld: My Pet Dungeon
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180512.2
+script_version=20180512.1
 
 # Set game-specific variables
 
-GAME_ID='soma'
-GAME_NAME='SOMA'
+GAME_ID='war-for-the-overworld'
+GAME_NAME='War for the Overworld: My Pet Dungeon'
 
-ARCHIVE_HUMBLE='SOMA_Linux_v110.zip'
-ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/soma'
-ARCHIVE_HUMBLE_MD5='46e9dadf90d347e0f384e636e71ce746'
-ARCHIVE_HUMBLE_VERSION='1.10-humble2'
-ARCHIVE_HUMBLE_SIZE='22000000'
-ARCHIVE_HUMBLE_TYPE='zip'
+ARCHIVE_GOG='war_for_the_overworld_my_pet_dungeon_dlc_en_gog_1_20169.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/war_for_the_overworld_my_pet_dungeon'
+ARCHIVE_GOG_MD5='21a75a89020491955a5fc9ccae6740af'
+ARCHIVE_GOG_SIZE='1300'
+ARCHIVE_GOG_VERSION='1.0-gog20169'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_HUMBLE_OLD='SOMA_Humble_Linux_1109.zip'
-ARCHIVE_HUMBLE_OLD_MD5='63f4c611fed4df25bee3fb89177ab57f'
-ARCHIVE_HUMBLE_OLD_VERSION='1109-humble1'
-ARCHIVE_HUMBLE_OLD_SIZE='22000000'
-ARCHIVE_HUMBLE_OLD_TYPE='zip'
+ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
+ARCHIVE_DOC_MAIN_FILES='./*'
 
-ARCHIVE_DOC_DATA_PATH='SOMA'
-ARCHIVE_DOC_DATA_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_DOC_DATA_FILES='./README.linux'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/game'
+ARCHIVE_GAME_MAIN_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='SOMA'
-ARCHIVE_GAME_BIN_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_BIN_FILES='./Soma.bin.x86_64 ./lib64'
+PACKAGES_LIST='PKG_MAIN'
 
-ARCHIVE_GAME_DATA_PATH='SOMA'
-ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_DATA_FILES='./billboards ./combos ./config ./core ./detail_meshes ./fonts ./graphics ./gui ./hps_api.hps ./hps_syntax.xml ./hps.xml ./Icon.bmp ./lang ./lights ./MainEditorSettings.cfg ./maps ./materials.cfg ./music ./particles ./resources.cfg ./script ./_shadersource ./_shadersource ./static_objects ./_supersecret.rar ./terminals ./textures ./undergrowth'
-
-ARCHIVE_GAME_ENTITIES_PATH='SOMA'
-ARCHIVE_GAME_ENTITIES_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_ENTITIES_FILES='./entities'
-
-ARCHIVE_GAME_SOUNDS_PATH='SOMA'
-ARCHIVE_GAME_SOUNDS_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_SOUNDS_FILES='./sounds'
-
-CONFIG_FILES='./*.cfg'
-CONFIG_DIRS='./config'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE='Soma.bin.x86_64'
-APP_MAIN_ICON='Icon.bmp'
-
-PACKAGES_LIST='PKG_BIN PKG_ENTITIES PKG_SOUNDS PKG_DATA'
-
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_ENTITIES_ID="${GAME_ID}-entities"
-PKG_ENTITIES_DESCRIPTION='entities'
-
-PKG_SOUNDS_ID="${GAME_ID}-sounds"
-PKG_SOUNDS_DESCRIPTION='sounds'
-
-PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_DATA_ID $PKG_ENTITIES_ID $PKG_SOUNDS_ID glu sdl2"
+PKG_MAIN_ID="${GAME_ID}-my-pet-dungeon"
+PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
@@ -129,17 +93,7 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-# Extract icons
-
-PKG='PKG_DATA'
-icons_get_from_package 'APP_MAIN'
-
-# Write launchers
-
-PKG='PKG_BIN'
-write_launcher 'APP_MAIN'
-
-# Build packages
+# Build package
 
 write_metadata
 build_pkg

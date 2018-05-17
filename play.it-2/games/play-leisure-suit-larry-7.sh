@@ -29,71 +29,51 @@ set -o errexit
 ###
 
 ###
-# SOMA
+# Leisure Suit Larry: Love for Sail!
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180512.2
+script_version=20180515.1
 
 # Set game-specific variables
 
-GAME_ID='soma'
-GAME_NAME='SOMA'
+GAME_ID='leisure-suit-larry-7'
+GAME_NAME='Leisure Suit Larry: Love for Sail!'
 
-ARCHIVE_HUMBLE='SOMA_Linux_v110.zip'
-ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/soma'
-ARCHIVE_HUMBLE_MD5='46e9dadf90d347e0f384e636e71ce746'
-ARCHIVE_HUMBLE_VERSION='1.10-humble2'
-ARCHIVE_HUMBLE_SIZE='22000000'
-ARCHIVE_HUMBLE_TYPE='zip'
+ARCHIVES_LIST='ARCHIVE_GOG_EN ARCHIVE_GOG_FR'
 
-ARCHIVE_HUMBLE_OLD='SOMA_Humble_Linux_1109.zip'
-ARCHIVE_HUMBLE_OLD_MD5='63f4c611fed4df25bee3fb89177ab57f'
-ARCHIVE_HUMBLE_OLD_VERSION='1109-humble1'
-ARCHIVE_HUMBLE_OLD_SIZE='22000000'
-ARCHIVE_HUMBLE_OLD_TYPE='zip'
+ARCHIVE_GOG_EN='leisure_suit_larry_love_for_sail_en_gog_1_20744.sh'
+ARCHIVE_GOG_EN_URL='https://www.gog.com/game/leisure_suit_larry_love_for_sail'
+ARCHIVE_GOG_EN_TYPE='mojosetup'
+ARCHIVE_GOG_EN_MD5='38862663d3dd9298acdf3fcc5f4bd88d'
+ARCHIVE_GOG_EN_SIZE='680000'
+ARCHIVE_GOG_EN_VERSION='1.0-gog20744'
 
-ARCHIVE_DOC_DATA_PATH='SOMA'
-ARCHIVE_DOC_DATA_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_DOC_DATA_FILES='./README.linux'
+ARCHIVE_GOG_FR='leisure_suit_larry_love_for_sail_fr_gog_1_20744.sh'
+ARCHIVE_GOG_FR_URL='https://www.gog.com/game/leisure_suit_larry_love_for_sail'
+ARCHIVE_GOG_FR_TYPE='mojosetup'
+ARCHIVE_GOG_FR_MD5='1386fa634b48ecb5af83fdab12e99c2d'
+ARCHIVE_GOG_FR_SIZE='630000'
+ARCHIVE_GOG_FR_VERSION='1.0-gog20744'
 
-ARCHIVE_GAME_BIN_PATH='SOMA'
-ARCHIVE_GAME_BIN_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_BIN_FILES='./Soma.bin.x86_64 ./lib64'
+ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
+ARCHIVE_DOC_MAIN_FILES='./*'
 
-ARCHIVE_GAME_DATA_PATH='SOMA'
-ARCHIVE_GAME_DATA_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_DATA_FILES='./billboards ./combos ./config ./core ./detail_meshes ./fonts ./graphics ./gui ./hps_api.hps ./hps_syntax.xml ./hps.xml ./Icon.bmp ./lang ./lights ./MainEditorSettings.cfg ./maps ./materials.cfg ./music ./particles ./resources.cfg ./script ./_shadersource ./_shadersource ./static_objects ./_supersecret.rar ./terminals ./textures ./undergrowth'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/data'
+ARCHIVE_GAME_MAIN_FILES='./*'
 
-ARCHIVE_GAME_ENTITIES_PATH='SOMA'
-ARCHIVE_GAME_ENTITIES_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_ENTITIES_FILES='./entities'
+APP_MAIN_TYPE='scummvm'
+APP_MAIN_SCUMMID='sci'
+APP_MAIN_ICON='lsl7.ico'
 
-ARCHIVE_GAME_SOUNDS_PATH='SOMA'
-ARCHIVE_GAME_SOUNDS_PATH_HUMBLE_OLD='Linux'
-ARCHIVE_GAME_SOUNDS_FILES='./sounds'
+PACKAGES_LIST='PKG_MAIN'
 
-CONFIG_FILES='./*.cfg'
-CONFIG_DIRS='./config'
-
-APP_MAIN_TYPE='native'
-APP_MAIN_EXE='Soma.bin.x86_64'
-APP_MAIN_ICON='Icon.bmp'
-
-PACKAGES_LIST='PKG_BIN PKG_ENTITIES PKG_SOUNDS PKG_DATA'
-
-PKG_DATA_ID="${GAME_ID}-data"
-PKG_DATA_DESCRIPTION='data'
-
-PKG_ENTITIES_ID="${GAME_ID}-entities"
-PKG_ENTITIES_DESCRIPTION='entities'
-
-PKG_SOUNDS_ID="${GAME_ID}-sounds"
-PKG_SOUNDS_DESCRIPTION='sounds'
-
-PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_DATA_ID $PKG_ENTITIES_ID $PKG_SOUNDS_ID glu sdl2"
+PKG_MAIN_ID="$GAME_ID"
+PKG_MAIN_ID_GOG_EN="${GAME_ID}-en"
+PKG_MAIN_ID_GOG_FR="${GAME_ID}-fr"
+PKG_MAIN_PROVIDE="$PKG_MAIN_ID"
+PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
@@ -123,23 +103,22 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Extract game data
+# Extract data from game
 
 extract_data_from "$SOURCE_ARCHIVE"
+tolower "$PLAYIT_WORKDIR/gamedata"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-# Extract icons
+# Get icon
 
-PKG='PKG_DATA'
 icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
-PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
-# Build packages
+# Build package
 
 write_metadata
 build_pkg

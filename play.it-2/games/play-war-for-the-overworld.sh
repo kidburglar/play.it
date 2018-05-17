@@ -34,43 +34,37 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180514.1
 
 # Set game-specific variables
 
 GAME_ID='war-for-the-overworld'
 GAME_NAME='War for the Overworld'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST ARCHIVE_HUMBLE'
-
-ARCHIVE_GOG='war_for_the_overworld_en_1_6_66_16455.sh'
+ARCHIVE_GOG='war_for_the_overworld_en_2_0f4_20414.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/war_for_the_overworld'
-ARCHIVE_GOG_MD5='3317bba3d2ec7dc5715f0d44e6cb70c1'
-ARCHIVE_GOG_SIZE='2800000'
-ARCHIVE_GOG_VERSION='1.6.66-gog16455'
+ARCHIVE_GOG_MD5='9110eadd613d39f95e08e182f08546cf'
+ARCHIVE_GOG_SIZE='4500000'
+ARCHIVE_GOG_VERSION='2.0f4-gog20414'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='war_for_the_overworld_en_1_6_5f1_15803.sh'
-ARCHIVE_GOG_OLD_MD5='5fb91f8c86eafeea09c91b36c0c82afe'
-ARCHIVE_GOG_OLD_SIZE='2800000'
-ARCHIVE_GOG_OLD_VERSION='1.6.5f1-gog15803'
+ARCHIVE_GOG_OLD='war_for_the_overworld_en_2_0f1_20175.sh'
+ARCHIVE_GOG_OLD_MD5='51bcd2bd37c4914f5074a622767859d4'
+ARCHIVE_GOG_OLD_SIZE='4500000'
+ARCHIVE_GOG_OLD_VERSION='2.0f1-gog20175'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='war_for_the_overworld_en_1_6_4_15562.sh'
-ARCHIVE_GOG_OLDER_MD5='45847e6faf4114e266d0fef99cae42b6'
+ARCHIVE_GOG_OLDER='war_for_the_overworld_en_1_6_66_16455.sh'
+ARCHIVE_GOG_OLDER_MD5='3317bba3d2ec7dc5715f0d44e6cb70c1'
 ARCHIVE_GOG_OLDER_SIZE='2800000'
-ARCHIVE_GOG_OLDER_VERSION='1.6.4-gog15562'
+ARCHIVE_GOG_OLDER_VERSION='1.6.66-gog16455'
 ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDEST='war_for_the_overworld_en_1_6_4_15447.sh'
-ARCHIVE_GOG_OLDEST_MD5='09335b964b387ce911942f6c72ab3fb0'
+ARCHIVE_GOG_OLDEST='war_for_the_overworld_en_1_6_5f1_15803.sh'
+ARCHIVE_GOG_OLDEST_MD5='5fb91f8c86eafeea09c91b36c0c82afe'
 ARCHIVE_GOG_OLDEST_SIZE='2800000'
-ARCHIVE_GOG_OLDEST_VERSION='1.6.4-gog15447'
+ARCHIVE_GOG_OLDEST_VERSION='1.6.5f1-gog15803'
 ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
-
-ARCHIVE_GOG_UNDERLORD='gog_war_for_the_overworld_underlord_edition_upgrade_dlc_2.0.0.1.sh'
-ARCHIVE_GOG_UNDERLORD_MD5='635912eed200d45d8907ab1fb4cc53a4'
-ARCHIVE_GOG_UNDERLORD_TYPE='mojosetup'
 
 ARCHIVE_HUMBLE='War_for_the_Overworld_v1.5.2_-_Linux_x64.zip'
 ARCHIVE_HUMBLE_MD5='bedee8b966767cf42c55c6b883e3127c'
@@ -84,49 +78,48 @@ ARCHIVE_GAME_BIN_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN_PATH_HUMBLE='Linux'
 ARCHIVE_GAME_BIN_FILES='./*.x86_64 ./*_Data/Plugins ./*_Data/Mono ./*_Data/CoherentUI_Host'
 
-ARCHIVE_GAME_ASSETS_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_ASSETS_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_ASSETS_FILES='./*_Data/*.assets*'
-
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_DATA_PATH_HUMBLE='Linux'
-ARCHIVE_GAME_DATA_FILES='./*_Data/globalgamemanagers ./*_Data/resources.resource ./*_Data/level* ./*_Data/*.dat ./*_Data/*.ini ./*_Data/*.png ./*_Data/GameData ./*_Data/Managed ./*_Data/Resources ./*_Data/Translation ./*_Data/uiresources ./*.info'
+ARCHIVE_GAME_DATA_FILES='./*_Data ./*.info'
 
-DATA_DIRS='./logs'
-DATA_DIRS_GOG='./WFTOGame_Data/GameData'
-DATA_DIRS_HUMBLE='./WFTO_Data/GameData'
-DATA_FILES='./WFTOGame_Data/uiresources/wftoUI/menu/vids/MPDTUT.webm'
+DATA_DIRS='./*_Data/GameData ./logs'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_GOG='WFTOGame.x86_64'
 APP_MAIN_EXE_HUMBLE='WFTO.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON_GOG='WFTOGame_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_HUMBLE='WFTO_Data/Resources/UnityPlayer.png'
 
-PACKAGES_LIST='PKG_ASSETS PKG_DATA PKG_BIN'
-
-PKG_ASSETS_ID="${GAME_ID}-assets"
-PKG_ASSETS_DESCRIPTION='assets'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_ASSETS_ID $PKG_DATA_ID glibc libstdc++ glx xcursor gconf"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor gconf"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -134,56 +127,47 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
-# Load extra archives (DLC)
+# Set archive-specific values
 
-ARCHIVE_MAIN="$ARCHIVE"
-set_archive 'ARCHIVE_UNDERLORD' 'ARCHIVE_GOG_UNDERLORD'
-ARCHIVE="$ARCHIVE_MAIN"
+use_archive_specific_value 'APP_MAIN_EXE'
+use_archive_specific_value 'APP_MAIN_ICON'
 
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-if [ "$ARCHIVE_UNDERLORD" ]; then
-	touch "$PLAYIT_WORKDIR/gamedata/$ARCHIVE_GAME_DATA_PATH_GOG/goggame-1906832216.info"
-fi
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
-
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host
-chmod +x "${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
-
-(
-	cd "${PKG_DATA_PATH}${PATH_GAME}"/*_Data/uiresources/maps
-	mv 'Stonegate.unity.png' 'stonegate.unity.png'
-)
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-# Write launchers
+# Tweaks for old versions
 
-case "$ARCHIVE" in
-	('ARCHIVE_GOG'*)
-		APP_MAIN_EXE="$APP_MAIN_EXE_GOG"
-		DATA_DIRS="$DATA_DIRS $DATA_DIRS_GOG"
-	;;
-	('ARCHIVE_HUMBLE')
-		APP_MAIN_EXE="$APP_MAIN_EXE_HUMBLE"
-		DATA_DIRS="$DATA_DIRS $DATA_DIRS_HUMBLE"
-	;;
-esac
+for file in\
+	"${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host\
+	"${PKG_BIN_PATH}${PATH_GAME}"/*_Data/CoherentUI_Host/linux/CoherentUI_Host.bin
+do
+	if [ -e "$file" ]; then
+		chmod +x "$file"
+	fi
+done
+
+file="${PKG_DATA_PATH}${PATH_GAME}"/*_Data/uiresources/maps/Stonegate.unity.png
+if [ -e "$file" ]; then
+	(
+		cd "${file%/*}"
+		mv "${file##*/}" 'stonegate.unity.png'
+	)
+fi
+
+# Write launchers
 
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
-# Build package
+# Build packages
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_ASSETS' 'PKG_BIN'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up
