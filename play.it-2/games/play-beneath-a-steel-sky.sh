@@ -34,38 +34,38 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180404.1
+script_version=20180519.1
 
 # Set game-specific variables
 
 GAME_ID='beneath-a-steel-sky'
 GAME_NAME='Beneath a Steel Sky'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='gog_beneath_a_steel_sky_2.1.0.4.sh'
+ARCHIVE_GOG='beneath_a_steel_sky_en_gog_2_20150.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/beneath_a_steel_sky'
-ARCHIVE_GOG_MD5='603887dd11b4dec2ff43553ce40303a0'
-ARCHIVE_GOG_SIZE='130000'
-ARCHIVE_GOG_VERSION='1.0-gog2.1.0.4'
-ARCHIVE_GOG_TYPE='mojosetup_unzip'
+ARCHIVE_GOG_MD5='5cc68247b61ba31e37e842fd04409d98'
+ARCHIVE_GOG_SIZE='160000'
+ARCHIVE_GOG_VERSION='1.0-gog20150'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC0_MAIN_MAIN_PATH='data/noarch/docs'
+ARCHIVE_GOG_OLD='gog_beneath_a_steel_sky_2.1.0.4.sh'
+ARCHIVE_GOG_OLD_MD5='603887dd11b4dec2ff43553ce40303a0'
+ARCHIVE_GOG_OLD_SIZE='130000'
+ARCHIVE_GOG_OLD_VERSION='1.0-gog2.1.0.4'
+ARCHIVE_GOG_OLD_TYPE='mojosetup_unzip'
+
+ARCHIVE_DOC0_MAIN_PATH='data/noarch/docs'
 ARCHIVE_DOC0_MAIN_FILES='./*.pdf ./*.txt'
 
-ARCHIVE_DOC1_MAIN_MAIN_PATH='data/noarch/data'
+ARCHIVE_DOC1_MAIN_PATH='data/noarch/data'
 ARCHIVE_DOC1_MAIN_FILES='./*.txt'
 
-ARCHIVE_GAME0_MAIN_PATH='data/noarch/data'
-ARCHIVE_GAME0_MAIN_FILES='./*'
-
-ARCHIVE_GAME1_MAIN_PATH='data/noarch'
-ARCHIVE_GAME1_MAIN_FILES='beneath.ini'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/data'
+ARCHIVE_GAME_MAIN_FILES='./sky.cpt ./sky.dnr ./sky.dsk'
 
 APP_MAIN_TYPE='scummvm'
 APP_MAIN_SCUMMID='sky'
 APP_MAIN_ICON='data/noarch/support/icon.png'
-APP_MAIN_ICON_RES='256'
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -74,15 +74,25 @@ PKG_MAIN_DEPS='scummvm'
 
 # Load common functions
 
-target_version='2.7'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -95,8 +105,10 @@ fi
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 
-get_icon_from_temp_dir 'APP_MAIN'
 
+# Get icons
+
+icons_get_from_workdir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
