@@ -34,20 +34,24 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180519.1
 
 # Set game-specific variables
 
 GAME_ID='reus'
 GAME_NAME='Reus'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_HUMBLE'
-
-ARCHIVE_GOG='gog_reus_2.0.0.2.sh'
+ARCHIVE_GOG='reus_en_1_6_5_20844.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/reus'
-ARCHIVE_GOG_MD5='25fe7ec93305e804558e4ef8a31fbbf8'
+ARCHIVE_GOG_MD5='a768dd2347ac7f6be16ffa9e3f0952c4'
 ARCHIVE_GOG_SIZE='480000'
-ARCHIVE_GOG_VERSION='1.5.1-gog2.0.0.2'
+ARCHIVE_GOG_VERSION='1.6.5-gog20844'
+ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='gog_reus_2.0.0.2.sh'
+ARCHIVE_GOG_OLD_MD5='25fe7ec93305e804558e4ef8a31fbbf8'
+ARCHIVE_GOG_OLD_SIZE='480000'
+ARCHIVE_GOG_OLD_VERSION='1.5.1-gog2.0.0.2'
 
 ARCHIVE_HUMBLE='reus_linux_1389636757-bin'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/reus'
@@ -56,12 +60,12 @@ ARCHIVE_HUMBLE_SIZE='380000'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 ARCHIVE_HUMBLE_VERSION='0.beta-humble140113'
 
-ARCHIVE_DOC1_PATH_GOG='data/noarch/game'
-ARCHIVE_DOC1_PATH_HUMBLE='data'
-ARCHIVE_DOC1_FILES='./Linux.README'
+ARCHIVE_DOC0_PATH_GOG='data/noarch/game'
+ARCHIVE_DOC0_PATH_HUMBLE='data'
+ARCHIVE_DOC0_FILES='./Linux.README'
 
-ARCHIVE_DOC2_PATH_GOG='data/noarch/docs'
-ARCHIVE_DOC2_FILES='./*'
+ARCHIVE_DOC1_PATH_GOG='data/noarch/docs'
+ARCHIVE_DOC1_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH_GOG='data/noarch/game'
 ARCHIVE_GAME_BIN32_PATH_HUMBLE='data'
@@ -79,32 +83,43 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Reus.bin.x86'
 APP_MAIN_EXE_BIN64='Reus.bin.x86_64'
 APP_MAIN_ICON='Reus.bmp'
-APP_MAIN_ICON_RES='512'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libfreetype6, libogg0, libopenal1, libsdl2-2.0-0, libtheora0, libvorbis0a"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-glibc lib32-gcc-libs lib32-freetype2 lib32-libogg lib32-openal lib32-sdl2 lib32-libtheora lib32-libvorbis"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ vorbis openal sdl2 freetype"
+PKG_BIN32_DEPS_DEB='libtheora0'
+PKG_BIN32_DEPS_ARCH='lib32-libtheora'
 
 PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID glibc gcc-libs freetype2 libogg openal sdl2 libtheora libvorbis"
+PKG_BIN64_DEPS_ARCH='libtheora'
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -115,25 +130,13 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
+# Extract icon
 
 PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
-extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
@@ -152,10 +155,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
