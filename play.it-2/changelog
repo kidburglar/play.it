@@ -1,3 +1,7 @@
+2.9
+
+  * Update license file to keep track of all authors
+
 2.8.3
 
   * Fix typo in help(), that led to suboptimal wording when called on a script
