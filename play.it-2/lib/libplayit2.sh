@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.1
-library_revision=20180512.1
+library_version=2.8.2
+library_revision=20180520.3
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -716,7 +716,7 @@ help() {
 
 	printf 'ARCHIVE\n\n'
 	archives_get_list
-	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
+	if [ -n "${ARCHIVE_LIST##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"
@@ -1586,7 +1586,7 @@ icon_extract_ico_from_exe() {
 	file="$1"
 	destination="$2"
 	[ "$wrestool_id" ] && options="--name=$wrestool_id"
-	wrestool --extract --type=14 $options --output="$destination" "$file"
+	wrestool --extract --type=14 $options --output="$destination" "$file" 2>/dev/null
 }
 
 # convert .bmp file to .png
@@ -1677,10 +1677,11 @@ icon_get_resolution_from_file() {
 		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
 		[ -n "${file##* *}" ]
 	then
-		resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
-		if [ -n "${resolution##*x*}" ]; then
-			resolution="$(identify $file | sed "s;^$file ;;" | awk '{print $3}')"
-		fi
+		field=2
+		while [ -z "$resolution" ] || [ -n "$(printf '%s' "$resolution" | sed 's/[0-9]*x[0-9]*//')" ]; do
+			resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=$field)"
+			field=$((field + 1))
+		done
 	else
 		resolution="$(identify "$file" | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
 	fi

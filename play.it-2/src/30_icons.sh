@@ -163,7 +163,7 @@ icon_extract_ico_from_exe() {
 	file="$1"
 	destination="$2"
 	[ "$wrestool_id" ] && options="--name=$wrestool_id"
-	wrestool --extract --type=14 $options --output="$destination" "$file"
+	wrestool --extract --type=14 $options --output="$destination" "$file" 2>/dev/null
 }
 
 # convert .bmp file to .png
@@ -254,10 +254,11 @@ icon_get_resolution_from_file() {
 		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
 		[ -n "${file##* *}" ]
 	then
-		resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
-		if [ -n "${resolution##*x*}" ]; then
-			resolution="$(identify $file | sed "s;^$file ;;" | awk '{print $3}')"
-		fi
+		field=2
+		while [ -z "$resolution" ] || [ -n "$(printf '%s' "$resolution" | sed 's/[0-9]*x[0-9]*//')" ]; do
+			resolution="$(identify $file | sed "s;^$file ;;" | cut --delimiter=' ' --fields=$field)"
+			field=$((field + 1))
+		done
 	else
 		resolution="$(identify "$file" | sed "s;^$file ;;" | cut --delimiter=' ' --fields=2)"
 	fi
