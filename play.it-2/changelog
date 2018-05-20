@@ -4,6 +4,9 @@
 
   * New generic dependency: libcurl
 
+  * Remove shebang from library, as it is always meant to be sourced, never
+    directly executed
+
 2.8.3
 
   * Fix typo in help(), that led to suboptimal wording when called on a script

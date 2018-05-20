@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
 # All rights reserved.
@@ -33,5 +31,5 @@
 ###
 
 library_version=2.9.0~dev
-library_revision=20180606.1
+library_revision=20180606.2
 
