@@ -33,7 +33,7 @@
 ###
 
 library_version=2.8.2~dev
-library_revision=20180520.1
+library_revision=20180520.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -716,7 +716,7 @@ help() {
 
 	printf 'ARCHIVE\n\n'
 	archives_get_list
-	if [ -n "${ARCHIVE_LISTS##* *}" ]; then
+	if [ -n "${ARCHIVE_LIST##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"

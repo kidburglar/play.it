@@ -6,6 +6,9 @@
     library version 2.7 or older in a more robust way than what has been done
     in 2.8.1
 
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive
+
 2.8.1
 
   * Fix icon_get_resolution_from_file and icons_linking_postinst compatibility
