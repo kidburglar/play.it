@@ -1,3 +1,8 @@
+2.8.3
+
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive (previous 2.8.2 fix was incomplete)
+
 2.8.2
 
   * icon_extract_ico_from_exe: Suppress wrestool error output

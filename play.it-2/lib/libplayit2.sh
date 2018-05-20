@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.2
-library_revision=20180520.3
+library_version=2.8.3~dev
+library_revision=20180520.4
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -716,7 +716,7 @@ help() {
 
 	printf 'ARCHIVE\n\n'
 	archives_get_list
-	if [ -n "${ARCHIVE_LIST##* *}" ]; then
+	if [ -n "${ARCHIVES_LIST##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"
