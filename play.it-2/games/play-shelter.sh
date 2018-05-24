@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180516.1
+script_version=20180524.1
 
 # Set game-specific variables
 
@@ -60,6 +60,8 @@ ARCHIVE_GAME_DATA_FILES='./*_data'
 
 DATA_DIRS='./saves'
 
+APP_WINETRICKS='csmt=on'
+
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='shelter.exe'
 APP_MAIN_ICON='shelter.exe'
@@ -70,7 +72,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_DATA_ID wine"
+PKG_BIN_DEPS="$PKG_DATA_ID wine-staging winetricks"
 
 # Load common functions
 
