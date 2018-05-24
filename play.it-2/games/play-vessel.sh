@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180522.1
+script_version=20180524.1
 
 # Set game-specific variables
 
@@ -45,7 +45,7 @@ ARCHIVE_HUMBLE='vessel-02222013-bin'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/vessel'
 ARCHIVE_HUMBLE_MD5='2e25cafed61eaa1a1b758eb53fa6b2f6'
 ARCHIVE_HUMBLE_SIZE='1200000'
-ARCHIVE_HUMBLE_VERSION='0222013-gog130222'
+ARCHIVE_HUMBLE_VERSION='2013.02.22-humble130222'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 
 ARCHIVE_DOC_PATH='data'
