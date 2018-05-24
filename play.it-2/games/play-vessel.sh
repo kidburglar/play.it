@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180524.1
+script_version=20180524.2
 
 # Set game-specific variables
 
@@ -52,7 +52,7 @@ ARCHIVE_DOC_PATH='data'
 ARCHIVE_DOC_FILES='./Linux.README'
 
 ARCHIVE_GAME_BIN_PATH='data'
-ARCHIVE_GAME_BIN_FILES='./x86'
+ARCHIVE_GAME_BIN_FILES='./x86/libfmodevent-4.42.06.so ./x86/libfmodex-4.42.06.so ./x86/libSDL-1.2.so.0 ./x86/vessel.x86'
 
 ARCHIVE_GAME_DATA_PATH='data'
 ARCHIVE_GAME_DATA_FILES='./Data ./Vessel.bmp'
