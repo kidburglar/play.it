@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180529.1
 
 # Set game-specific variables
 
@@ -90,25 +90,22 @@ DATA_FILES='./data/h3ab_bmp.lod ./data/h3ab_spr.lod ./data/h3bitmap.lod ./data/h
 APP_WINETRICKS="vd=\$(xrandr|grep '\*'|awk '{print \$1}')"
 
 APP_MAIN_TYPE='wine'
-APP_MAIN_EXE='./heroes3.exe'
-APP_MAIN_ICON='./heroes3.exe'
-APP_MAIN_ICON_RES='16 32 48 64'
+APP_MAIN_EXE='heroes3.exe'
+APP_MAIN_ICON='heroes3.exe'
 
 APP_EDITOR_MAP_TYPE='wine'
 APP_EDITOR_MAP_ID="${GAME_ID}_map-editor"
-APP_EDITOR_MAP_EXE='./h3maped.exe'
-APP_EDITOR_MAP_ICON='./h3maped.exe'
-APP_EDITOR_MAP_ICON_RES='16 32 48 64'
+APP_EDITOR_MAP_EXE='h3maped.exe'
+APP_EDITOR_MAP_ICON='h3maped.exe'
 APP_EDITOR_MAP_NAME="$GAME_NAME - map editor"
 
 APP_EDITOR_CAMPAIGN_TYPE='wine'
 APP_EDITOR_CAMPAIGN_ID="${GAME_ID}_campaign-editor"
-APP_EDITOR_CAMPAIGN_EXE='./h3ccmped.exe'
-APP_EDITOR_CAMPAIGN_ICON='./h3ccmped.exe'
-APP_EDITOR_CAMPAIGN_ICON_RES='16 32 48 64'
+APP_EDITOR_CAMPAIGN_EXE='h3ccmped.exe'
+APP_EDITOR_CAMPAIGN_ICON='h3ccmped.exe'
 APP_EDITOR_CAMPAIGN_NAME="$GAME_NAME - campaign editor"
 
-PACKAGES_LIST='PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_ID_GOG_EN="${PKG_DATA_ID}-en"
@@ -125,15 +122,25 @@ PKG_BIN_DEPS="$PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
-target_version='2.5'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -145,7 +152,8 @@ fi
 
 if [ "$ARCHIVE" = 'ARCHIVE_GOG_EN_OLD' ]; then
 	ARCHIVE_MAIN="$ARCHIVE"
-	set_archive 'ARCHIVE_PATCH' 'ARCHIVE_GOG_OLD_EN_PATCH'
+	archive_set 'ARCHIVE_PATCH' 'ARCHIVE_GOG_EN_OLD_PATCH'
+	[ "$ARCHIVE_PATCH" ] || archive_set_error_not_found 'ARCHIVE_GOG_EN_OLD_PATCH'
 	ARCHIVE="$ARCHIVE_MAIN"
 	set_temp_directories $PACKAGES_LIST
 fi
@@ -159,17 +167,15 @@ if [ "$ARCHIVE_PATCH" ]; then
 		extract_data_from "$ARCHIVE_PATCH"
 	)
 fi
+prepare_package_layout
+PKG='PKG_BIN'
+organize_data 'GAME_PATCH_BIN' "$PATH_GAME"
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "GAME_${PKG#PKG_}"       "$PATH_GAME"
-	organize_data "GAME_PATCH_${PKG#PKG_}" "$PATH_GAME"
-	organize_data "DOC1_${PKG#PKG_}"       "$PATH_DOC"
-	organize_data "DOC2_${PKG#PKG_}"       "$PATH_DOC"
-done
+# Extract icons
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN' 'APP_EDITOR_MAP' 'APP_EDITOR_CAMPAIGN'
-move_icons_to 'PKG_DATA'
+icons_get_from_package 'APP_MAIN' 'APP_EDITOR_MAP' 'APP_EDITOR_CAMPAIGN'
+icons_move_to 'PKG_DATA'
 
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
