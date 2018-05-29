@@ -137,6 +137,9 @@ pkg_set_deps_arch32() {
 			('json')
 				pkg_dep='lib32-json-c'
 			;;
+			('libcurl')
+				pkg_dep='lib32-curl'
+			;;
 			('libcurl-gnutls')
 				pkg_dep='lib32-libcurl-gnutls'
 			;;
@@ -237,6 +240,9 @@ pkg_set_deps_arch64() {
 			;;
 			('json')
 				pkg_dep='json-c'
+			;;
+			('libcurl')
+				pkg_dep='curl'
 			;;
 			('libcurl-gnutls')
 				pkg_dep='libcurl-gnutls'
