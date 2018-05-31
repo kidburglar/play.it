@@ -30,7 +30,7 @@ set -o errexit
 ###
 
 ###
-# Bit Trip Beat
+# 6180 The Moon
 # build native Linux packages from the original installers
 # send your bug reports to mopi@dotslashplay.it
 ###
@@ -39,44 +39,35 @@ script_version=20180531.1
 
 # Set game-specific variables
 
-GAME_ID='bit-trip-beat'
-GAME_NAME='BIT.TRIP BEAT'
+GAME_ID='6180-the-moon'
+GAME_NAME='6180 The Moon'
 
-ARCHIVE_GOG='gog_bit_trip_beat_2.0.0.1.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/bittrip_beat'
-ARCHIVE_GOG_MD5='32b6fd23c32553aa7c50eaf4247ba664'
-ARCHIVE_GOG_VERSION='1.0.5-gog2.0.0.1'
-ARCHIVE_GOG_SIZE='120000'
+ARCHIVE_HUMBLE='6180_the_moon_2.1.0_Linux.zip'
+ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/6180-the-moon'
+ARCHIVE_HUMBLE_MD5='79e81fb57d8d5dbf27a7c4be2dd0efd9'
+ARCHIVE_HUMBLE_SIZE='130000'
+ARCHIVE_HUMBLE_VERSION='2.1.0-humble141209'
 
-ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC0_DATA_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='.'
+ARCHIVE_GAME_BIN_FILES='./*.x86 ./*_Data/*/x86'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_DOC1_DATA_FILES='./README* ./*.txt'
+ARCHIVE_GAME_DATA_PATH='.'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_GAME_BIN32_FILES='./bit.trip.beat/Effects ./bit.trip.beat/Sounds ./bit.trip.beat/Models ./bit.trip.beat/bit.trip.beat'
-
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game/bit.trip.beat-1.0-64'
-ARCHIVE_GAME_BIN64_FILES='./bit.trip.beat/Effects ./bit.trip.beat/Sounds ./bit.trip.beat/Models ./bit.trip.beat/bit.trip.beat'
-
-ARCHIVE_GAME_DATA_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_GAME_DATA_FILES='./bit.trip.beat/Shaders ./bit.trip.beat/BEAT.png ./bit.trip.beat/Fonts ./bit.trip.beat/Textures'
+DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='bit.trip.beat/bit.trip.beat'
-APP_MAIN_ICON='bit.trip.beat/BEAT.png'
+APP_MAIN_EXE='6180 the moon.x86'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICON='6180 the moon_Data/Resources/UnityPlayer.png'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PACKAGES_LIST='PKG_BIN PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor sdl1.2 openal"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++"
 
 # Load common functions
 
@@ -114,19 +105,15 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
-
-pattern='s|"./$APP_EXE" \($APP_OPTIONS $@\)|cd "${APP_EXE%/*}"\n"./${APP_EXE##*/}" \1|'
-sed --in-place "$pattern" "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID" "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
 
 # Build package
 
 PKG='PKG_DATA'
 icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata 'PKG_BIN'
 build_pkg
 
 # Clean up

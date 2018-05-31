@@ -30,7 +30,7 @@ set -o errexit
 ###
 
 ###
-# Bit Trip Beat
+# Aer - Memories of Old
 # build native Linux packages from the original installers
 # send your bug reports to mopi@dotslashplay.it
 ###
@@ -39,33 +39,49 @@ script_version=20180531.1
 
 # Set game-specific variables
 
-GAME_ID='bit-trip-beat'
-GAME_NAME='BIT.TRIP BEAT'
+GAME_ID='aer-memories-of-old'
+GAME_NAME='AER: Memories of Old'
 
-ARCHIVE_GOG='gog_bit_trip_beat_2.0.0.1.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/bittrip_beat'
-ARCHIVE_GOG_MD5='32b6fd23c32553aa7c50eaf4247ba664'
-ARCHIVE_GOG_VERSION='1.0.5-gog2.0.0.1'
-ARCHIVE_GOG_SIZE='120000'
+ARCHIVE_GOG='aer_memories_of_old_en_v1_0_4_1_19457.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/aer'
+ARCHIVE_GOG_MD5='ca59918433567c974b4985767c4af576'
+ARCHIVE_GOG_SIZE='1400000'
+ARCHIVE_GOG_VERSION='1.0.4.1-gog19475'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC0_DATA_FILES='./*'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_DOC1_DATA_FILES='./README* ./*.txt'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_GAME_BIN32_FILES='./bit.trip.beat/Effects ./bit.trip.beat/Sounds ./bit.trip.beat/Models ./bit.trip.beat/bit.trip.beat'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game/bit.trip.beat-1.0-64'
-ARCHIVE_GAME_BIN64_FILES='./bit.trip.beat/Effects ./bit.trip.beat/Sounds ./bit.trip.beat/Models ./bit.trip.beat/bit.trip.beat'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game/bit.trip.beat-1.0-32'
-ARCHIVE_GAME_DATA_FILES='./bit.trip.beat/Shaders ./bit.trip.beat/BEAT.png ./bit.trip.beat/Fonts ./bit.trip.beat/Textures'
+DATA_DIRS='./logs'
 
+APP_MAIN_PRERUN='
+file="$HOME/.config/unity3d/Daedalic Entertainment GmbH/AERMemoriesofOld/prefs"
+if [ ! -f "$file" ] ; then
+	mkdir --parents "${file%/*}"
+	cat > "$file" <<- EOF
+	<unity_prefs version_major="1" version_minor="1">
+	<pref name="Screenmanager Is Fullscreen mode" type="int">0</pref>
+	<pref name="UnitySelectMonitor" type="int">0</pref>
+	</unity_prefs>
+	EOF
+else
+	sed --in-place "s#<\(pref name=\"Screenmanager Is Fullscreen mode\" type=\"int\"\)>.<\(/pref\)>#<\\1>0<\\2>#" "$file"
+fi
+'
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='bit.trip.beat/bit.trip.beat'
-APP_MAIN_ICON='bit.trip.beat/BEAT.png'
+APP_MAIN_EXE_BIN32='AER.x86'
+APP_MAIN_EXE_BIN64='AER.x86_64'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICON='AER_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
@@ -73,7 +89,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor sdl1.2 openal"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
@@ -117,9 +133,6 @@ rm --recursive "$PLAYIT_WORKDIR/gamedata"
 for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
-
-pattern='s|"./$APP_EXE" \($APP_OPTIONS $@\)|cd "${APP_EXE%/*}"\n"./${APP_EXE##*/}" \1|'
-sed --in-place "$pattern" "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID" "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
 
 # Build package
 
