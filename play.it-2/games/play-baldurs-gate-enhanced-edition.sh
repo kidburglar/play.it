@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180512.1
+script_version=20180602.2
 
 # Set game-specific variables
 
@@ -61,6 +61,9 @@ ARCHIVE_GOG_OLDER_VERSION='2.3.67.3-gog2.5.0.7'
 ARCHIVE_LIBSSL_32='libssl_1.0.0_32-bit.tar.gz'
 ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
 
+ARCHIVE_ICONS_PACK='baldurs-gate-enhanced-edition_icons.tar.gz'
+ARCHIVE_ICONS_PACK_MD5='364512a51e235ac3a6f4d237283ea10f'
+
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
 
@@ -72,6 +75,9 @@ ARCHIVE_GAME_L10N_FILES='./lang'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./movies ./music ./chitin.key ./Manuals ./scripts ./data'
+
+ARCHIVE_ICONS_PATH='.'
+ARCHIVE_ICONS_FILES='./16x16 ./24x42 ./32x32 ./48x48 ./64x64 ./256x256'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE='BaldursGate'
@@ -86,7 +92,7 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json"
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID glibc libstdc++ glx openal json libxrandr"
 PKG_BIN_DEPS_ARCH='lib32-openssl-1.0'
 
 # Load common functions
@@ -125,15 +131,29 @@ if [ "$OPTION_PACKAGE" != 'arch' ]; then
 	ARCHIVE="$ARCHIVE_MAIN"
 fi
 
+# Try to load icons archive
+
+ARCHIVE_MAIN="$ARCHIVE"
+archive_set 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 
-# Get icon
+# Get icons
 
 PKG='PKG_DATA'
-icons_get_from_workdir 'APP_MAIN'
+if [ "$ARCHIVE_ICONS" ]; then
+	(
+		ARCHIVE='ARCHIVE_ICONS'
+		extract_data_from "$ARCHIVE_ICONS"
+	)
+	organize_data 'ICONS' "$PATH_ICON_BASE"
+else
+	icons_get_from_workdir 'APP_MAIN'
+fi
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Include libSSL into the game directory
