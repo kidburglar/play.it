@@ -32,8 +32,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.2
-library_revision=20180520.3
+library_version=2.8.3
+library_revision=20180603.2
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -637,7 +637,7 @@ check_deps() {
 				check_deps_7z
 			;;
 			(*)
-				if ! which "$dep" >/dev/null 2>&1; then
+				if ! command -v "$dep" >/dev/null 2>&1; then
 					check_deps_error_not_found "$dep"
 				fi
 			;;
@@ -650,11 +650,11 @@ check_deps() {
 # CALLS: check_deps_error_not_found
 # CALLED BY: check_deps
 check_deps_7z() {
-	if which 7zr >/dev/null 2>&1; then
+	if command -v 7zr >/dev/null 2>&1; then
 		extract_7z() { 7zr x -o"$2" -y "$1"; }
-	elif which 7za >/dev/null 2>&1; then
+	elif command -v 7za >/dev/null 2>&1; then
 		extract_7z() { 7za x -o"$2" -y "$1"; }
-	elif which unar >/dev/null 2>&1; then
+	elif command -v unar >/dev/null 2>&1; then
 		extract_7z() { unar -output-directory "$2" -force-overwrite -no-directory "$1"; }
 	else
 		check_deps_error_not_found 'p7zip'
@@ -716,7 +716,7 @@ help() {
 
 	printf 'ARCHIVE\n\n'
 	archives_get_list
-	if [ -n "${ARCHIVE_LIST##* *}" ]; then
+	if [ -n "${ARCHIVES_LIST##* *}" ]; then
 		printf '%s\n' "$string_archive"
 	else
 		printf '%s\n' "$string_archives"
@@ -1674,7 +1674,7 @@ icon_get_resolution_from_file() {
 	version_major_target="${target_version%%.*}"
 	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 	if
-		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+		{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 		[ -n "${file##* *}" ]
 	then
 		field=2
@@ -1716,7 +1716,7 @@ icons_linking_postinst() {
 		for icon in $list; do
 			file="$(eval printf -- '%b' \"\$$icon\")"
 			if
-				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 				( ls "$path/$file" >/dev/null 2>&1 || ls "$path"/$file >/dev/null 2>&1 )
 			then
 				icon_get_resolution_from_file "$path/$file"
@@ -1725,7 +1725,7 @@ icons_linking_postinst() {
 			fi
 			path_icon="$PATH_ICON_BASE/$resolution/apps"
 			if
-				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 				[ -n "${file##* *}" ]
 			then
 				cat >> "$postinst" <<- EOF
@@ -1887,7 +1887,7 @@ print_instructions_arch() {
 # USAGE: print_instructions_deb $pkg[…]
 # CALLS: print_instructions_deb_apt print_instructions_deb_dpkg
 print_instructions_deb() {
-	if which apt >/dev/null 2>&1; then
+	if command -v apt >/dev/null 2>&1; then
 		debian_version="$(apt --version | cut --delimiter=' ' --fields=2)"
 		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
 		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"
@@ -2253,12 +2253,12 @@ write_desktop() {
 
 		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
-		   ( [ "$app_type" = 'wine' ] || \
+		   { [ "$app_type" = 'wine' ] || \
 		     [ "$app_type" = 'wine32' ] || \
 		     [ "$app_type" = 'wine64' ] || \
 		     [ "$app_type" = 'wine-staging' ] || \
 		     [ "$app_type" = 'wine32-staging' ] || \
-		     [ "$app_type" = 'wine64-staging' ] )
+		     [ "$app_type" = 'wine64-staging' ] ; }
 		then
 			winecfg_desktop='done'
 			write_desktop_winecfg
@@ -2524,7 +2524,7 @@ write_bin_build_wine() {
 	  LANG=C wineboot --init 2>/dev/null
 	EOF
 
-	if ! ( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ); then
+	if ! { [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; }; then
 		cat >> "$file" <<- 'EOF'
 		  # Remove most links pointing outside of the WINE prefix
 		  rm "$WINEPREFIX/dosdevices/z:"
@@ -2719,7 +2719,7 @@ packages_guess_format() {
 	eval variable_name=\"$1\"
 	if [ -e '/etc/os-release' ]; then
 		guessed_host_os="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-	elif which lsb_release >/dev/null 2>&1; then
+	elif command -v lsb_release >/dev/null 2>&1; then
 		guessed_host_os="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
 	fi
 	case "$guessed_host_os" in

@@ -2,7 +2,7 @@
 # USAGE: print_instructions_deb $pkg[…]
 # CALLS: print_instructions_deb_apt print_instructions_deb_dpkg
 print_instructions_deb() {
-	if which apt >/dev/null 2>&1; then
+	if command -v apt >/dev/null 2>&1; then
 		debian_version="$(apt --version | cut --delimiter=' ' --fields=2)"
 		debian_version_major="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='1')"
 		debian_version_minor="$(printf '%s' "$debian_version" | cut --delimiter='.' --fields='2')"

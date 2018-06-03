@@ -122,7 +122,7 @@ packages_guess_format() {
 	eval variable_name=\"$1\"
 	if [ -e '/etc/os-release' ]; then
 		guessed_host_os="$(grep '^ID=' '/etc/os-release' | cut --delimiter='=' --fields=2)"
-	elif which lsb_release >/dev/null 2>&1; then
+	elif command -v lsb_release >/dev/null 2>&1; then
 		guessed_host_os="$(lsb_release --id --short | tr '[:upper:]' '[:lower:]')"
 	fi
 	case "$guessed_host_os" in
