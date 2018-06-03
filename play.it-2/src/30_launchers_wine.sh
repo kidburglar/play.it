@@ -68,7 +68,7 @@ write_bin_build_wine() {
 	  LANG=C wineboot --init 2>/dev/null
 	EOF
 
-	if ! ( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ); then
+	if ! { [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; }; then
 		cat >> "$file" <<- 'EOF'
 		  # Remove most links pointing outside of the WINE prefix
 		  rm "$WINEPREFIX/dosdevices/z:"

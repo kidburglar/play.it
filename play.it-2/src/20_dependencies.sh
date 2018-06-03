@@ -50,7 +50,7 @@ check_deps() {
 				check_deps_7z
 			;;
 			(*)
-				if ! which "$dep" >/dev/null 2>&1; then
+				if ! command -v "$dep" >/dev/null 2>&1; then
 					check_deps_error_not_found "$dep"
 				fi
 			;;
@@ -63,11 +63,11 @@ check_deps() {
 # CALLS: check_deps_error_not_found
 # CALLED BY: check_deps
 check_deps_7z() {
-	if which 7zr >/dev/null 2>&1; then
+	if command -v 7zr >/dev/null 2>&1; then
 		extract_7z() { 7zr x -o"$2" -y "$1"; }
-	elif which 7za >/dev/null 2>&1; then
+	elif command -v 7za >/dev/null 2>&1; then
 		extract_7z() { 7za x -o"$2" -y "$1"; }
-	elif which unar >/dev/null 2>&1; then
+	elif command -v unar >/dev/null 2>&1; then
 		extract_7z() { unar -output-directory "$2" -force-overwrite -no-directory "$1"; }
 	else
 		check_deps_error_not_found 'p7zip'

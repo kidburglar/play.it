@@ -307,12 +307,12 @@ write_desktop() {
 
 		app_type="$(eval printf -- '%b' \"\$${app}_TYPE\")"
 		if [ "$winecfg_desktop" != 'done' ] && \
-		   ( [ "$app_type" = 'wine' ] || \
+		   { [ "$app_type" = 'wine' ] || \
 		     [ "$app_type" = 'wine32' ] || \
 		     [ "$app_type" = 'wine64' ] || \
 		     [ "$app_type" = 'wine-staging' ] || \
 		     [ "$app_type" = 'wine32-staging' ] || \
-		     [ "$app_type" = 'wine64-staging' ] )
+		     [ "$app_type" = 'wine64-staging' ] ; }
 		then
 			winecfg_desktop='done'
 			write_desktop_winecfg

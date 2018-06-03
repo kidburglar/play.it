@@ -251,7 +251,7 @@ icon_get_resolution_from_file() {
 	version_major_target="${target_version%%.*}"
 	version_minor_target=$(printf '%s' "$target_version" | cut --delimiter='.' --fields=2)
 	if
-		( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+		{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 		[ -n "${file##* *}" ]
 	then
 		field=2
@@ -293,7 +293,7 @@ icons_linking_postinst() {
 		for icon in $list; do
 			file="$(eval printf -- '%b' \"\$$icon\")"
 			if
-				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 				( ls "$path/$file" >/dev/null 2>&1 || ls "$path"/$file >/dev/null 2>&1 )
 			then
 				icon_get_resolution_from_file "$path/$file"
@@ -302,7 +302,7 @@ icons_linking_postinst() {
 			fi
 			path_icon="$PATH_ICON_BASE/$resolution/apps"
 			if
-				( [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ) &&
+				{ [ $version_major_target -lt 2 ] || [ $version_minor_target -lt 8 ] ; } &&
 				[ -n "${file##* *}" ]
 			then
 				cat >> "$postinst" <<- EOF

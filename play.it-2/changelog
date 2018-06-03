@@ -5,6 +5,8 @@
 
   * Add automated shellcheck tests based on GitLab CI
 
+  * Improve syntax based on shellcheck 0.5.0 report
+
 2.8.2
 
   * icon_extract_ico_from_exe: Suppress wrestool error output
