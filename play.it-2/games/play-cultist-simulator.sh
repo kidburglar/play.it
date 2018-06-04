@@ -34,19 +34,25 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180602.1
+script_version=20180604.1
 
 # Set game-specific variables
 
 GAME_ID='cultist-simulator'
 GAME_NAME='Cultist Simulator'
 
-ARCHIVE_GOG='cultist_simulator_en_v2018_x_6_21136.sh'
+ARCHIVE_GOG='cultist_simulator_en_v2018_5_x_6_21178.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/cultist_simulator_perpetual_edition'
-ARCHIVE_GOG_MD5='852ab8e55316df5e653793a590d4fbb3'
+ARCHIVE_GOG_MD5='7885e6e571940ddc0f8c6101c2af77a5'
 ARCHIVE_GOG_SIZE='310000'
-ARCHIVE_GOG_VERSION='2018.x.6-gog21136'
+ARCHIVE_GOG_VERSION='2018.5.x.6-gog21178'
 ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='cultist_simulator_en_v2018_x_6_21136.sh'
+ARCHIVE_GOG_OLD_MD5='852ab8e55316df5e653793a590d4fbb3'
+ARCHIVE_GOG_OLD_SIZE='310000'
+ARCHIVE_GOG_OLD_VERSION='2018.x.6-gog21136'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
 ARCHIVE_DOC0_PATH='data/noarch/docs'
 ARCHIVE_DOC0_FILES='./*'
