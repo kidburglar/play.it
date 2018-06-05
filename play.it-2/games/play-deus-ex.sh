@@ -34,17 +34,14 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180605.1
 
 # Set game-specific variables
 
 GAME_ID='deus-ex'
 GAME_NAME='Deus Ex'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER'
-
 ARCHIVE_GOG='setup_deus_ex_goty_1.112fm(revision_1.3.1)_(17719).exe'
-ARCHIVE_GOG_URL='https://www.gog.com/game/deus_ex'
 ARCHIVE_GOG_MD5='92e9e6a33642f9e6c41cb24055df9b3c'
 ARCHIVE_GOG_VERSION='1.112fm-gog17719'
 ARCHIVE_GOG_SIZE='750000'
@@ -79,7 +76,6 @@ bgamma=\$(xgamma 2>&1|sed 's/->//'|cut -d',' -f3|awk '{print \$2}')"
 APP_MAIN_POSTRUN='xgamma -rgamma $rgamma -ggamma $ggamma -bgamma $bgamma'
 APP_MAIN_EXE='system/deusex.exe'
 APP_MAIN_ICON='system/deusex.exe'
-APP_MAIN_ICON_RES='16 32'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN'
 
@@ -87,21 +83,29 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIND_DEPS="$PKG_DATA_ID wine"
-PKG_BIN_DEPS_DEB='x11-xserver-utils:amd64 | x11-xserver-utils'
-PKG_BIN_DEPS_ARCH='xorg-xgamma'
+PKG_BIND_DEPS="$PKG_DATA_ID wine xgamma"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -112,17 +116,14 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-for PKG in 'PKG_DATA' 'PKG_BIN'; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Extract icons
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
+icons_move_to 'PKG_DATA'
 
 # Write launchers
 
