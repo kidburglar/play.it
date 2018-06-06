@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,65 +30,54 @@ set -o errexit
 ###
 
 ###
-# Cultist Simulator
+# The Book of Unwritten Tales: The Critter Chronicles
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180604.1
+script_version=20180606.1
 
 # Set game-specific variables
 
-GAME_ID='cultist-simulator'
-GAME_NAME='Cultist Simulator'
+GAME_ID='the-book-of-unwritten-tales-the-critter-chronicles'
+GAME_NAME='The Book of Unwritten Tales: The Critter Chronicles'
 
-ARCHIVE_GOG='cultist_simulator_en_v2018_5_x_6_21178.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/cultist_simulator_perpetual_edition'
-ARCHIVE_GOG_MD5='7885e6e571940ddc0f8c6101c2af77a5'
-ARCHIVE_GOG_SIZE='310000'
-ARCHIVE_GOG_VERSION='2018.5.x.6-gog21178'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='setup_book_of_unwritten_tales_critter_chronicles_2.1.0.10.exe'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_book_of_unwritten_tales_critter_chronicles'
+ARCHIVE_GOG_MD5='eed5cd99d36e5900d0fd5775d0466c22'
+ARCHIVE_GOG_VERSION='1.0-gog2.1.0.10'
+ARCHIVE_GOG_SIZE='2800000'
 
-ARCHIVE_GOG_OLD='cultist_simulator_en_v2018_x_6_21136.sh'
-ARCHIVE_GOG_OLD_MD5='852ab8e55316df5e653793a590d4fbb3'
-ARCHIVE_GOG_OLD_SIZE='310000'
-ARCHIVE_GOG_OLD_VERSION='2018.x.6-gog21136'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
+ARCHIVE_DOC_DATA_PATH='app'
+ARCHIVE_DOC_DATA_FILES='./manual.pdf'
 
-ARCHIVE_DOC0_PATH='data/noarch/docs'
-ARCHIVE_DOC0_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='app'
+ARCHIVE_GAME_BIN_FILES='./critterchronicles.exe ./alut.dll ./cg.dll ./libogg.dll ./libtheora.dll ./libtheoraplayer.dll ./libvorbis.dll ./libvorbisfile.dll ./lua5.1.dll ./lua51.dll ./ogremain.dll ./ois.dll ./particleuniverse.dll ./plugin_cgprogrammanager.dll ./rendersystem_direct3d9.dll ./plugins.cfg ./resources.cfg'
 
-ARCHIVE_DOC1_PATH='data/noarch/game'
-ARCHIVE_DOC1_FILES='./README'
+ARCHIVE_GAME_L10N_PATH='app'
+ARCHIVE_GAME_L10N_FILES='./kagedata/lang'
 
-ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./CS_Data/*/x86'
+ARCHIVE_GAME_DATA_PATH='app'
+ARCHIVE_GAME_DATA_FILES='./data ./kagedata ./kapedata ./config.xml ./exportedfunctions.lua'
 
-ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./CS_Data/*/x86_64'
+DATA_DIRS='./saves'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./CS_Data'
+APP_WINETRICKS='directx9'
 
-DATA_DIRS='./logs'
+APP_MAIN_TYPE='wine'
+APP_MAIN_EXE='critterchronicles.exe'
+APP_MAIN_ICON='critterchronicles.exe'
 
-APP_MAIN_TYPE='native'
-APP_MAIN_PRERUN='export LANG=C'
-APP_MAIN_EXE_BIN32='CS.x86'
-APP_MAIN_EXE_BIN64='CS.x86_64'
-APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='CS_Data/Resources/UnityPlayer.png'
+PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
-PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
+PKG_L10N_ID="${GAME_ID}-l10n-en"
+PKG_L10N_DESCRIPTION='English localization'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
-PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ gtk2"
-
-PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine winetricks"
 
 # Load common functions
 
@@ -123,18 +113,29 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Extract icons
+
+PKG='PKG_BIN'
+icons_get_from_package 'APP_MAIN'
+icons_move_to 'PKG_DATA'
+
 # Write launchers
 
-for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
-	write_launcher 'APP_MAIN'
-done
+write_launcher 'APP_MAIN'
+
+# Store saved games outside of WINE prefix
+
+saves_path='$WINEPREFIX/drive_c/users/$(whoami)/My Documents/Unwritten Tales - Critter Chronicles/savegames'
+pattern='s#init_prefix_dirs "$PATH_DATA" "$DATA_DIRS"#&'
+pattern="$pattern\\nif [ ! -e \"$saves_path\" ]; then"
+pattern="$pattern\\n\\tmkdir --parents \"${saves_path%/*}\""
+pattern="$pattern\\n\\tln --symbolic \"\$PATH_DATA/saves\" \"$saves_path\""
+pattern="$pattern\\nfi#"
+sed --in-place "$pattern" "${PKG_BIN_PATH}${PATH_BIN}"/*
 
 # Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN32' 'PKG_BIN64'
+write_metadata
 build_pkg
 
 # Clean up

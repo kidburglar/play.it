@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180602.2
+script_version=20180605.1
 
 # Set game-specific variables
 
@@ -63,6 +63,12 @@ ARCHIVE_LIBSSL_32_MD5='9443cad4a640b2512920495eaf7582c4'
 
 ARCHIVE_ICONS_PACK='baldurs-gate-enhanced-edition_icons.tar.gz'
 ARCHIVE_ICONS_PACK_MD5='364512a51e235ac3a6f4d237283ea10f'
+
+ARCHIVE_GOG_SOD='baldur_s_gate_siege_of_dragonspear_en_2_3_0_4_20148.sh'
+ARCHIVE_GOG_SOD_URL='https://www.gog.com/game/baldurs_gate_siege_of_dragonspear'
+ARCHIVE_GOG_SOD_MD5='152225ec02c87e70bfb59970ac33b755'
+ARCHIVE_GOG_SOD_VERSION='2.3.0.4-gog20148'
+ARCHIVE_GOG_SOD_TYPE='mojosetup_unzip'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
@@ -137,6 +143,10 @@ ARCHIVE_MAIN="$ARCHIVE"
 archive_set 'ARCHIVE_ICONS' 'ARCHIVE_ICONS_PACK'
 ARCHIVE="$ARCHIVE_MAIN"
 
+ARCHIVE_MAIN="$ARCHIVE"
+archive_set 'ARCHIVE_SOD' 'ARCHIVE_GOG_SOD'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
@@ -155,6 +165,17 @@ else
 	icons_get_from_workdir 'APP_MAIN'
 fi
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Attempt to include SOD into the game directory
+
+if [ "$ARCHIVE_SOD" ]; then
+	(
+		ARCHIVE='ARCHIVE_SOD'
+		extract_data_from "$ARCHIVE_SOD"
+	)
+	mv "$PLAYIT_WORKDIR/gamedata/data/noarch/game/sod-dlc.zip" "${PKG_DATA_PATH}/${PATH_GAME}"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
 
 # Include libSSL into the game directory
 

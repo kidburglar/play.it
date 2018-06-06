@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,54 +30,45 @@ set -o errexit
 ###
 
 ###
-# Cultist Simulator
+# World to the West
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180604.1
+script_version=20180524.1
 
 # Set game-specific variables
 
-GAME_ID='cultist-simulator'
-GAME_NAME='Cultist Simulator'
+GAME_ID='world-to-the-west'
+GAME_NAME='World to the West'
 
-ARCHIVE_GOG='cultist_simulator_en_v2018_5_x_6_21178.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/cultist_simulator_perpetual_edition'
-ARCHIVE_GOG_MD5='7885e6e571940ddc0f8c6101c2af77a5'
-ARCHIVE_GOG_SIZE='310000'
-ARCHIVE_GOG_VERSION='2018.5.x.6-gog21178'
-ARCHIVE_GOG_TYPE='mojosetup'
+ARCHIVE_GOG='gog_world_to_the_west_2.0.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/world_to_the_west'
+ARCHIVE_GOG_MD5='dd393d192c7569cc19edb0e3fff7851a'
+ARCHIVE_GOG_SIZE='2500000'
+ARCHIVE_GOG_VERSION='1.0.1-gog2.0.0.2'
 
-ARCHIVE_GOG_OLD='cultist_simulator_en_v2018_x_6_21136.sh'
-ARCHIVE_GOG_OLD_MD5='852ab8e55316df5e653793a590d4fbb3'
-ARCHIVE_GOG_OLD_SIZE='310000'
-ARCHIVE_GOG_OLD_VERSION='2018.x.6-gog21136'
-ARCHIVE_GOG_OLD_TYPE='mojosetup'
-
-ARCHIVE_DOC0_PATH='data/noarch/docs'
-ARCHIVE_DOC0_FILES='./*'
-
-ARCHIVE_DOC1_PATH='data/noarch/game'
-ARCHIVE_DOC1_FILES='./README'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./CS_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./CS_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='./*.x86_64 ./*_Data/*/x86_64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./CS_Data'
+ARCHIVE_GAME_DATA_FILES='./*_Data'
 
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_PRERUN='export LANG=C'
-APP_MAIN_EXE_BIN32='CS.x86'
-APP_MAIN_EXE_BIN64='CS.x86_64'
+APP_MAIN_EXE_BIN32='WorldToTheWest.x86'
+APP_MAIN_EXE_BIN64='WorldToTheWest.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='CS_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_ICON='WorldToTheWest_Data/Resources/UnityPlayer.png'
+APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
@@ -84,10 +76,11 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ gtk2"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc glx xcursor libxrandr"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS_DEB"
+
 
 # Load common functions
 
@@ -95,21 +88,11 @@ target_version='2.8'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	for path in\
-		'./'\
-		"$XDG_DATA_HOME/play.it/"\
-		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
-		'/usr/local/share/games/play.it/'\
-		'/usr/local/share/play.it/'\
-		'/usr/share/games/play.it/'\
-		'/usr/share/play.it/'
-	do
-		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
-			PLAYIT_LIB2="$path/libplayit2.sh"
-			break
-		fi
-	done
-	if [ -z "$PLAYIT_LIB2" ]; then
+	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
+		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
+	elif [ -e './libplayit2.sh' ]; then
+		PLAYIT_LIB2='./libplayit2.sh'
+	else
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
