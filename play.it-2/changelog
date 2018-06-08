@@ -15,6 +15,26 @@
 
   * meta-script: Add manpage
 
+2.8.3
+
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive (previous 2.8.2 fix was incomplete)
+
+  * Add automated shellcheck tests based on GitLab CI
+
+  * Improve syntax based on shellcheck 0.5.0 report
+
+2.8.2
+
+  * icon_extract_ico_from_exe: Suppress wrestool error output
+
+  * icon_get_resolution_from_file: Fix compatibility with scripts targeting
+    library version 2.7 or older in a more robust way than what has been done
+    in 2.8.1
+
+  * Fix typo in help(), that led to suboptimal wording when called on a script
+    with a single supported archive
+
 2.8.1
 
   * Fix icon_get_resolution_from_file and icons_linking_postinst compatibility
@@ -44,28 +64,6 @@
   * Fix sort_icons behaviour when icon extraction produced a single file
 
   * meta-script: Fix broken support for ./play.it 1 scripts
-
-2.8.3
-
-  * Fix typo in help(), that led to suboptimal wording when called on a script
-    with a single supported archive (previous 2.8.2 fix was incomplete)
-
-  * Add automated shellcheck tests based on GitLab CI
-
-  * Improve syntax based on shellcheck 0.5.0 report
-
-2.8.2
-
-  * icon_extract_ico_from_exe: Suppress wrestool error output
-
-  * icon_get_resolution_from_file: Fix compatibility with scripts targeting
-    library version 2.7 or older in a more robust way than what has been done
-    in 2.8.1
-
-  * Fix typo in help(), that led to suboptimal wording when called on a script
-    with a single supported archive
-=======
-2.9.0
 
 2.7.4
 
