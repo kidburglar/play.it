@@ -129,6 +129,9 @@ pkg_set_deps_deb() {
 			('json')
 				pkg_dep='libjson-c3 | libjson-c2 | libjson0'
 			;;
+			('libcurl')
+				pkg_dep='libcurl4 | libcurl3'
+			;;
 			('libcurl-gnutls')
 				pkg_dep='libcurl3-gnutls'
 			;;

@@ -1,5 +1,10 @@
 .PHONY: all
 
+prefix = /usr/local
+bindir = $(prefix)/games
+datadir = $(prefix)/share/games
+mandir = $(prefix)/share/man
+
 all: libplayit2.sh
 
 libplayit2.sh: play.it-2/src/*
@@ -9,15 +14,14 @@ clean:
 	rm -f play.it-2/lib/libplayit2.sh
 
 install:
-	mkdir -p ~/.local/share/play.it/
-	[ -e play.it-1 ] && cp -a play.it-1 ~/.local/share/play.it/ || true
-	[ -e play.it-2 ] && cp -a play.it-2 ~/.local/share/play.it/ || true
-	ln -fs play.it-2/lib/libplayit2.sh ~/.local/share/play.it/
-	mkdir -p ~/bin
-	cp -a play.it ~/bin
+	mkdir -p $(DESTDIR)$(bindir)
+	cp -a play.it $(DESTDIR)$(bindir)
+	mkdir -p $(DESTDIR)$(datadir)/play.it
+	cp -a play.it-2/lib/libplayit2.sh play.it-2/games/* $(DESTDIR)$(datadir)/play.it
+	mkdir -p $(DESTDIR)$(mandir)/man6
+	gzip -c play.it.6 > $(DESTDIR)$(mandir)/man6/play.it.6.gz
 
 uninstall:
-	rm -f ~/.local/share/play.it/libplayit2.sh
-	rm -rf ~/.local/share/play.it/play.it-1
-	rm -rf ~/.local/share/play.it/play.it-2
-	rm -f ~/bin/play.it
+	rm $(DESTDIR)$(bindir)/play.it
+	rm -r $(DESTDIR)$(datadir)/play.it
+	rm $(DESTDIR)$(mandir)/man6/play.it.6.gz

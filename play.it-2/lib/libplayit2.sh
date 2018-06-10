@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
 # All rights reserved.
@@ -32,8 +30,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.3
-library_revision=20180603.2
+library_version=2.9.0
+library_revision=20180610.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -2892,6 +2890,9 @@ pkg_set_deps_arch32() {
 			('json')
 				pkg_dep='lib32-json-c'
 			;;
+			('libcurl')
+				pkg_dep='lib32-curl'
+			;;
 			('libcurl-gnutls')
 				pkg_dep='lib32-libcurl-gnutls'
 			;;
@@ -2992,6 +2993,9 @@ pkg_set_deps_arch64() {
 			;;
 			('json')
 				pkg_dep='json-c'
+			;;
+			('libcurl')
+				pkg_dep='curl'
 			;;
 			('libcurl-gnutls')
 				pkg_dep='libcurl-gnutls'
@@ -3240,6 +3244,9 @@ pkg_set_deps_deb() {
 			;;
 			('json')
 				pkg_dep='libjson-c3 | libjson-c2 | libjson0'
+			;;
+			('libcurl')
+				pkg_dep='libcurl4 | libcurl3'
 			;;
 			('libcurl-gnutls')
 				pkg_dep='libcurl3-gnutls'

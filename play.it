@@ -7,22 +7,30 @@ shift 1
 
 LIB_ONLY=true
 
+[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
+
 if [ -z "$PLAYIT_LIB2" ]; then
-	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	elif [ -e './play.it-2/lib/libplayit2.sh' ]; then
-		PLAYIT_LIB2='./play.it-2/lib/libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
 	fi
 fi
 . "$PLAYIT_LIB2"
-
 
 if [ ! -f "$INPUT_FILE" ]; then
 	print_error
@@ -49,7 +57,7 @@ case "${LANG%_*}" in
 	;;
 esac
 printf "$string" "$FILE_NAME"
-SCRIPT="$(grep --dereference-recursive --files-with-matches "ARCHIVE_.\\+='$FILE_NAME'" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
+SCRIPT="$(grep --dereference-recursive --files-with-matches "ARCHIVE_.\\+='$FILE_NAME'" "$XDG_DATA_HOME/play.it/play.it-2/" '/usr/local/share/games/play.it/' '/usr/local/share/play.it/' '/usr/share/games/play.it/' '/usr/share/play.it/'  2>/dev/null | head --lines=1)"
 
 # Locate script by file MD5 checksum
 if [ -z "$SCRIPT" ]; then
@@ -64,7 +72,7 @@ if [ -z "$SCRIPT" ]; then
 	printf "$string" "$FILE_NAME"
 	check_deps 'md5sum'
 	FILE_MD5="$(md5sum $INPUT_FILE | cut --delimiter=' ' --fields=1)"
-	SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" ~/.local/share/play.it/play.it-* | sort --reverse | head --lines=1)"
+	SCRIPT="$(grep --dereference-recursive --files-with-matches "$FILE_MD5" "$XDG_DATA_HOME/play.it/play.it-2/" '/usr/local/share/games/play.it/' '/usr/local/share/play.it/' '/usr/share/games/play.it/' '/usr/share/play.it/' 2>/dev/null | head --lines=1)"
 	SCRIPT_OPTIONS='--checksum=none'
 fi
 
@@ -82,8 +90,6 @@ if [ -z "$SCRIPT" ]; then
 	return 1
 fi
 
-PLAYIT_LIB="$HOME/.local/share/play.it/play.it-1/play-anything.sh"
-export PLAYIT_LIB
 export PLAYIT_LIB2
 
 "$SCRIPT" "$INPUT_FILE" $SCRIPT_OPTIONS "$@"

@@ -34,27 +34,31 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180530.2
 
 # Set game-specific variables
 
 GAME_ID='the-witcher-2'
 GAME_NAME='The Witcher 2: Assassins Of Kings'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='gog_the_witcher_2_assassins_of_kings_enhanced_edition_2.2.0.8.sh'
+ARCHIVE_GOG='the_witcher_2_assassins_of_kings_enhanced_edition_en_release_3_20150306204412_20992.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/the_witcher_2'
-ARCHIVE_GOG_MD5='3fff5123677a7be2023ecdb6af3b82b6'
+ARCHIVE_GOG_MD5='fd7b85d44e3da7fdf860ab4267574b36'
 ARCHIVE_GOG_SIZE='24000000'
-ARCHIVE_GOG_VERSION='1release3-gog2.2.0.8'
+ARCHIVE_GOG_VERSION='1release3-gog20992'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_DOC1_PATH='data/noarch/docs'
-ARCHIVE_DOC1_FILES='./*'
+ARCHIVE_GOG_OLD='gog_the_witcher_2_assassins_of_kings_enhanced_edition_2.2.0.8.sh'
+ARCHIVE_GOG_OLD_MD5='3fff5123677a7be2023ecdb6af3b82b6'
+ARCHIVE_GOG_OLD_SIZE='24000000'
+ARCHIVE_GOG_OLD_VERSION='1release3-gog2.2.0.8'
+ARCHIVE_GOG_OLD_TYPE='mojosetup_unzip'
 
-ARCHIVE_DOC2_PATH='data/noarch/game'
-ARCHIVE_DOC2_FILES='./*.rtf ./*.txt'
+ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC0_DATA_FILES='./*'
+
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC1_DATA_FILES='./*.rtf ./*.txt'
 
 ARCHIVE_GAME_BIN_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN_FILES='./bin ./configurator ./CrashReporter* ./crash_reporting ./eONprecompiledShaders32.dat ./*launcher* ./libopenal-eon.so.1 ./saferun.sh ./sdlinput ./witcher2'
@@ -65,28 +69,36 @@ ARCHIVE_GAME_PACK1_FILES='./CookedPC/pack0.dzip.split00'
 ARCHIVE_GAME_PACK2_PATH='data/noarch/game'
 ARCHIVE_GAME_PACK2_FILES='./CookedPC/pack0.dzip.split01 ./CookedPC/pack0.dzip.split02'
 
-ARCHIVE_GAME_MOVIES_PATH='data/noarch/game'
-ARCHIVE_GAME_MOVIES_FILES='./CookedPC/movies'
+ARCHIVE_GAME_VOICES_DE_PATH='data/noarch/game'
+ARCHIVE_GAME_VOICES_DE_FILES='./CookedPC/de0.w2speech'
+
+ARCHIVE_GAME_VOICES_EN_PATH='data/noarch/game'
+ARCHIVE_GAME_VOICES_EN_FILES='./CookedPC/en0.w2speech'
+
+ARCHIVE_GAME_VOICES_FR_PATH='data/noarch/game'
+ARCHIVE_GAME_VOICES_FR_FILES='./CookedPC/fr0.w2speech'
+
+ARCHIVE_GAME_VOICES_PL_PATH='data/noarch/game'
+ARCHIVE_GAME_VOICES_PL_FILES='./CookedPC/pl0.w2speech'
+
+ARCHIVE_GAME_VOICES_RU_PATH='data/noarch/game'
+ARCHIVE_GAME_VOICES_RU_FILES='./CookedPC/ru0.w2speech'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./CookedPC ./fontconfig ./icudt52l.dat ./linux ./SDLGamepad.config ./VPFS_registry.vpfsdb ./witcher2.vpfs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='./witcher2'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
+APP_MAIN_EXE='witcher2'
 APP_MAIN_ICON='linux/icons/witcher2-icon.png'
-APP_MAIN_ICON_RES='256'
 
 APP_CONFIG_ID="${GAME_ID}_config"
 APP_CONFIG_TYPE='native'
-APP_CONFIG_EXE='./configurator'
+APP_CONFIG_EXE='configurator'
 APP_CONFIG_NAME="$GAME_NAME - configuration"
-APP_CONFIG_ICONS_LIST='APP_CONFIG_ICON'
 APP_CONFIG_ICON='linux/icons/witcher2-configurator.png'
-APP_CONFIG_ICON_RES='256'
 APP_CONFIG_CAT='Settings'
 
-PACKAGES_LIST='PKG_PACK1 PKG_PACK2 PKG_MOVIES PKG_DATA PKG_BIN'
+PACKAGES_LIST='PKG_BIN PKG_PACK1 PKG_PACK2 PKG_VOICES_DE PKG_VOICES_EN PKG_VOICES_FR PKG_VOICES_PL PKG_VOICES_RU PKG_DATA'
 
 PKG_PACK1_ID="${GAME_ID}-pack1"
 PKG_PACK1_DESCRIPTION='pack0, part 1'
@@ -94,27 +106,58 @@ PKG_PACK1_DESCRIPTION='pack0, part 1'
 PKG_PACK2_ID="${GAME_ID}-pack2"
 PKG_PACK2_DESCRIPTION='pack0, part 2'
 
-PKG_MOVIES_ID="${GAME_ID}-movies"
-PKG_MOVIES_DESCRIPTION='movies'
+PKG_VOICES_ID="${GAME_ID}-voices"
+PKG_VOICES_DESCRIPTION='voices'
+
+PKG_VOICES_DE_ID="${PKG_VOICES_ID}-de"
+PKG_VOICES_DE_PROVIDE="$PKG_VOICES_ID"
+PKG_VOICES_DE_DESCRIPTION="$PKG_VOICES_DESCRIPTION - German"
+
+PKG_VOICES_EN_ID="${PKG_VOICES_ID}-en"
+PKG_VOICES_EN_PROVIDE="$PKG_VOICES_ID"
+PKG_VOICES_EN_DESCRIPTION="$PKG_VOICES_DESCRIPTION - English"
+
+PKG_VOICES_FR_ID="${PKG_VOICES_ID}-fr"
+PKG_VOICES_FR_PROVIDE="$PKG_VOICES_ID"
+PKG_VOICES_FR_DESCRIPTION="$PKG_VOICES_DESCRIPTION - French"
+
+PKG_VOICES_PL_ID="${PKG_VOICES_ID}-pl"
+PKG_VOICES_PL_PROVIDE="$PKG_VOICES_ID"
+PKG_VOICES_PL_DESCRIPTION="$PKG_VOICES_DESCRIPTION - Polish"
+
+PKG_VOICES_RU_ID="${PKG_VOICES_ID}-ru"
+PKG_VOICES_RU_PROVIDE="$PKG_VOICES_ID"
+PKG_VOICES_RU_DESCRIPTION="$PKG_VOICES_DESCRIPTION - Russian"
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN_ARCH='32'
-PKG_BIN_DEPS_DEB="$PKG_PACK1_ID, $PKG_PACK2_ID, $PKG_MOVIES_ID, $PKG_DATA_ID, libasound2-plugins, libgtk2.0-0, libsdl2-image-2.0-0, libfreetype6, libcurl3, libtxc-dxtn-s2tc0 | libtxc-dxtn0, libudev1"
-PKG_BIN_DEPS_ARCH="$PKG_PACK1_ID $PKG_PACK2_ID $PKG_MOVIES_ID $PKG_DATA_ID lib32-alsa-lib lib32-gtk2 lib32-sdl2_image lib32-freetype2 lib32-curl lib32-libtxc_dxtn"
+PKG_BIN_DEPS="$PKG_PACK1_ID $PKG_PACK2_ID $PKG_VOICES_ID $PKG_DATA_ID alsa gtk2 sdl2_image freetype libcurl"
+PKG_BIN_DEPS_DEB='libtxc-dxtn-s2tc0 | libtxc-dxtn0, libudev1'
+PKG_BIN_DEPS_ARCH='lib32-libtxc_dxtn'
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
@@ -125,24 +168,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-PKG='PKG_BIN'
-organize_data 'GAME_BIN' "$PATH_GAME"
-
-PKG='PKG_PACK1'
-organize_data 'GAME_PACK1' "$PATH_GAME"
-
-PKG='PKG_PACK2'
-organize_data 'GAME_PACK2' "$PATH_GAME"
-
-PKG='PKG_MOVIES'
-organize_data 'GAME_MOVIES' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'DOC1'      "$PATH_DOC"
-organize_data 'DOC2'      "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -152,6 +178,10 @@ write_launcher 'APP_MAIN' 'APP_CONFIG'
 
 # Build package
 
+PKG='PKG_DATA'
+postinst_icons_linking 'APP_MAIN' 'APP_CONFIG'
+write_metadata 'PKG_DATA'
+
 cat > "$postinst" << EOF
 printf 'Building pack0.dzip, this might take a while…\n'
 cat "$PATH_GAME/CookedPC/pack0.dzip.split"* > "$PATH_GAME/CookedPC/pack0.dzip"
@@ -160,9 +190,9 @@ EOF
 cat > "$prerm" << EOF
 rm "$PATH_GAME/CookedPC/pack0.dzip"
 EOF
-postinst_icons_linking 'APP_MAIN' 'APP_CONFIG'
 write_metadata 'PKG_BIN'
-write_metadata 'PKG_PACK1' 'PKG_PACK2' 'PKG_MOVIES' 'PKG_DATA'
+
+write_metadata 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_DE' 'PKG_VOICES_EN' 'PKG_VOICES_FR' 'PKG_VOICES_PL' 'PKG_VOICES_RU'
 build_pkg
 
 # Clean up
@@ -171,6 +201,34 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-print_instructions
+case "${LANG%_*}" in
+	('fr')
+		lang_string='voix %s :'
+		lang_de='allemandes'
+		lang_en='anglaises'
+		lang_fr='françaises'
+		lang_pl='polonaises'
+		lang_ru='russes'
+	;;
+	('en'|*)
+		lang_string='%s voices:'
+		lang_de='German'
+		lang_en='English'
+		lang_fr='French'
+		lang_pl='Polish'
+		lang_ru='Russian'
+	;;
+esac
+printf '\n'
+printf "$lang_string" "$lang_de"
+print_instructions 'PKG_BIN' 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_DE' 'PKG_DATA'
+printf "$lang_string" "$lang_en"
+print_instructions 'PKG_BIN' 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_EN' 'PKG_DATA'
+printf "$lang_string" "$lang_fr"
+print_instructions 'PKG_BIN' 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_FR' 'PKG_DATA'
+printf "$lang_string" "$lang_pl"
+print_instructions 'PKG_BIN' 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_PL' 'PKG_DATA'
+printf "$lang_string" "$lang_ru"
+print_instructions 'PKG_BIN' 'PKG_PACK1' 'PKG_PACK2' 'PKG_VOICES_RU' 'PKG_DATA'
 
 exit 0

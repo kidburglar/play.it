@@ -1,5 +1,3 @@
-#!/bin/sh
-
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
 # All rights reserved.
@@ -32,6 +30,6 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.8.3
-library_revision=20180603.2
+library_version=2.9.0
+library_revision=20180610.1
 
