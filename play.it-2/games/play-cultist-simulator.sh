@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180610.1
+script_version=20180610.2
 
 # Set game-specific variables
 
@@ -67,10 +67,10 @@ ARCHIVE_DOC1_PATH='data/noarch/game'
 ARCHIVE_DOC1_FILES='./README'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./CS_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./libsteam_api.so ./CS_Data/*/x86'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./CS_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./libsteam_api64.so ./CS_Data/*/x86_64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./CS_Data'
