@@ -34,25 +34,31 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180604.1
+script_version=20180610.2
 
 # Set game-specific variables
 
 GAME_ID='cultist-simulator'
 GAME_NAME='Cultist Simulator'
 
-ARCHIVE_GOG='cultist_simulator_en_v2018_5_x_6_21178.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/cultist_simulator_perpetual_edition'
-ARCHIVE_GOG_MD5='7885e6e571940ddc0f8c6101c2af77a5'
+ARCHIVE_GOG='cultist_simulator_en_v2018_6_c_7_21347.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/cultist_simulator'
+ARCHIVE_GOG_MD5='beff3d27b3cce3f1448cd9cd46d488bc'
 ARCHIVE_GOG_SIZE='310000'
-ARCHIVE_GOG_VERSION='2018.5.x.6-gog21178'
+ARCHIVE_GOG_VERSION='2018.6.c.7-gog21347'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='cultist_simulator_en_v2018_x_6_21136.sh'
-ARCHIVE_GOG_OLD_MD5='852ab8e55316df5e653793a590d4fbb3'
+ARCHIVE_GOG_OLD='cultist_simulator_en_v2018_5_x_6_21178.sh'
+ARCHIVE_GOG_OLD_MD5='7885e6e571940ddc0f8c6101c2af77a5'
 ARCHIVE_GOG_OLD_SIZE='310000'
-ARCHIVE_GOG_OLD_VERSION='2018.x.6-gog21136'
+ARCHIVE_GOG_OLD_VERSION='2018.5.x.6-gog21178'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLDER='cultist_simulator_en_v2018_x_6_21136.sh'
+ARCHIVE_GOG_OLDER_MD5='852ab8e55316df5e653793a590d4fbb3'
+ARCHIVE_GOG_OLDER_SIZE='310000'
+ARCHIVE_GOG_OLDER_VERSION='2018.x.6-gog21136'
+ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
 ARCHIVE_DOC0_PATH='data/noarch/docs'
 ARCHIVE_DOC0_FILES='./*'
@@ -61,10 +67,10 @@ ARCHIVE_DOC1_PATH='data/noarch/game'
 ARCHIVE_DOC1_FILES='./README'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./CS_Data/*/x86'
+ARCHIVE_GAME_BIN32_FILES='./CS.x86 ./libsteam_api.so ./CS_Data/*/x86'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./CS_Data/*/x86_64'
+ARCHIVE_GAME_BIN64_FILES='./CS.x86_64 ./libsteam_api64.so ./CS_Data/*/x86_64'
 
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./CS_Data'
@@ -91,7 +97,7 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.8'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
