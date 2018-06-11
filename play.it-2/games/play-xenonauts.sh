@@ -34,24 +34,30 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180508.1
+script_version=20180614.1
 
 # Set game-specific variables
 
 GAME_ID='xenonauts'
 GAME_NAME='Xenonauts'
 
-ARCHIVE_GOG='gog_xenonauts_2.1.0.4.sh'
+ARCHIVE_GOG='xenonauts_en_1_65_21328.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/xenonauts'
-ARCHIVE_GOG_MD5='7830dee208e779f97858ee81a97c9327'
+ARCHIVE_GOG_MD5='bff1d949f13f2123551a964475ea655e'
 ARCHIVE_GOG_SIZE='2900000'
-ARCHIVE_GOG_VERSION='1.63-gog2.1.0.4'
+ARCHIVE_GOG_VERSION='1.65-gog21328'
+ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='gog_xenonauts_2.1.0.4.sh'
+ARCHIVE_GOG_OLD_MD5='7830dee208e779f97858ee81a97c9327'
+ARCHIVE_GOG_OLD_SIZE='2900000'
+ARCHIVE_GOG_OLD_VERSION='1.63-gog2.1.0.4'
 
 ARCHIVE_HUMBLE='Xenonauts-DRMFree-Linux-2016-03-03.sh'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/xenonauts'
 ARCHIVE_HUMBLE_MD5='f4369e987381b84fde64be569fbab913'
 ARCHIVE_HUMBLE_SIZE='2700000'
-ARCHIVE_HUMBLE_VERSION='1.65L-humble160303'
+ARCHIVE_HUMBLE_VERSION='1.65-humble160303'
 ARCHIVE_HUMBLE_TYPE='mojosetup'
 
 ARCHIVE_DOC0_PATH_GOG='data/noarch/game'
@@ -83,15 +89,25 @@ PKG_BIN_DEPS="$PKG_DATA_ID glx sdl2 alsa"
 
 # Load common functions
 
-target_version='2.8'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		return 1
