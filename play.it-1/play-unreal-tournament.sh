@@ -34,7 +34,7 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20161001.1
+script_version=20180611.1
 
 # Set game-specific variables
 
@@ -69,7 +69,7 @@ PKG1_ID="${GAME_ID}"
 PKG1_VERSION='451'
 PKG1_ARCH='i386'
 PKG1_CONFLICTS=''
-PKG1_DEPS='libc6, libstdc++6, libsdl1.2debian'
+PKG1_DEPS='libc6, libstdc++6, libsdl1.2debian, libpulsedsp'
 PKG1_RECS=''
 PKG1_DESC="${GAME_NAME}
  package built from GOG.com installer
@@ -186,6 +186,7 @@ print done
 # Write launchers
 
 write_bin_native "${PKG1_DIR}${PATH_BIN}/${APP1_ID}" "${APP1_EXE}" '' '' '' "${APP1_NAME}"
+sed -i 's|./"${GAME_EXE_PATH##\*/}"|export LD_PRELOAD="/usr/lib/i386-linux-gnu/pulseaudio/libpulsedsp.so"\n&|' "${PKG1_DIR}${PATH_BIN}/${APP1_ID}"
 sed -i 's|./"${GAME_EXE_PATH##\*/}"|mkdir -p "${HOME}/.loki/ut/System"\n&|' "${PKG1_DIR}${PATH_BIN}/${APP1_ID}"
 write_desktop "${APP1_ID}" "${APP1_NAME}" "${APP1_NAME_FR}" "${PKG1_DIR}${PATH_DESK}/${APP1_ID}.desktop" "${APP1_CAT}"
 printf '\n'
