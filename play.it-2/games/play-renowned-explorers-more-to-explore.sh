@@ -34,27 +34,31 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180612.1
 
 # Set game-specific variables
 
 GAME_ID='renowned-explorers-international-society'
 GAME_NAME='Renowned Explorers: More To Explore'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='renowned_explorers_more_to_explore_dlc_en_466_15616.sh'
+ARCHIVE_GOG='renowned_explorers_more_to_explore_dlc_en_489_20916.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/renowned_explorers_more_to_explore'
-ARCHIVE_GOG_MD5='c99ca440cb312b90052939db49aeef03'
+ARCHIVE_GOG_MD5='cc51077bdcb04086349f81da8b1d19ff'
 ARCHIVE_GOG_SIZE='69000'
-ARCHIVE_GOG_VERSION='466-gog15616'
+ARCHIVE_GOG_VERSION='489-gog20916'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GOG_OLD='renowned_explorers_more_to_explore_dlc_en_466_15616.sh'
+ARCHIVE_GOG_OLD_MD5='c99ca440cb312b90052939db49aeef03'
+ARCHIVE_GOG_OLD_SIZE='69000'
+ARCHIVE_GOG_OLD_VERSION='466-gog15616'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GAME_PATH='data/noarch/game'
-ARCHIVE_GAME_FILES='./data'
+ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
+ARCHIVE_DOC_MAIN_FILES='./*'
+
+ARCHIVE_GAME_MAIN_PATH='data/noarch/game'
+ARCHIVE_GAME_MAIN_FILES='./data'
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -63,18 +67,28 @@ PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
-		return 1
+		exit 1
 	fi
 fi
 . "$PLAYIT_LIB2"
@@ -82,10 +96,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-organize_data 'DOC'  "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Build package
