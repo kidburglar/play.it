@@ -30,12 +30,12 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.9.0
-library_revision=20180610.1
+library_version=2.10.0~dev
+library_revision=20180613.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
-# CALLS: liberror set_architecture_arch set_architecture_deb
+# CALLS: liberror set_architecture_arch set_architecture_deb set_architecture_gentoo
 # NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) (PKG_ARCH)
 # CALLED BY: set_temp_directories write_metadata
 set_architecture() {
@@ -49,8 +49,33 @@ set_architecture() {
 		('deb')
 			set_architecture_deb "$architecture"
 		;;
+		('gentoo')
+			set_architecture_gentoo "$architecture"
+		;;
 		(*)
 			liberror 'OPTION_PACKAGE' 'set_architecture'
+		;;
+	esac
+}
+
+# set package distribution-specific architectures
+# USAGE: set_supported_architectures $pkg
+# CALLS: liberror set_architecture set_architecture_gentoo
+# NEEDED VARS: (ARCHIVE) (OPTION_PACKAGE) (PKG_ARCH)
+# CALLED BY: write_bin write_bin_set_native_noprefix write_metadata_gentoo
+set_supported_architectures() {
+	case $OPTION_PACKAGE in
+		('arch'|'deb')
+			set_architecture "$1"
+		;;
+		('gentoo')
+			use_archive_specific_value "${1}_ARCH"
+			local architecture
+			architecture="$(eval printf -- '%b' \"\$${1}_ARCH\")"
+			set_supported_architectures_gentoo "$architecture"
+		;;
+		(*)
+			liberror 'OPTION_PACKAGE' 'set_supported_architectures'
 		;;
 	esac
 }
@@ -254,6 +279,38 @@ set_architecture_deb() {
 	esac
 }
 
+# set distribution-specific package architecture for Gentoo Linux target
+# Usage set_architecture_gentoo $architecture
+# CALLED BY: set_architecture
+set_architecture_gentoo() {
+	case "$1" in
+		('32')
+			pkg_architecture='x86'
+		;;
+		('64')
+			pkg_architecture='amd64'
+		;;
+		(*)
+			pkg_architecture='data' # We could put anything here, it shouldn't be used for package metadata
+		;;
+	esac
+}
+# set distribution-specific supported architectures for Gentoo Linux target
+# Usage set_supported_architectures_gentoo $architecture
+# CALLED BY: set_supported_architectures
+set_supported_architectures_gentoo() {
+	case "$1" in
+		('32')
+			pkg_architectures='-* x86 amd64'
+		;;
+		('64')
+			pkg_architectures='-* amd64'
+		;;
+		(*)
+			pkg_architectures='x86 amd64' #data packages
+		;;
+	esac
+}
 # set main archive for data extraction
 # USAGE: archive_set_main $archive[…]
 # CALLS: archive_set archive_set_error_not_found
@@ -629,6 +686,9 @@ check_deps() {
 	if [ "$OPTION_PACKAGE" = 'deb' ]; then
 		SCRIPT_DEPS="$SCRIPT_DEPS fakeroot dpkg"
 	fi
+	if [ "$OPTION_PACKAGE" = 'gentoo' ]; then
+		SCRIPTS_DEPS="$SCRIPTS_DEPS fakeroot-ng ebuild"
+	fi
 	for dep in $SCRIPT_DEPS; do
 		case $dep in
 			('7z')
@@ -860,21 +920,25 @@ help_package() {
 			string_default='(type par défaut)'
 			string_arch='paquet .pkg.tar (Arch Linux)'
 			string_deb='paquet .deb (Debian, Ubuntu)'
+			string_gentoo='paquet .tbz2 (Gentoo)'
 		;;
 		('en'|*)
 			string='Generated package Type choice'
 			string_default='(default type)'
 			string_arch='.pkg.tar package (Arch Linux)'
 			string_deb='.deb package (Debian, Ubuntu)'
+			string_gentoo='.tbz2 package (Gentoo)'
 		;;
 	esac
-	printf -- '--package=arch|deb\n'
-	printf -- '--package arch|deb\n\n'
+	printf -- '--package=arch|deb|gentoo\n'
+	printf -- '--package arch|deb|gentoo\n\n'
 	printf '\t%s\n\n' "$string"
 	printf '\tarch\t%s' "$string_arch"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'arch' ] && printf ' %s\n' "$string_default" || printf '\n'
 	printf '\tdeb\t%s' "$string_deb"
 	[ "$DEFAULT_OPTION_PACKAGE" = 'deb' ] && printf ' %s\n' "$string_default" || printf '\n'
+	printf '\tgentoo\t%s' "$string_gentoo"
+	[ "$DEFAULT_OPTION_PACKAGE" = 'gentoo' ] && printf ' %s\n' "$string_default" || printf '\n'
 }
 
 # display --dry-run option usage
@@ -1824,6 +1888,9 @@ print_instructions() {
 			('deb')
 				print_instructions_deb "$@"
 			;;
+			('gentoo')
+				print_instructions_gentoo "$@"
+			;;
 			(*)
 				liberror 'OPTION_PACKAGE' 'print_instructions'
 			;;
@@ -1834,7 +1901,7 @@ print_instructions() {
 
 # print installation instructions for Arch Linux - 32-bit version
 # USAGE: print_instructions_architecture_specific $pkg[…]
-# CALLS: print_instructions_arch print_instructions_deb
+# CALLS: print_instructions_arch print_instructions_deb print_instructions_gentoo
 print_instructions_architecture_specific() {
 	case "${LANG%_*}" in
 		('fr')
@@ -1852,6 +1919,9 @@ print_instructions_architecture_specific() {
 		;;
 		('deb')
 			print_instructions_deb "$@"
+		;;
+		('gentoo')
+			print_instructions_gentoo "$@"
 		;;
 		(*)
 			liberror 'OPTION_PACKAGE' 'print_instructions'
@@ -1940,6 +2010,28 @@ print_instructions_deb_common() {
 		printf "$str_format" "$pkg_path"
 	done
 	printf '\n'
+}
+
+# print installation instructions for Gentoo Linux
+# USAGE: print_instructions_gentoo $pkg[…]
+print_instructions_gentoo() {
+	local pkg_path
+	local str_format
+	printf 'quickunpkg'
+	for pkg in "$@"; do
+		if [ "$OPTION_ARCHITECTURE" != all ] && [ -n "${PACKAGES_LIST##*$pkg*}" ]; then
+			skipping_pkg_warning 'print_instructions_gentoo' "$pkg"
+			return 0
+		fi
+		pkg_path="$(eval printf -- '%b' \"\$${pkg}_PKG\")"
+		if [ -z "${pkg_path##* *}" ]; then
+			str_format=' "%s"'
+		else
+			str_format=' %s'
+		fi
+		printf "$str_format" "$pkg_path"
+	done
+	printf ' # %s\n' 'https://github.com/zoobab/quickunpkg'
 }
 
 # alias calling write_bin() and write_desktop()
@@ -2035,13 +2127,21 @@ write_bin() {
 			write_bin_set_native_noprefix
 		else
 			# Set executable, options and libraries
+			local library_path
+			library_path="$app_libs"
+			if [ "$OPTION_PACKAGE" = 'gentoo' ]; then # Add debiancompat directory to LD_LIBRARY_PATH if necessary
+				local pkg_architecture
+				set_architecture "$PKG"
+				library_path="$library_path:/usr/\$(portageq envvar LIBDIR_$pkg_architecture)/debiancompat"
+			fi
+			library_path="$library_path:\$LD_LIBRARY_PATH"
 			if [ "$app_id" != "${GAME_ID}_winecfg" ]; then
 				cat >> "$file" <<- EOF
 				# Set executable file
 
 				APP_EXE='$app_exe'
 				APP_OPTIONS="$app_options"
-				LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+				LD_LIBRARY_PATH="$library_path"
 				export LD_LIBRARY_PATH
 
 				EOF
@@ -2348,12 +2448,19 @@ write_bin_run_dosbox() {
 # USAGE: write_bin_set_native_noprefix
 # CALLED BY: write_bin
 write_bin_set_native_noprefix() {
+	local library_path="$app_libs"
+	if [ "$OPTION_PACKAGE" = 'gentoo' ]; then # Add debiancompat directory to LD_LIBRARY_PATH if necessary
+		local pkg_architecture
+		set_architecture "$PKG"
+		library_path="$library_path:/usr/\$(portageq envvar LIBDIR_$pkg_architecture)/debiancompat"
+	fi
+	library_path="$library_path:\$LD_LIBRARY_PATH"
 	cat >> "$file" <<- EOF
 	# Set executable file
 
 	APP_EXE='$app_exe'
 	APP_OPTIONS="$app_options"
-	LD_LIBRARY_PATH="$app_libs:\$LD_LIBRARY_PATH"
+	LD_LIBRARY_PATH="$library_path"
 	export LD_LIBRARY_PATH
 
 	# Set game-specific variables
@@ -2596,7 +2703,7 @@ write_desktop_winecfg() {
 # write package meta-data
 # USAGE: write_metadata [$pkg…]
 # NEEDED VARS: (ARCHIVE) GAME_NAME (OPTION_PACKAGE) PACKAGES_LIST (PKG_ARCH) PKG_DEPS_ARCH PKG_DEPS_DEB PKG_DESCRIPTION PKG_ID (PKG_PATH) PKG_PROVIDE
-# CALLS: liberror pkg_write_arch pkg_write_deb set_architecture testvar
+# CALLS: liberror pkg_write_arch pkg_write_deb pkg_write_gentoo set_architecture testvar
 write_metadata() {
 	if [ $# = 0 ]; then
 		write_metadata $PACKAGES_LIST
@@ -2634,6 +2741,9 @@ write_metadata() {
 			('deb')
 				pkg_write_deb
 			;;
+			('gentoo')
+				pkg_write_gentoo
+			;;
 			(*)
 				liberror 'OPTION_PACKAGE' 'write_metadata'
 			;;
@@ -2645,7 +2755,7 @@ write_metadata() {
 # build .pkg.tar or .deb package
 # USAGE: build_pkg [$pkg…]
 # NEEDED VARS: (OPTION_COMPRESSION) (LANG) (OPTION_PACKAGE) PACKAGES_LIST (PKG_PATH) PLAYIT_WORKDIR
-# CALLS: liberror pkg_build_arch pkg_build_deb testvar
+# CALLS: liberror pkg_build_arch pkg_build_deb pkg_build_gentoo testvar
 build_pkg() {
 	if [ $# = 0 ]; then
 		build_pkg $PACKAGES_LIST
@@ -2667,6 +2777,9 @@ build_pkg() {
 			('deb')
 				pkg_build_deb "$pkg_path"
 			;;
+			('gentoo')
+				pkg_build_gentoo "$pkg_path"
+			;;
 			(*)
 				liberror 'OPTION_PACKAGE' 'build_pkg'
 			;;
@@ -2677,7 +2790,7 @@ build_pkg() {
 # print package building message
 # USAGE: pkg_print $file
 # NEEDED VARS: (LANG)
-# CALLED BY: pkg_build_arch pkg_build_deb
+# CALLED BY: pkg_build_arch pkg_build_deb pkg_build_gentoo
 pkg_print() {
 	local string
 	case "${LANG%_*}" in
@@ -2694,7 +2807,7 @@ pkg_print() {
 # print package building message
 # USAGE: pkg_build_print_already_exists $file
 # NEEDED VARS: (LANG)
-# CALLED BY: pkg_build_arch pkg_build_deb
+# CALLED BY: pkg_build_arch pkg_build_deb pkg_build_gentoo
 pkg_build_print_already_exists() {
 	local string
 	case "${LANG%_*}" in
@@ -2730,6 +2843,9 @@ packages_guess_format() {
 		('arch'|\
 		 'manjaro'|'manjarolinux')
 			eval $variable_name=\'arch\'
+		;;
+		('gentoo')
+			eval $variable_name=\'gentoo\'
 		;;
 		(*)
 			print_warning
@@ -3372,6 +3488,287 @@ pkg_build_deb() {
 	print_ok
 }
 
+# write .ebuild package meta-data
+# USAGE: pkg_write_arch
+# NEEDED VARS: GAME_NAME PKG_DEPS_GENTOO
+# CALLED BY: write_metadata
+pkg_write_gentoo() {
+	pkg_id="$(printf '%s' "$pkg_id" | sed 's/-/_/g')" # This makes sure numbers in the package name doesn't get interpreted as a version by portage
+
+	local pkg_deps
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS\")" ]; then
+		pkg_set_deps_gentoo $(eval printf -- '%b' \"\$${pkg}_DEPS\")
+	fi
+	use_archive_specific_value "${pkg}_DEPS_GENTOO"
+	if [ "$(eval printf -- '%b' \"\$${pkg}_DEPS_GENTOO\")" ]; then
+		pkg_deps="$pkg_deps $(eval printf -- '%b' \"\$${pkg}_DEPS_GENTOO\")"
+	fi
+
+	if [ -n "$pkg_provide" ]; then
+		for package in $PACKAGES_LIST; do
+			if [ "$package" != "$pkg" ]; then
+				use_archive_specific_value "${package}_PROVIDE"
+				local provide="$(eval printf -- '%b' \"\$${package}_PROVIDE\")"
+				if [ "$provide" = "$pkg_provide" ]; then
+					use_archive_specific_value "${pkg}_ID"
+					local package_id="$(eval printf -- '%b' \"\$${package}_ID\" | sed 's/-/_/g')"
+					pkg_deps="$pkg_deps !!games-playit/$package_id"
+				fi
+			fi
+		done
+	fi
+
+	PKG="$pkg"
+	get_package_version
+
+	mkdir --parents \
+		"$PLAYIT_WORKDIR/gentoo-overlay/metadata" \
+		"$PLAYIT_WORKDIR/gentoo-overlay/profiles" \
+		"$PLAYIT_WORKDIR/gentoo-overlay/games-playit/$pkg_id/files"
+	echo 'masters = gentoo steam-overlay' > "$PLAYIT_WORKDIR/gentoo-overlay/metadata/layout.conf"
+	echo 'games-playit' > "$PLAYIT_WORKDIR/gentoo-overlay/profiles/categories"
+	ln --symbolic --force --no-target-directory "$pkg_path" "$PLAYIT_WORKDIR/gentoo-overlay/games-playit/$pkg_id/files/install"
+	local target
+	target="$PLAYIT_WORKDIR/gentoo-overlay/games-playit/$pkg_id/$pkg_id-$(printf '%s' "$PKG_VERSION" | grep -Eo '^([0-9]{1,18})(\.[0-9]{1,18})*[a-z]?' || echo 1).ebuild" # Portage doesn't like some of our version names (See https://devmanual.gentoo.org/ebuild-writing/file-format/index.html)
+
+	cat > "$target" <<- EOF
+	EAPI=6
+	EOF
+	local pkg_architectures
+	set_supported_architectures "$PKG"
+	cat >> "$target" <<- EOF
+	KEYWORDS="$pkg_architectures"
+	EOF
+
+	if [ -n "$pkg_description" ]; then
+		cat >> "$target" <<- EOF
+		DESCRIPTION="$GAME_NAME - $pkg_description - ./play.it script version $script_version"
+		EOF
+	else
+		cat >> "$target" <<- EOF
+		DESCRIPTION="$GAME_NAME - ./play.it script version $script_version"
+		EOF
+	fi
+
+	cat >> "$target" <<- EOF
+	SLOT="0"
+	EOF
+
+	cat >> "$target" <<- EOF
+	RDEPEND="$pkg_deps"
+
+	src_unpack() {
+		mkdir -p "\$S"
+	}
+	src_install() {
+		cp -Rl \$FILESDIR/install/* \$D/
+	}
+	EOF
+
+	#if [ -n "$pkg_provide" ]; then
+	#	cat >> "$target" <<- EOF
+	#	conflict = $pkg_provide
+	#	provides = $pkg_provide
+	#	EOF
+	#fi
+
+	if [ -e "$postinst" ]; then
+		cat >> "$target" <<- EOF
+		pkg_postinst() {
+		$(cat "$postinst")
+		}
+		EOF
+	fi
+
+	if [ -e "$prerm" ]; then
+		cat >> "$target" <<- EOF
+		pkg_prerm() {
+		$(cat "$prerm")
+		}
+		EOF
+	fi
+}
+
+# set list or Gentoo Linux dependencies from generic names
+# USAGE: pkg_set_deps_gentoo $dep[…]
+# CALLS: pkg_set_deps_gentoo32 pkg_set_deps_gentoo64
+# CALLED BY: pkg_write_gentoo
+pkg_set_deps_gentoo() {
+	use_archive_specific_value "${pkg}_ARCH"
+	local architecture
+	architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+	local architecture_suffix
+	case $architecture in
+		('32')
+			architecture_suffix='[abi_x86_32]'
+		;;
+		('64')
+			architecture_suffix=''
+		;;
+	esac
+	for dep in "$@"; do
+		case $dep in
+			('alsa')
+				pkg_dep="media-libs/alsa-lib$architecture_suffix media-plugins/alsa-plugins$architecture_suffix"
+			;;
+			('bzip2')
+				pkg_dep="app-arch/bzip2$architecture_suffix"
+			;;
+			('dosbox')
+				pkg_dep="games-emulation/dosbox"
+			;;
+			('freetype')
+				pkg_dep="media-libs/freetype$architecture_suffix"
+			;;
+			('gcc32')
+				pkg_dep='' #gcc (in @system) should be multilib unless it is a no-multilib profile, in which case the 32 bits libraries wouldn't work
+			;;
+			('gconf')
+				pkg_dep="gnome-base/gconf$architecture_suffix"
+			;;
+			('glibc')
+				pkg_dep="sys-libs/glibc"
+				if [ "$architecture" = '32' ]; then
+					pkg_dep="$pkg_dep amd64? ( sys-libs/glibc[multilib] )" #TODO: check if it works
+				fi
+			;;
+			('glu')
+				pkg_dep="virtual/glu$architecture_suffix"
+			;;
+			('glx')
+				pkg_dep="virtual/opengl$architecture_suffix"
+			;;
+			('gtk2')
+				pkg_dep="x11-libs/gtk+:2$architecture_suffix"
+			;;
+			('json')
+				pkg_dep="dev-libs/json-c$architecture_suffix"
+			;;
+			('libcurl-gnutls')
+				pkg_dep="net-libs/libcurl-debian$architecture_suffix" #available in the steam overlay
+			;;
+			('libstdc++')
+				pkg_dep='' #maybe this should be virtual/libstdc++, otherwise, it is included in gcc, which should be in @system
+			;;
+			('libxrandr')
+				pkg_dep="x11-libs/libXrandr$architecture_suffix"
+			;;
+			('nss')
+				pkg_dep="dev-libs/nss$architecture_suffix"
+			;;
+			('openal')
+				pkg_dep="media-libs/openal$architecture_suffix"
+			;;
+			('pulseaudio')
+				pkg_dep='media-sound/pulseaudio' #TODO: maybe apulse could work too
+			;;
+			('sdl1.2')
+				pkg_dep="media-libs/libsdl$architecture_suffix"
+			;;
+			('sdl2')
+				pkg_dep="media-libs/libsdl2$architecture_suffix"
+			;;
+			('sdl2_image')
+				pkg_dep="media-libs/sdl2-image$architecture_suffix"
+			;;
+			('sdl2_mixer')
+				pkg_dep="media-libs/sdl2-mixer$architecture_suffix"
+			;;
+			('vorbis')
+				pkg_dep="media-libs/libvorbis$architecture_suffix"
+			;;
+			('wine')
+				use_archive_specific_value "${pkg}_ARCH"
+				architecture="$(eval printf -- '%b' \"\$${pkg}_ARCH\")"
+				case "$architecture" in
+					('32') pkg_set_deps_gentoo 'wine32' ;;
+					('64') pkg_set_deps_gentoo 'wine64' ;;
+				esac
+			;;
+			('wine32')
+				 pkg_dep='virtual/wine[abi_x86_32]'
+			;;
+			('wine64')
+				pkg_dep='vîrtual/wine[abi_x86_64]'
+			;;
+			('winetricks')
+				pkg_dep="app-emulation/winetricks$architecture_suffix"
+			;;
+			('xcursor')
+				pkg_dep="x11-libs/libXcursor$architecture_suffix"
+			;;
+			('xft')
+				pkg_dep="x11-libs/libXft$architecture_suffix"
+			;;
+			('xgamma')
+				pkg_dep="x11-apss/xgamma$architecture_suffix"
+			;;
+			('xrandr')
+				pkg_dep="x11-apps/xrandr$architecture_suffix"
+			;;
+			(*)
+				pkg_dep=''
+				local has_provides=false
+				for pkg in $PACKAGES_LIST; do
+					use_archive_specific_value "${pkg}_PROVIDE"
+					local provide="$(eval printf -- '%b' \"\$${pkg}_PROVIDE\")"
+					if [ "$provide" = "$dep" ]; then
+						has_provides=true
+						use_archive_specific_value "${pkg}_ID"
+						local pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\" | sed 's/-/_/g')"
+						pkg_dep="$pkg_dep games-playit/$pkg_id"
+					fi
+				done
+				if [ "$has_provides" != true ]; then
+					pkg_dep='games-playit/'"$(printf '%s' "$dep" | sed 's/-/_/g')"
+				else
+					pkg_dep="|| ($pkg_dep )"
+				fi
+			;;
+		esac
+		pkg_deps="$pkg_deps $pkg_dep"
+	done
+}
+
+# build .tbz2 gentoo package
+# USAGE: pkg_build_gentoo $pkg_path
+# NEEDED VARS: (LANG) PLAYIT_WORKDIR
+# CALLS: pkg_print
+# CALLED BY: build_pkg
+pkg_build_gentoo() {
+	local pkg_filename
+	pkg_filename="$PWD/${1##*/}.tbz2"
+
+	if [ -e "$pkg_filename" ]; then
+		pkg_build_print_already_exists "${pkg_filename##*/}"
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
+
+	pkg_print "${pkg_filename##*/}"
+	if [ "$DRY_RUN" = '1' ]; then
+		printf '\n'
+		eval ${pkg}_PKG=\"$pkg_filename\"
+		export ${pkg}_PKG
+		return 0
+	fi
+
+	mkdir --parents "$PLAYIT_WORKDIR/portage-tmpdir"
+	pkg_id="$(eval printf -- '%b' \"\$${pkg}_ID\" | sed 's/-/_/g')" # This makes sure numbers in the package name doesn't get interpreted as a version by portage
+	local pkg_version="$(printf '%s' "$PKG_VERSION" | grep -Eo '^([0-9]{1,18})(\.[0-9]{1,18})*[a-z]?' || echo 1)" # Portage doesn't like some of our version names (See https://devmanual.gentoo.org/ebuild-writing/file-format/index.html)
+	local ebuild_path="$PLAYIT_WORKDIR/gentoo-overlay/games-playit/$pkg_id/$pkg_id-$pkg_version.ebuild"
+	ebuild "$ebuild_path" manifest
+	PORTAGE_TMPDIR="$PLAYIT_WORKDIR/portage-tmpdir" PKGDIR="$PLAYIT_WORKDIR/gentoo-pkgdir" fakeroot-ng -- ebuild "$ebuild_path" package
+	mv "$PLAYIT_WORKDIR/gentoo-pkgdir/games-playit/$pkg_id-$pkg_version.tbz2" "$pkg_filename"
+	rm -r "$PLAYIT_WORKDIR/portage-tmpdir"
+
+	eval ${pkg}_PKG=\"$pkg_filename\"
+	export ${pkg}_PKG
+
+	print_ok
+}
+
 if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 
 	# Check library version against script target version
@@ -3404,7 +3801,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	ALLOWED_VALUES_ARCHITECTURE='all 32 64 auto'
 	ALLOWED_VALUES_CHECKSUM='none md5'
 	ALLOWED_VALUES_COMPRESSION='none gzip xz'
-	ALLOWED_VALUES_PACKAGE='arch deb'
+	ALLOWED_VALUES_PACKAGE='arch deb gentoo'
 
 	# Set default values for common options
 
@@ -3547,7 +3944,7 @@ if [ "${0##*/}" != 'libplayit2.sh' ] && [ -z "$LIB_ONLY" ]; then
 	# Set package paths
 
 	case $OPTION_PACKAGE in
-		('arch')
+		('arch'|'gentoo')
 			PATH_BIN="$OPTION_PREFIX/bin"
 			PATH_DESK='/usr/local/share/applications'
 			PATH_DOC="$OPTION_PREFIX/share/doc/$GAME_ID"
