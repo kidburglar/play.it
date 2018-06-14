@@ -1,4 +1,4 @@
-2.9
+2.9.0
 
   * Update license file to keep track of all authors
 
@@ -7,7 +7,7 @@
   * Remove shebang from library, as it is always meant to be sourced, never
     directly executed
 
-  * Makefile: Add ability to chose the installation path, now defaulting to
+  * Makefile: Add ability to choose the installation path, now defaulting to
     /usr/local/share/games/play.it for library and scripts, and
     /usr/local/games for meta-script
 

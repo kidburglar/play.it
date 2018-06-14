@@ -34,27 +34,31 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180612.1
 
 # Set game-specific variables
 
 GAME_ID='renowned-explorers-international-society'
 GAME_NAME='Renowned Explorers: International Society'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD'
-
-ARCHIVE_GOG='renowned_explorers_international_society_en_466_15616.sh'
+ARCHIVE_GOG='renowned_explorers_international_society_en_489_20916.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/renowned_explorers'
-ARCHIVE_GOG_MD5='fbad4b4d361a0e7d29b9781e3c5a5e85'
+ARCHIVE_GOG_MD5='42d0ecb54d8302545e78f41ed43acef6'
 ARCHIVE_GOG_SIZE='1100000'
-ARCHIVE_GOG_VERSION='466-gog15616'
+ARCHIVE_GOG_VERSION='489-gog20916'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='renowned_explorers_international_society_en_459_14894.sh'
-ARCHIVE_GOG_OLD_MD5='ff6b368b3919002d2db750213d33fcef'
+ARCHIVE_GOG_OLD='renowned_explorers_international_society_en_466_15616.sh'
+ARCHIVE_GOG_OLD_MD5='fbad4b4d361a0e7d29b9781e3c5a5e85'
 ARCHIVE_GOG_OLD_SIZE='1100000'
-ARCHIVE_GOG_OLD_VERSION='459-gog14894'
+ARCHIVE_GOG_OLD_VERSION='466-gog15616'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLDER='renowned_explorers_international_society_en_459_14894.sh'
+ARCHIVE_GOG_OLDER_MD5='ff6b368b3919002d2db750213d33fcef'
+ARCHIVE_GOG_OLDER_SIZE='1100000'
+ARCHIVE_GOG_OLDER_VERSION='459-gog14894'
+ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
@@ -69,7 +73,7 @@ ARCHIVE_GAME_DATA_PATH='data/noarch/game'
 ARCHIVE_GAME_DATA_FILES='./build.bni ./data ./project.bni ./settings.ini ./soundbanks'
 
 CONFIG_FILES='./*.ini'
-DATA_DIRS='./savedata ./userdata'
+DATA_DIRS='./savedata'
 DATA_FILES='./*.txt'
 
 APP_MAIN_TYPE='native'
@@ -91,18 +95,28 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.4'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
-		return 1
+		exit 1
 	fi
 fi
 . "$PLAYIT_LIB2"
@@ -110,15 +124,12 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
 
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC_${PKG#PKG_}"  "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
+# Get icon
 
 PKG='PKG_DATA'
-get_icon_from_temp_dir 'APP_MAIN'
-
+icons_get_from_workdir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -138,10 +149,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0

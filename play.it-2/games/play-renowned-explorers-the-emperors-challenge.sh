@@ -34,21 +34,26 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180318.2
+script_version=20180612.1
 
 # Set game-specific variables
 
 GAME_ID='renowned-explorers-international-society'
 GAME_NAME='Renowned Explorers: The Emperor’s Challenge'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='renowned_explorers_the_emperor_s_challenge_dlc_en_466_15616.sh'
+ARCHIVE_GOG='renowned_explorers_the_emperor_s_challenge_dlc_en_489_20916.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/renowned_explorers_the_emperors_challenge'
-ARCHIVE_GOG_MD5='12baa49b557c92e2f5eae7ff99623d34'
+ARCHIVE_GOG_MD5='553e0fa1ffed73c9c99022c20cfff707'
 ARCHIVE_GOG_SIZE='23000'
-ARCHIVE_GOG_VERSION='466-gog15616'
+ARCHIVE_GOG_VERSION='489-gog20916'
 ARCHIVE_GOG_TYPE='mojosetup'
+
+ARCHIVE_GOG_OLD='renowned_explorers_the_emperor_s_challenge_dlc_en_466_15616.sh'
+ARCHIVE_GOG_OLD_URL='https://www.gog.com/game/renowned_explorers_the_emperors_challenge'
+ARCHIVE_GOG_OLD_MD5='12baa49b557c92e2f5eae7ff99623d34'
+ARCHIVE_GOG_OLD_SIZE='23000'
+ARCHIVE_GOG_OLD_VERSION='466-gog15616'
+ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
 ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
 ARCHIVE_DOC_MAIN_FILES='./*'
@@ -63,18 +68,28 @@ PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
-target_version='2.6'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
-		return 1
+		exit 1
 	fi
 fi
 . "$PLAYIT_LIB2"
