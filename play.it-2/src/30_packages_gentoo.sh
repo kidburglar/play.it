@@ -43,6 +43,7 @@ pkg_write_gentoo() {
 
 	cat > "$target" <<- EOF
 	EAPI=6
+	RESTRICT="fetch"
 	EOF
 	local pkg_architectures
 	set_supported_architectures "$PKG"
