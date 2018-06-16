@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2018, Janeene Beeforth
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -29,52 +30,57 @@ set -o errexit
 ###
 
 ###
-# La•Mulana
+# Surviving Mars
 # build native Linux packages from the original installers
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180519.1
+script_version=20180616.1
 
 # Set game-specific variables
 
-GAME_ID='la-mulana'
-GAME_NAME='La•Mulana'
+GAME_ID='surviving-mars'
+GAME_NAME='Surviving Mars'
 
-SCRIPT_DEPS='bsdtar'
+ARCHIVE_GOG='surviving_mars_en_curiosity_update_21183.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/surviving_mars'
+ARCHIVE_GOG_MD5='ab9a61d04a128f19bc9e003214fe39a9'
+ARCHIVE_GOG_VERSION='231.139'
+ARCHIVE_GOG_TYPE='mojosetup_unzip'
+ARCHIVE_GOG_SIZE='3950000'
 
-ARCHIVE_HUMBLE='20170404_LaMulana_Linux.zip'
-ARCHIVE_HUMBLE_MD5='e7a597ea2588ae975a7cc7b59c17d50d'
-ARCHIVE_HUMBLE_SIZE='120000'
-ARCHIVE_HUMBLE_VERSION='1.6.6-humble180409'
+ARCHIVE_GOG_DELUXE_UPGRADE='surviving_mars_digital_deluxe_edition_upgrade_pack_en_180423_opportunity_rc1_20289.sh'
+ARCHIVE_GOG_DELUXE_UPGRADE_MD5='a574de12f4b7f3aa1f285167109bb6a3'
+ARCHIVE_GOG_DELUXE_UPGRADE_TYPE='mojosetup_unzip'
 
-ARCHIVE_DOC0_DATA_PATH='.'
-ARCHIVE_DOC0_DATA_FILES='./ReadMe_??.txt ./License ./Manual'
+ARCHIVE_LIBSSL_64='libssl_1.0.0_64-bit.tar.gz'
+ARCHIVE_LIBSSL_64_MD5='89917bef5dd34a2865cb63c2287e0bd4'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch'
-ARCHIVE_DOC1_DATA_FILES='./README.linux'
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
-ARCHIVE_GAME_BIN_PATH='data/x86'
-ARCHIVE_GAME_BIN_FILES='./*'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./MarsGOG ./libopenal.so.1 ./libSDL2-2.0.so.0 ./libpops_api.so'
 
-ARCHIVE_GAME_DATA_PATH='data/noarch'
-ARCHIVE_GAME_DATA_FILES='./data ./*.bmp ./*.png'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./DLC ./Licenses ./Local ./ModTools ./Movies ./Packs ./ShaderPreprocessorTemp'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE='LaMulana.bin.x86'
-APP_MAIN_ICON='Icon.png'
-
-PACKAGES_LIST='PKG_BIN PKG_DATA'
+APP_MAIN_EXE='MarsGOG'
+APP_MAIN_ICON='data/noarch/support/icon.png'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
+PACKAGES_LIST='PKG_DATA PKG_BIN'
+
 PKG_BIN_ARCH='64'
-PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glx sdl2 openal"
+PKG_BIN_DEPS="$PKG_DATA_ID glibc libstdc++ glx"
+PKG_BIN_DEPS_ARCH='openssl-1.0'
 
 # Load common functions
 
-target_version='2.8'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
@@ -100,30 +106,61 @@ if [ -z "$PLAYIT_LIB2" ]; then
 fi
 . "$PLAYIT_LIB2"
 
+# Use libSSL 1.0.0 archives
+
+if [ "$OPTION_PACKAGE" != 'arch' ]; then
+	ARCHIVE_MAIN="$ARCHIVE"
+	set_archive 'ARCHIVE_LIBSSL' 'ARCHIVE_LIBSSL_64'
+	ARCHIVE="$ARCHIVE_MAIN"
+fi
+
+# Use Digital Deluxe upgrade
+
+ARCHIVE_MAIN="$ARCHIVE"
+archive_set 'ARCHIVE_DELUXE' 'ARCHIVE_GOG_DELUXE_UPGRADE'
+ARCHIVE="$ARCHIVE_MAIN"
+
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-(
-	ARCHIVE='INNER_ARCHIVE'
-	INNER_ARCHIVE="$PLAYIT_WORKDIR/gamedata/LaMulanaSetup-2017-01-27.sh"
-	INNER_ARCHIVE_TYPE='mojosetup'
-	extract_data_from "$INNER_ARCHIVE"
-	rm "$INNER_ARCHIVE"
-)
 prepare_package_layout
+
+# Get icon
+
+PKG='PKG_DATA'
+icons_get_from_workdir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-# Write launchers
+# Include libSSL into the game directory
 
+if [ "$ARCHIVE_LIBSSL" ]; then
+	(
+		ARCHIVE='ARCHIVE_LIBSSL'
+		extract_data_from "$ARCHIVE_LIBSSL"
+	)
+	mv "$PLAYIT_WORKDIR/gamedata"/* "${PKG_BIN_PATH}${PATH_GAME}"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
+
+# Include the Digital Deluxe upgrade
+
+if [ "$ARCHIVE_DELUXE" ]; then
+	(
+		ARCHIVE='ARCHIVE_DELUXE'
+		extract_data_from "$ARCHIVE_DELUXE"
+	)
+	mv "$PLAYIT_WORKDIR/gamedata/data/noarch/docs"/* "${PKG_DATA_PATH}/${PATH_DOC}"
+	mv "$PLAYIT_WORKDIR/gamedata/data/noarch/game"/* "${PKG_DATA_PATH}/${PATH_GAME}"
+	rm --recursive "$PLAYIT_WORKDIR/gamedata"
+fi
+
+# Write launchers
 PKG='PKG_BIN'
 write_launcher 'APP_MAIN'
 
-# Build packages
+# Build package
 
-PKG='PKG_DATA'
-icons_linking_postinst 'APP_MAIN'
-write_metadata 'PKG_DATA'
-write_metadata 'PKG_BIN'
+write_metadata
 build_pkg
 
 # Clean up

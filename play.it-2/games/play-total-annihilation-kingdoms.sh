@@ -2,7 +2,7 @@
 set -o errexit
 
 ###
-# Copyright (c) 2015-2017, Antoine Le Gonidec
+# Copyright (c) 2015-2018, Antoine Le Gonidec
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -81,7 +81,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	else
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
-		return 1
+		exit 1
 	fi
 fi
 . "$PLAYIT_LIB2"

@@ -90,7 +90,7 @@ if [ -z "$PLAYIT_LIB2" ]; then
 	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
-		return 1
+		exit 1
 	fi
 fi
 . "$PLAYIT_LIB2"
