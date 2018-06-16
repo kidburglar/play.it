@@ -30,8 +30,8 @@
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-library_version=2.9.0
-library_revision=20180610.1
+library_version=2.9.1~dev
+library_revision=20180616.1
 
 # set package distribution-specific architecture
 # USAGE: set_architecture $pkg
@@ -1258,7 +1258,7 @@ extract_data_from() {
 			;;
 		esac
 
-		if [ "$archive_type" != 'innosetup' ]; then
+		if [ "${archive_type#innosetup}" = "$archive_type" ]; then
 			print_ok
 		fi
 	done

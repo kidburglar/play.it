@@ -75,7 +75,7 @@ extract_data_from() {
 			;;
 		esac
 
-		if [ "$archive_type" != 'innosetup' ]; then
+		if [ "${archive_type#innosetup}" = "$archive_type" ]; then
 			print_ok
 		fi
 	done
