@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180616.1
+script_version=20180617.1
 
 # Set game-specific variables
 
@@ -46,7 +46,7 @@ ARCHIVE_GOG='tis_100_en_11_27_2017_16765.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/tis-100'
 ARCHIVE_GOG_MD5='70518ec82ee8148697b704ed2c3c8953'
 ARCHIVE_GOG_VERSION='2017.11.27-gog16765'
-ARCHIVE_GOG_SIZE='36000'
+ARCHIVE_GOG_SIZE='83000'
 ARCHIVE_GOG_TYPE='mojosetup'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
