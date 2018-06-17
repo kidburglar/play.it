@@ -3,7 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
-# Copyright (c) 2018, Janeene Beeforth
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,36 +30,45 @@ set -o errexit
 ###
 
 ###
-# Mysteries Resupply Pack for Surviving Mars.
+# This War of Mine
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180614.1
+script_version=20180617.1
 
 # Set game-specific variables
 
-# copy GAME_ID from play-surviving-mars.sh
-GAME_ID='surviving-mars'
-GAME_NAME='Surviving Mars: Mysteries Resupply Pack'
+GAME_ID='this-war-of-mine'
+GAME_NAME='This War Of Mine'
 
-ARCHIVE_GOG='surviving_mars_mysteries_resupply_pack_en_curiosity_2_21442.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/surviving_mars_mysteries_resupply_pack'
-ARCHIVE_GOG_MD5='9ca47c2cdb5a41cf8b221dca99783916'
-ARCHIVE_GOG_SIZE='2900'
-ARCHIVE_GOG_VERSION='2-gog21442'
-ARCHIVE_GOG_TYPE='mojosetup_unzip'
+ARCHIVE_GOG='this_war_of_mine_en_4_0_0_29_01_2018_18230.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/this_war_of_mine'
+ARCHIVE_GOG_MD5='165f4d6158425c3d2861c533f10b5713'
+ARCHIVE_GOG_VERSION='4.0.0-gog18230'
+ARCHIVE_GOG_SIZE='1500000'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
-ARCHIVE_DOC_MAIN_FILES='./*'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_MAIN_PATH='data/noarch/game'
-ARCHIVE_GAME_MAIN_FILES='./DLC'
+ARCHIVE_GAME_BIN_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN_FILES='./libcurl.so.4 ./libOpenAL.so ./TWOMLinux'
 
-PACKAGES_LIST='PKG_MAIN'
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./*.dat ./*.idx ./*str ./CustomContent ./LocalizationPacks ./svnrev.txt ./WorkshopData'
 
-PKG_MAIN_ID="${GAME_ID}-mysteries-resupply-pack"
-PKG_MAIN_DEPS="$GAME_ID"
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE='TWOMLinux'
+APP_MAIN_ICON='data/noarch/support/icon.png'
+
+PACKAGES_LIST='PKG_BIN PKG_DATA'
+
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN_ARCH='32'
+PKG_BIN_DEPS="$PKG_DATA_ID glibc glx openal libcurl"
 
 # Load common functions
 
@@ -93,7 +102,18 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+
+# Extract icon
+
+PKG='PKG_DATA'
+get_icon_from_temp_dir 'APP_MAIN'
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Write launchers
+
+PKG='PKG_BIN'
+write_launcher 'APP_MAIN'
+
 
 # Build package
 

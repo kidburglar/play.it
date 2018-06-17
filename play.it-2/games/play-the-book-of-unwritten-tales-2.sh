@@ -3,7 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
-# Copyright (c) 2018, Janeene Beeforth
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -30,36 +30,59 @@ set -o errexit
 ###
 
 ###
-# Mysteries Resupply Pack for Surviving Mars.
+# The Book of Unwritten Tales 2
 # build native Linux packages from the original installers
-# send your bug reports to vv221@dotslashplay.it
+# send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180614.1
+script_version=20180617.1
 
 # Set game-specific variables
 
-# copy GAME_ID from play-surviving-mars.sh
-GAME_ID='surviving-mars'
-GAME_NAME='Surviving Mars: Mysteries Resupply Pack'
+GAME_ID='the-book-of-unwritten-tales-2'
+GAME_NAME='The Book of Unwritten Tales 2'
 
-ARCHIVE_GOG='surviving_mars_mysteries_resupply_pack_en_curiosity_2_21442.sh'
-ARCHIVE_GOG_URL='https://www.gog.com/game/surviving_mars_mysteries_resupply_pack'
-ARCHIVE_GOG_MD5='9ca47c2cdb5a41cf8b221dca99783916'
-ARCHIVE_GOG_SIZE='2900'
-ARCHIVE_GOG_VERSION='2-gog21442'
+ARCHIVE_GOG='gog_the_book_of_unwritten_tales_2_2.0.0.2.sh'
+ARCHIVE_GOG_URL='https://www.gog.com/game/the_book_of_unwritten_tales_2_almanac_edition'
+ARCHIVE_GOG_MD5='f2b0ca23d7bfc1f7e22fa6f990fc527c'
+ARCHIVE_GOG_VERSION='1.0-gog2.0.0.2'
+ARCHIVE_GOG_SIZE='13000000'
 ARCHIVE_GOG_TYPE='mojosetup_unzip'
 
-ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
-ARCHIVE_DOC_MAIN_FILES='./*'
+ARCHIVE_DOC_PATH='data/noarch/docs'
+ARCHIVE_DOC_FILES='./*'
 
-ARCHIVE_GAME_MAIN_PATH='data/noarch/game'
-ARCHIVE_GAME_MAIN_FILES='./DLC'
+ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN32_FILES='Linux/*.x86 Linux/*_Data/*/x86'
 
-PACKAGES_LIST='PKG_MAIN'
+ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
+ARCHIVE_GAME_BIN64_FILES='Linux/*.x86_64 Linux/*_Data/*/x86_64'
 
-PKG_MAIN_ID="${GAME_ID}-mysteries-resupply-pack"
-PKG_MAIN_DEPS="$GAME_ID"
+ARCHIVE_GAME_SCENES_PATH='data/noarch/game'
+ARCHIVE_GAME_SCENES_FILES='./data/episode_0?/Scenes'
+
+ARCHIVE_GAME_DATA_PATH='data/noarch/game'
+ARCHIVE_GAME_DATA_FILES='./data ./launcher ./qt.conf Linux/*_Data'
+
+APP_MAIN_TYPE='native'
+APP_MAIN_EXE_BIN32='Linux/BouT2.x86'
+APP_MAIN_EXE_BIN64='Linux/BouT2.x86_64'
+APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
+APP_MAIN_ICON='Linux/BouT2_Data/Resources/UnityPlayer.png'
+
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_SCENES PKG_DATA'
+
+PKG_SCENES_ID="${GAME_ID}-scenes"
+PKG_SCENES_DESCRIPTION='scenes'
+
+PKG_DATA_ID="${GAME_ID}-data"
+PKG_DATA_DESCRIPTION='data'
+
+PKG_BIN32_ARCH='32'
+PKG_BIN32_DEPS="$PKG_DATA_ID $PKG_SCENES glibc glu xcursor libxrandr"
+
+PKG_BIN64_ARCH='64'
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS_DEB"
 
 # Load common functions
 
@@ -95,11 +118,19 @@ extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
+# Write launchers
+
+for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
+	write_launcher 'APP_MAIN'
+done
+
 # Build package
 
-write_metadata
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
+write_metadata 'PKG_DATA'
+write_metadata 'PKG_BIN32' 'PKG_BIN64' 'PKG_SCENES'
 build_pkg
-
 # Clean up
 
 rm --recursive "$PLAYIT_WORKDIR"
