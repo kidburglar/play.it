@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2017-2018, mortalius
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,41 +35,46 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180331.1
+script_version=20180618.1
 
 # Set game-specific variables
 
 GAME_ID='hand-of-fate'
 GAME_NAME='Hand Of Fate'
 
-ARCHIVE_GOG='gog_hand_of_fate_2.12.0.16.sh'
+ARCHIVE_GOG='hand_of_fate_en_1_3_19_21087.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/hand_of_fate'
-ARCHIVE_GOG_MD5='54c61dce76b1281b4161d53d096d6ffe'
-ARCHIVE_GOG_SIZE='1700000'
-ARCHIVE_GOG_VERSION='1.3.17-gog2.12.0.16'
+ARCHIVE_GOG_MD5='5895ccaf640afff877b6cab5fa348748'
+ARCHIVE_GOG_SIZE='2800000'
+ARCHIVE_GOG_VERSION='1.3.19-gog21087'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-DATA_DIRS='./logs'
+ARCHIVE_GOG_OLD='gog_hand_of_fate_2.12.0.16.sh'
+ARCHIVE_GOG_OLD_MD5='54c61dce76b1281b4161d53d096d6ffe'
+ARCHIVE_GOG_OLD_SIZE='2800000'
+ARCHIVE_GOG_OLD_VERSION='1.3.17-gog2.12.0.16'
 
 ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
 ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN32_FILES='./Hand?of?Fate_Data/Mono/x86 ./Hand?of?Fate_Data/Plugins/x86 ./Hand?of?Fate.x86'
+ARCHIVE_GAME_BIN32_FILES='./Hand?of?Fate_Data/*/x86 ./Hand?of?Fate.x86'
 
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
-ARCHIVE_GAME_BIN64_FILES='./Hand?of?Fate_Data/Mono/x86_64 ./Hand?of?Fate_Data/Plugins/x86_64 ./Hand?of?Fate.x86_64'
+ARCHIVE_GAME_BIN64_FILES='./Hand?of?Fate_Data/*/x86_64 ./Hand?of?Fate.x86_64'
 
 ARCHIVE_GAME_DATA_PATH_GOG='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Hand?of?Fate_Data/global* ./Hand?of?Fate_Data/level* ./Hand?of?Fate_Data/resources* ./Hand?of?Fate_Data/sharedassets* ./Hand?of?Fate_Data/Managed ./Hand?of?Fate_Data/Mono/etc ./Hand?of?Fate_Data/Resources ./Hand?of?Fate_Data/StreamingAssets'
+ARCHIVE_GAME_DATA_FILES='./Hand?of?Fate_Data'
+
+DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Hand of Fate.x86'
 APP_MAIN_EXE_BIN64='Hand of Fate.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='Hand of Fate_Data/Resources/UnityPlayer.png'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
@@ -81,15 +87,25 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.7'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -111,14 +127,15 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
 
 # Clean up
 
-rm --recursive "${PLAYIT_WORKDIR}"
+rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
