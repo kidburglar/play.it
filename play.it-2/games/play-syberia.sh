@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,7 +35,7 @@ set -o errexit
 # send your bug reports to mopi@dotslashplay.it
 ###
 
-script_version=20180318.1
+script_version=20180619.1
 
 # Set game-specific variables
 
@@ -84,7 +85,6 @@ APP_REGEDIT="$GAME_ID.reg"
 APP_MAIN_TYPE='wine'
 APP_MAIN_EXE='game.exe'
 APP_MAIN_ICON='syberia.exe'
-APP_MAIN_ICON_RES='16 32 48'
 
 PACKAGES_LIST='PKG_BIN PKG_L10N PKG_DATA'
 
@@ -103,15 +103,25 @@ PKG_BIN_DEPS="$PKG_L10N_ID $PKG_DATA_ID wine"
 
 # Load common functions
 
-target_version='2.7'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -123,12 +133,13 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Extract icons
 
 PKG='PKG_BIN'
-extract_and_sort_icons_from 'APP_MAIN'
-move_icons_to 'PKG_DATA'
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
+icons_move_to 'PKG_DATA'
 
 # Create player.ini file
 
@@ -138,7 +149,7 @@ EOF
 
 # Add workaround for crash before reaching game menu
 
-cat > "${PKG_BIN_PATH}${PATH_GAME}/$GAME_ID.reg" << 'EOF'
+cat > "${PKG_BIN_PATH}${PATH_GAME}/$APP_REGEDIT" << 'EOF'
 Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Wine\X11 Driver]
