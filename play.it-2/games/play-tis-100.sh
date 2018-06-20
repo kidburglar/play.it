@@ -35,7 +35,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180617.1
+script_version=20180620.1
 
 # Set game-specific variables
 
@@ -49,8 +49,11 @@ ARCHIVE_GOG_VERSION='2017.11.27-gog16765'
 ARCHIVE_GOG_SIZE='83000'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC_DATA_FILES='./*.txt ./*.pdf'
+ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC0_DATA_FILES='./*'
+
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC1_DATA_FILES='./*.pdf'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
@@ -121,6 +124,17 @@ done
 
 PKG='PKG_DATA'
 icons_linking_postinst 'APP_MAIN'
+manual='TIS-100 Reference Manual.pdf'
+cat >> "$postinst" << EOF
+if [ ! -e "$PATH_GAME/$manual" ]; then
+	ln --symbolic "$PATH_DOC/$manual" "$PATH_GAME"
+fi
+EOF
+cat >> "$prerm" << EOF
+if [ -e "$PATH_GAME/$manual" ]; then
+	rm "$PATH_GAME/$manual"
+fi
+EOF
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
