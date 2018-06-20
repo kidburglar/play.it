@@ -34,20 +34,23 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180620.1
 
 # Set game-specific variables
 
 GAME_ID='lovers-in-a-dangerous-spacetime'
 GAME_NAME='Lovers in a Dangerous Spacetime'
 
-ARCHIVES_LIST='ARCHIVE_HUMBLE'
-
-ARCHIVE_HUMBLE='LoversInADangerousSpacetime-1.4.4_Linux.zip'
+ARCHIVE_HUMBLE='LoversInADangerousSpacetime-1.4.5_Linux.zip'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/lovers-in-a-dangerous-spacetime'
-ARCHIVE_HUMBLE_MD5='38927a73e1fe84620ebc876f8f039adb'
+ARCHIVE_HUMBLE_MD5='67b6bc5ba5590fb50e95996b267f8c60'
 ARCHIVE_HUMBLE_SIZE='880000'
-ARCHIVE_HUMBLE_VERSION='1.4.4-humble160908'
+ARCHIVE_HUMBLE_VERSION='1.4.5-humble180427'
+
+ARCHIVE_HUMBLE_OLD='LoversInADangerousSpacetime-1.4.4_Linux.zip'
+ARCHIVE_HUMBLE_OLD_MD5='38927a73e1fe84620ebc876f8f039adb'
+ARCHIVE_HUMBLE_OLD_SIZE='880000'
+ARCHIVE_HUMBLE_OLD_VERSION='1.4.4-humble160908'
 
 ARCHIVE_GAME_BIN32_PATH='.'
 ARCHIVE_GAME_BIN32_FILES='./*.x86 ./*_Data/*/x86'
@@ -61,12 +64,10 @@ ARCHIVE_GAME_DATA_FILES='./*_Data'
 DATA_DIRS='./logs'
 
 APP_MAIN_TYPE='native'
-APP_MAIN_EXE_BIN32='./LoversInADangerousSpacetime.x86'
-APP_MAIN_EXE_BIN64='./LoversInADangerousSpacetime.x86_64'
+APP_MAIN_EXE_BIN32='LoversInADangerousSpacetime.x86'
+APP_MAIN_EXE_BIN64='LoversInADangerousSpacetime.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='*_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='LoversInADangerousSpacetime_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -74,24 +75,32 @@ PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgl1-mesa-glx | libgl1, libxcursor1"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-libgl lib32-libxcursor"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ glx xcursor"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID libgl libxcursor"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.3'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -102,16 +111,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
-
-PKG='PKG_DATA'
-organize_data 'GAME_DATA' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -122,7 +122,8 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
@@ -133,10 +134,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
