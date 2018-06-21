@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180621.1
+script_version=20180621.2
 
 # Set game-specific variables
 
@@ -80,11 +80,8 @@ ARCHIVE_GAME_BIN32_FILES='./lib ./darkest.bin.x86'
 ARCHIVE_GAME_BIN64_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN64_FILES='./lib64 ./darkest.bin.x86_64'
 
-ARCHIVE_GAME_MEDIA_PATH='data/noarch/game'
-ARCHIVE_GAME_MEDIA_FILES='./audio ./video'
-
 ARCHIVE_GAME_DATA_PATH='data/noarch/game'
-ARCHIVE_GAME_DATA_FILES='./Icon.bmp ./pin ./svn_revision.txt ./activity_log ./campaign ./colours ./curios ./cursors ./dungeons ./effects ./fe_flow ./fonts ./fx ./game_over ./heroes ./inventory ./loading_screen ./loot ./maps ./modes ./mods ./monsters ./overlays ./panels ./props ./raid ./raid_results ./scripts ./scrolls ./shaders ./shared ./trinkets ./upgrades ./user_information ./localization/*.bat ./localization/*.csv ./localization/*.loc ./localization/*.txt ./localization/*.xml ./localization/pc'
+ARCHIVE_GAME_DATA_FILES='./audio ./video ./Icon.bmp ./pin ./svn_revision.txt ./activity_log ./campaign ./colours ./curios ./cursors ./dungeons ./effects ./fe_flow ./fonts ./fx ./game_over ./heroes ./inventory ./loading_screen ./loot ./maps ./modes ./mods ./monsters ./overlays ./panels ./props ./raid ./raid_results ./scripts ./scrolls ./shaders ./shared ./trinkets ./upgrades ./user_information ./localization/*.bat ./localization/*.csv ./localization/*.loc ./localization/*.txt ./localization/*.xml ./localization/pc'
 
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='darkest.bin.x86'
@@ -92,16 +89,13 @@ APP_MAIN_EXE_BIN64='darkest.bin.x86_64'
 APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
 APP_MAIN_ICON='Icon.bmp'
 
-PACKAGES_LIST='PKG_MEDIA PKG_DATA PKG_BIN32 PKG_BIN64'
-
-PKG_MEDIA_ID="${GAME_ID}-media"
-PKG_MEDIA_DESCRIPTION='audio & video'
+PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS="$PKG_MEDIA_ID $PKG_DATA_ID glibc libstdc++6 sdl2"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++6 sdl2"
 
 PKG_BIN64_ARCH='64'
 PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
