@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180621.1
 
 # Set game-specific variables
 
@@ -42,38 +42,36 @@ script_version=20180224.1
 GAME_ID='darkest-dungeon'
 GAME_NAME='Darkest Dungeon: The Crimson Court'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
-
-ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_21096_16065.sh'
+ARCHIVE_GOG='darkest_dungeon_the_crimson_court_dlc_en_23885_21662.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/darkest_dungeon_the_crimson_court'
-ARCHIVE_GOG_MD5='d4beaeb7effff0cbd2e292abf0ef5332'
+ARCHIVE_GOG_MD5='70018fc475ee4d24fdc19e107fa41a2a'
 ARCHIVE_GOG_SIZE='350000'
-ARCHIVE_GOG_VERSION='21096-gog16066'
+ARCHIVE_GOG_VERSION='23885-gog21662'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
-ARCHIVE_GOG_OLD_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
+ARCHIVE_GOG_OLD='darkest_dungeon_the_crimson_court_dlc_en_21096_16065.sh'
+ARCHIVE_GOG_OLD_MD5='d4beaeb7effff0cbd2e292abf0ef5332'
 ARCHIVE_GOG_OLD_SIZE='350000'
-ARCHIVE_GOG_OLD_VERSION='21071-gog15970'
+ARCHIVE_GOG_OLD_VERSION='21096-gog16066'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
-ARCHIVE_GOG_OLDER_MD5='523c66d4575095c66a03d3859e4f83b8'
-ARCHIVE_GOG_OLDER_SIZE='360000'
-ARCHIVE_GOG_OLDER_VERSION='20645-gog15279'
+ARCHIVE_GOG_OLDER='darkest_dungeon_the_crimson_court_dlc_en_21071_15970.sh'
+ARCHIVE_GOG_OLDER_MD5='67fcfc5e91763cbf20a4ef51ff7b8eff'
+ARCHIVE_GOG_OLDER_SIZE='350000'
+ARCHIVE_GOG_OLDER_VERSION='21071-gog15970'
 ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDEST='darkest_dungeon_the_crimson_court_dlc_en_20578_15132.sh'
-ARCHIVE_GOG_OLDEST_MD5='96ac3ed631dd2509ffbf88f88823e019'
+ARCHIVE_GOG_OLDEST='darkest_dungeon_the_crimson_court_dlc_en_20645_15279.sh'
+ARCHIVE_GOG_OLDEST_MD5='523c66d4575095c66a03d3859e4f83b8'
 ARCHIVE_GOG_OLDEST_SIZE='360000'
-ARCHIVE_GOG_OLDEST_VERSION='20578-gog15132'
+ARCHIVE_GOG_OLDEST_VERSION='20645-gog15279'
 ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_DOC_MAIN_PATH='data/noarch/docs'
+ARCHIVE_DOC_MAIN_FILES='./*'
 
-ARCHIVE_GAME_PATH='data/noarch/game'
-ARCHIVE_GAME_FILES='./dlc'
+ARCHIVE_GAME_MAIN_PATH='data/noarch/game'
+ARCHIVE_GAME_MAIN_FILES='./dlc'
 
 PACKAGES_LIST='PKG_MAIN'
 
@@ -82,15 +80,25 @@ PKG_MAIN_DEPS="$GAME_ID"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -101,10 +109,7 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-organize_data 'DOC'  "$PATH_DOC"
-organize_data 'GAME' "$PATH_GAME"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Build package

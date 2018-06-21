@@ -34,47 +34,45 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180621.1
 
 # Set game-specific variables
 
 GAME_ID='darkest-dungeon'
 GAME_NAME='Darkest Dungeon'
 
-ARCHIVES_LIST='ARCHIVE_GOG ARCHIVE_GOG_OLD ARCHIVE_GOG_OLDER ARCHIVE_GOG_OLDEST'
-
-ARCHIVE_GOG='darkest_dungeon_en_21142_16140.sh'
+ARCHIVE_GOG='darkest_dungeon_en_23885_21662.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/darkest_dungeon'
-ARCHIVE_GOG_MD5='4b43065624dbab74d794c56809170588'
-ARCHIVE_GOG_SIZE='2200000'
-ARCHIVE_GOG_VERSION='21142-gog16140'
+ARCHIVE_GOG_MD5='ff449de9cfcdf97fa1a27d1073139463'
+ARCHIVE_GOG_SIZE='2300000'
+ARCHIVE_GOG_VERSION='23885-gog21662'
 ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLD='darkest_dungeon_en_21096_16066.sh'
-ARCHIVE_GOG_OLD_MD5='435905fe6edd911a8645d4feaf94ec34'
+ARCHIVE_GOG_OLD='darkest_dungeon_en_21142_16140.sh'
+ARCHIVE_GOG_OLD_MD5='4b43065624dbab74d794c56809170588'
 ARCHIVE_GOG_OLD_SIZE='2200000'
-ARCHIVE_GOG_OLD_VERSION='21096-gog16066'
+ARCHIVE_GOG_OLD_VERSION='21142-gog16140'
 ARCHIVE_GOG_OLD_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDER='darkest_dungeon_en_21071_15970.sh'
-ARCHIVE_GOG_OLDER_MD5='e4880968101835fcd27f63a48e208ed8'
+ARCHIVE_GOG_OLDER='darkest_dungeon_en_21096_16066.sh'
+ARCHIVE_GOG_OLDER_MD5='435905fe6edd911a8645d4feaf94ec34'
 ARCHIVE_GOG_OLDER_SIZE='2200000'
-ARCHIVE_GOG_OLDER_VERSION='21071-gog15970'
+ARCHIVE_GOG_OLDER_VERSION='21096-gog16066'
 ARCHIVE_GOG_OLDER_TYPE='mojosetup'
 
-ARCHIVE_GOG_OLDEST='darkest_dungeon_en_20645_15279.sh'
-ARCHIVE_GOG_OLDEST_MD5='78bfc79c2b0e7e8016d611746499fa22'
-ARCHIVE_GOG_OLDEST_SIZE='2100000'
-ARCHIVE_GOG_OLDEST_VERSION='20645-gog15279'
+ARCHIVE_GOG_OLDEST='darkest_dungeon_en_21071_15970.sh'
+ARCHIVE_GOG_OLDEST_MD5='e4880968101835fcd27f63a48e208ed8'
+ARCHIVE_GOG_OLDEST_SIZE='2200000'
+ARCHIVE_GOG_OLDEST_VERSION='21071-gog15970'
 ARCHIVE_GOG_OLDEST_TYPE='mojosetup'
 
 DATA_DIRS='./logs'
 
-ARCHIVE_DOC1_DATA_PATH='data/noarch/docs'
-ARCHIVE_DOC1_DATA_FILES='./*'
+ARCHIVE_DOC0_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC0_DATA_FILES='./*'
 
-ARCHIVE_DOC2_DATA_PATH='data/noarch/game'
-ARCHIVE_DOC2_DATA_FILES='./README.linux'
+ARCHIVE_DOC1_DATA_PATH='data/noarch/game'
+ARCHIVE_DOC1_DATA_FILES='./README.linux'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./lib ./darkest.bin.x86'
@@ -93,7 +91,6 @@ APP_MAIN_EXE_BIN32='darkest.bin.x86'
 APP_MAIN_EXE_BIN64='darkest.bin.x86_64'
 APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
 APP_MAIN_ICON='Icon.bmp'
-APP_MAIN_ICON_RES='128'
 
 PACKAGES_LIST='PKG_MEDIA PKG_DATA PKG_BIN32 PKG_BIN64'
 
@@ -111,15 +108,25 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.2'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -130,20 +137,13 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
-
-for PKG in $PACKAGES_LIST; do
-	organize_data "DOC1_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "DOC2_${PKG#PKG_}" "$PATH_DOC"
-	organize_data "GAME_${PKG#PKG_}" "$PATH_GAME"
-done
-
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
-
+prepare_package_layout
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
+
+# Get icon
+
+PKG='PKG_DATA'
+icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
@@ -154,8 +154,10 @@ done
 
 # Allow persistent logging via output redirection to work
 
-sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
-sed --in-place 's|"\./$APP_EXE" $APP_OPTIONS $@|eval &|' "${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+pattern='s|"\./$APP_EXE" $APP_OPTIONS $@|eval &|'
+file0="${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
+file1="${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
+sed --in-place "$pattern" "$file0" "$file1"
 
 # Build package
 
@@ -168,10 +170,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_MEDIA' 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_MEDIA' 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
