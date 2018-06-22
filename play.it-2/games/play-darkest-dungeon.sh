@@ -34,7 +34,7 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180622.1
+script_version=20180622.2
 
 # Set game-specific variables
 
@@ -86,7 +86,6 @@ ARCHIVE_GAME_DATA_FILES='./audio ./video ./Icon.bmp ./pin ./svn_revision.txt ./a
 APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='darkest.bin.x86'
 APP_MAIN_EXE_BIN64='darkest.bin.x86_64'
-APP_MAIN_OPTIONS='1>./logs/$(date +%F-%R).log 2>&1'
 APP_MAIN_ICON='Icon.bmp'
 
 PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
@@ -145,10 +144,9 @@ for PKG in 'PKG_BIN32' 'PKG_BIN64'; do
 	write_launcher 'APP_MAIN'
 done
 
+# Set up persistent logging
 
-# Allow persistent logging via output redirection to work
-
-pattern='s|"\./$APP_EXE" $APP_OPTIONS $@|eval &|'
+pattern='s|"\./$APP_EXE" $APP_OPTIONS $@|& 1>./logs/$(date +%F-%R).log 2>\&1|'
 file0="${PKG_BIN32_PATH}${PATH_BIN}/$GAME_ID"
 file1="${PKG_BIN64_PATH}${PATH_BIN}/$GAME_ID"
 sed --in-place "$pattern" "$file0" "$file1"
