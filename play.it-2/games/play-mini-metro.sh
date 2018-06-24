@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,18 +35,23 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180409.1
+script_version=20180624.1
 
 # Set game-specific variables
 
 GAME_ID='mini-metro'
 GAME_NAME='Mini Metro'
 
-ARCHIVE_HUMBLE='MiniMetro-gamma35b-linux.tar.gz'
+ARCHIVE_HUMBLE='MiniMetro-release-36b-linux.tar.gz'
 ARCHIVE_HUMBLE_URL='https://www.humblebundle.com/store/mini-metro'
-ARCHIVE_HUMBLE_MD5='5548397ea5eddd915aa33247a38dad74'
-ARCHIVE_HUMBLE_VERSION='1.0-humble2.4.0.7'
+ARCHIVE_HUMBLE_MD5='5c6b16404cd0c3fc00be295721ec7bdd'
+ARCHIVE_HUMBLE_VERSION='1.36b-humble180605'
 ARCHIVE_HUMBLE_SIZE='310000'
+
+ARCHIVE_HUMBLE_OLD='MiniMetro-gamma35b-linux.tar.gz'
+ARCHIVE_HUMBLE_OLD_MD5='5548397ea5eddd915aa33247a38dad74'
+ARCHIVE_HUMBLE_OLD_VERSION='1.35b-humble1'
+ARCHIVE_HUMBLE_OLD_SIZE='310000'
 
 ARCHIVE_GAME_BIN32_PATH='.'
 ARCHIVE_GAME_BIN32_FILES='./Mini?Metro.x86 ./Mini?Metro_Data/*/x86'
@@ -63,9 +69,7 @@ APP_MAIN_PRERUN='export LANG=C'
 APP_MAIN_EXE_BIN32='Mini Metro.x86'
 APP_MAIN_EXE_BIN64='Mini Metro.x86_64'
 APP_MAIN_OPTIONS='-logFile ./logs/$(date +%F-%R).log'
-APP_MAIN_ICONS_LIST='APP_MAIN_ICON'
-APP_MAIN_ICON='Mini?Metro_Data/Resources/UnityPlayer.png'
-APP_MAIN_ICON_RES='128'
+APP_MAIN_ICON='Mini Metro_Data/Resources/UnityPlayer.png'
 
 PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA'
 
@@ -80,15 +84,25 @@ PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.7'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/play.it-2/lib/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -100,7 +114,6 @@ fi
 
 extract_data_from "$SOURCE_ARCHIVE"
 prepare_package_layout
-
 rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
 # Write launchers
@@ -111,7 +124,8 @@ done
 
 # Build package
 
-postinst_icons_linking 'APP_MAIN'
+PKG='PKG_DATA'
+icons_linking_postinst 'APP_MAIN'
 write_metadata 'PKG_DATA'
 write_metadata 'PKG_BIN32' 'PKG_BIN64'
 build_pkg
