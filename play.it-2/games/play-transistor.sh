@@ -3,6 +3,7 @@ set -o errexit
 
 ###
 # Copyright (c) 2015-2018, Antoine Le Gonidec
+# Copyright (c) 2017-2018, Solène Huault
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -34,23 +35,27 @@ set -o errexit
 # send your bug reports to vv221@dotslashplay.it
 ###
 
-script_version=20180224.1
+script_version=20180624.1
 
 # Set game-specific variables
 
 GAME_ID='transistor'
 GAME_NAME='Transistor'
 
-ARCHIVES_LIST='ARCHIVE_GOG'
-
-ARCHIVE_GOG='gog_transistor_2.0.0.3.sh'
+ARCHIVE_GOG='transistor_en_v1_50423_21516.sh'
 ARCHIVE_GOG_URL='https://www.gog.com/game/transistor'
-ARCHIVE_GOG_MD5='53dbaf643471f3b8494548261584dd13'
-ARCHIVE_GOG_SIZE='3200000'
-ARCHIVE_GOG_VERSION='1.20140310-gog2.0.0.3'
+ARCHIVE_GOG_MD5='52d0df1d959b333b17ede106f8e53062'
+ARCHIVE_GOG_SIZE='3600000'
+ARCHIVE_GOG_VERSION='1.50423-gog21516'
+ARCHIVE_GOG_TYPE='mojosetup'
 
-ARCHIVE_DOC_PATH='data/noarch/docs'
-ARCHIVE_DOC_FILES='./*'
+ARCHIVE_GOG_OLD='gog_transistor_2.0.0.3.sh'
+ARCHIVE_GOG_OLD_MD5='53dbaf643471f3b8494548261584dd13'
+ARCHIVE_GOG_OLD_SIZE='3200000'
+ARCHIVE_GOG_OLD_VERSION='1.20140310-gog2.0.0.3'
+
+ARCHIVE_DOC_DATA_PATH='data/noarch/docs'
+ARCHIVE_DOC_DATA_FILES='./*'
 
 ARCHIVE_GAME_BIN32_PATH='data/noarch/game'
 ARCHIVE_GAME_BIN32_FILES='./lib ./Transistor.bin.x86'
@@ -67,32 +72,39 @@ APP_MAIN_TYPE='native'
 APP_MAIN_EXE_BIN32='Transistor.bin.x86'
 APP_MAIN_EXE_BIN64='Transistor.bin.x86_64'
 APP_MAIN_ICON='Transistor.bmp'
-APP_MAIN_ICON_RES='256'
 
-PACKAGES_LIST='PKG_DATA PKG_BIN32 PKG_BIN64'
+PACKAGES_LIST='PKG_BIN32 PKG_BIN64 PKG_DATA '
 
 PKG_DATA_ID="${GAME_ID}-data"
 PKG_DATA_DESCRIPTION='data'
 
 PKG_BIN32_ARCH='32'
-PKG_BIN32_DEPS_DEB="$PKG_DATA_ID, libc6, libstdc++6, libgcc1, libsdl2-2.0-0, libasound2-plugins"
-PKG_BIN32_DEPS_ARCH="$PKG_DATA_ID lib32-gcc-libs lib32-sdl2 lib32-alsa-lib"
+PKG_BIN32_DEPS="$PKG_DATA_ID glibc libstdc++ sdl2 alsa"
 
 PKG_BIN64_ARCH='64'
-PKG_BIN64_DEPS_DEB="$PKG_BIN32_DEPS_DEB"
-PKG_BIN64_DEPS_ARCH="$PKG_DATA_ID gcc-libs sdl2 alsa-lib"
+PKG_BIN64_DEPS="$PKG_BIN32_DEPS"
 
 # Load common functions
 
-target_version='2.0'
+target_version='2.9'
 
 if [ -z "$PLAYIT_LIB2" ]; then
 	[ -n "$XDG_DATA_HOME" ] || XDG_DATA_HOME="$HOME/.local/share"
-	if [ -e "$XDG_DATA_HOME/play.it/libplayit2.sh" ]; then
-		PLAYIT_LIB2="$XDG_DATA_HOME/play.it/libplayit2.sh"
-	elif [ -e './libplayit2.sh' ]; then
-		PLAYIT_LIB2='./libplayit2.sh'
-	else
+	for path in\
+		'./'\
+		"$XDG_DATA_HOME/play.it/"\
+		"$XDG_DATA_HOME/play.it/play.it-2/lib/"\
+		'/usr/local/share/games/play.it/'\
+		'/usr/local/share/play.it/'\
+		'/usr/share/games/play.it/'\
+		'/usr/share/play.it/'
+	do
+		if [ -z "$PLAYIT_LIB2" ] && [ -e "$path/libplayit2.sh" ]; then
+			PLAYIT_LIB2="$path/libplayit2.sh"
+			break
+		fi
+	done
+	if [ -z "$PLAYIT_LIB2" ]; then
 		printf '\n\033[1;31mError:\033[0m\n'
 		printf 'libplayit2.sh not found.\n'
 		exit 1
@@ -103,24 +115,13 @@ fi
 # Extract game data
 
 extract_data_from "$SOURCE_ARCHIVE"
+prepare_package_layout
+rm --recursive "$PLAYIT_WORKDIR/gamedata"
 
-PKG='PKG_BIN32'
-organize_data 'GAME_BIN32' "$PATH_GAME"
-
-PKG='PKG_BIN64'
-organize_data 'GAME_BIN64' "$PATH_GAME"
+# Get icon
 
 PKG='PKG_DATA'
-organize_data 'DOC'       "$PATH_DOC"
-organize_data 'GAME_DATA' "$PATH_GAME"
-
-res="$APP_MAIN_ICON_RES"
-PATH_ICON="$PATH_ICON_BASE/${res}x${res}/apps"
-extract_icon_from "${PKG_DATA_PATH}${PATH_GAME}/$APP_MAIN_ICON"
-mkdir --parents "${PKG_DATA_PATH}${PATH_ICON}"
-mv "$PLAYIT_WORKDIR/icons/${APP_MAIN_ICON%.bmp}.png" "${PKG_DATA_PATH}${PATH_ICON}/$GAME_ID.png"
-
-rm --recursive "$PLAYIT_WORKDIR/gamedata"
+icons_get_from_package 'APP_MAIN'
 
 # Write launchers
 
@@ -139,10 +140,6 @@ rm --recursive "$PLAYIT_WORKDIR"
 
 # Print instructions
 
-printf '\n'
-printf '32-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN32'
-printf '64-bit:'
-print_instructions 'PKG_DATA' 'PKG_BIN64'
+print_instructions
 
 exit 0
